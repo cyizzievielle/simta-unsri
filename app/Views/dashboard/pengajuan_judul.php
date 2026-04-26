@@ -1,403 +1,545 @@
 <?= $this->extend('layouts/dashboard') ?>
-
 <?= $this->section('content') ?>
 
 <style>
-    .page-hero {
-        background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 55%, #2563eb 100%);
-        color: #fff;
-        border-radius: 28px;
-        padding: 28px 30px;
-        margin-bottom: 22px;
-        box-shadow: 0 18px 40px rgba(37, 99, 235, 0.18);
-        position: relative;
-        overflow: hidden;
-    }
-
-    .page-hero::after {
-        content: "";
-        position: absolute;
-        right: -45px;
-        top: -45px;
-        width: 180px;
-        height: 180px;
-        background: rgba(255,255,255,0.08);
-        border-radius: 50%;
-    }
-
-    .page-hero h2 {
-        margin: 0 0 8px;
-        font-size: 28px;
-        font-weight: 800;
-        position: relative;
-        z-index: 1;
-    }
-
-    .page-hero p {
-        margin: 0;
-        color: rgba(255,255,255,0.92);
-        line-height: 1.7;
-        position: relative;
-        z-index: 1;
-    }
-
-    .premium-stats {
+    .judul-grid {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 18px;
-        margin-bottom: 22px;
+        grid-template-columns: 1fr;
+        gap: 22px;
     }
 
-    .premium-stat-card {
-        border-radius: 24px;
-        padding: 22px;
-        color: #fff;
-        position: relative;
-        overflow: hidden;
-        box-shadow: 0 14px 35px rgba(15, 23, 42, 0.10);
-    }
-
-    .premium-stat-card::after {
-        content: "";
-        position: absolute;
-        right: -18px;
-        bottom: -18px;
-        width: 85px;
-        height: 85px;
-        background: rgba(255,255,255,0.10);
-        border-radius: 50%;
-    }
-
-    .stat-blue { background: linear-gradient(135deg, #2563eb, #1d4ed8); }
-    .stat-amber { background: linear-gradient(135deg, #d97706, #f59e0b); }
-    .stat-emerald { background: linear-gradient(135deg, #059669, #10b981); }
-
-    .premium-stat-label {
-        font-size: 13px;
-        font-weight: 700;
-        margin-bottom: 10px;
-        position: relative;
-        z-index: 1;
-    }
-
-    .premium-stat-value {
-        font-size: 34px;
-        font-weight: 800;
-        margin-bottom: 6px;
-        position: relative;
-        z-index: 1;
-    }
-
-    .premium-stat-desc {
-        font-size: 12px;
-        opacity: 0.95;
-        position: relative;
-        z-index: 1;
-    }
-
-    .card-premium {
+    .card-modern {
         background: #fff;
-        border-radius: 26px;
-        padding: 24px;
-        box-shadow: 0 14px 35px rgba(15, 23, 42, 0.06);
-        border: 1px solid #eef2f7;
-        margin-bottom: 22px;
+        border-radius: 28px;
+        padding: 28px;
+        border: 1px solid #edf2f7;
+        box-shadow: 0 18px 42px rgba(15,23,42,.06);
     }
 
-    .section-title-premium {
-        margin: 0 0 6px;
-        font-size: 24px;
-        font-weight: 800;
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 16px;
+        flex-wrap: wrap;
+        margin-bottom: 20px;
+    }
+
+    .section-title {
+        margin: 0 0 8px;
+        font-size: 26px;
+        font-weight: 900;
         color: #0f172a;
     }
 
-    .section-subtitle-premium {
-        margin: 0 0 16px;
+    .section-subtitle {
+        margin: 0;
+        color: #64748b;
+        font-size: 15px;
+        line-height: 1.7;
+    }
+
+    .judul-active-box {
+        padding: 22px;
+        border-radius: 24px;
+        background: linear-gradient(135deg, #ecfdf5, #f0fdf4);
+        border: 1px solid #bbf7d0;
+    }
+
+    .judul-active-title {
+        font-size: 18px;
+        font-weight: 900;
+        color: #065f46;
+        line-height: 1.7;
+        margin-bottom: 14px;
+    }
+
+    .judul-meta {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .empty-modern {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 22px;
+        border-radius: 24px;
+        background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+        border: 1px dashed #cbd5e1;
         color: #64748b;
         line-height: 1.7;
     }
 
-    .detail-box {
-        border: 1px dashed #cbd5e1;
-        background: linear-gradient(135deg, #f8fafc, #f1f5f9);
-        border-radius: 20px;
-        padding: 18px;
-        color: #64748b;
-        line-height: 1.7;
+    .empty-icon {
+        width: 54px;
+        height: 54px;
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #e0f2fe;
+        color: #0369a1;
+        font-size: 24px;
+        flex-shrink: 0;
+    }
+
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 8px 12px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 900;
+        white-space: nowrap;
+    }
+
+    .badge-green { background: #dcfce7; color: #166534; }
+    .badge-blue { background: #dbeafe; color: #1d4ed8; }
+    .badge-orange { background: #fef3c7; color: #92400e; }
+    .badge-red { background: #fee2e2; color: #b91c1c; }
+    .badge-gray { background: #e2e8f0; color: #475569; }
+
+    .btn-modern {
+        border: none;
+        border-radius: 15px;
+        padding: 12px 18px;
+        background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        color: #fff;
+        font-weight: 900;
+        cursor: pointer;
+        box-shadow: 0 12px 26px rgba(37,99,235,.20);
+        transition: .2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .btn-modern:hover {
+        transform: translateY(-1px);
+    }
+
+    .btn-light {
+        background: #f8fafc;
+        color: #334155;
+        border: 1px solid #dbe3ef;
+        box-shadow: none;
+    }
+
+    .form-wrapper {
+        display: none;
+        margin-top: 22px;
+        padding: 22px;
+        border-radius: 24px;
+        background: linear-gradient(135deg, #f8fbff, #f1f5f9);
+        border: 1px solid #e2e8f0;
+    }
+
+    .form-wrapper.show {
+        display: block;
     }
 
     .form-grid {
         display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 16px;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 18px;
     }
 
-    .form-group-premium {
-        margin-bottom: 16px;
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
     }
 
-    .form-group-premium.full {
+    .form-group.full {
         grid-column: 1 / -1;
     }
 
-    .form-group-premium label {
-        display: block;
-        font-weight: 700;
+    .form-group label {
+        font-weight: 800;
         color: #334155;
-        margin-bottom: 8px;
     }
 
-    .form-group-premium input,
-    .form-group-premium select,
-    .form-group-premium textarea {
+    .input-modern {
         width: 100%;
         border: 1px solid #dbe3ef;
         border-radius: 16px;
-        padding: 13px 15px;
-        font-size: 14px;
-        background: #fff;
+        padding: 14px 16px;
+        font-size: 15px;
         outline: none;
+        background: #fff;
         box-sizing: border-box;
     }
 
-    .form-group-premium input:focus,
-    .form-group-premium select:focus,
-    .form-group-premium textarea:focus {
+    .input-modern:focus {
         border-color: #2563eb;
-        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.10);
+        box-shadow: 0 0 0 4px rgba(37,99,235,.10);
     }
 
-    .form-group-premium textarea {
-        min-height: 120px;
+    textarea.input-modern {
+        min-height: 130px;
         resize: vertical;
     }
 
-    .status-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 8px 12px;
-        border-radius: 999px;
-        font-size: 12px;
-        font-weight: 800;
-        line-height: 1;
-        white-space: nowrap;
+    .form-actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 20px;
     }
 
-    .badge-diajukan { background: #dbeafe; color: #1d4ed8; }
-    .badge-direview { background: #fef3c7; color: #92400e; }
-    .badge-revisi { background: #fee2e2; color: #b91c1c; }
-    .badge-disetujui { background: #dcfce7; color: #166534; }
-    .badge-ditolak { background: #e5e7eb; color: #374151; }
-
-    .premium-table-wrap {
+    .table-wrap {
         width: 100%;
         overflow-x: auto;
-        border-radius: 18px;
+        border-radius: 22px;
         border: 1px solid #eef2f7;
     }
 
-    .premium-table {
+    .table-modern {
         width: 100%;
-        min-width: 1000px;
+        min-width: 980px;
         border-collapse: collapse;
         background: #fff;
     }
 
-    .premium-table thead tr {
+    .table-modern thead {
         background: linear-gradient(135deg, #f8fbff, #eff6ff);
     }
 
-    .premium-table th,
-    .premium-table td {
-        padding: 16px 14px;
-        text-align: left;
+    .table-modern th,
+    .table-modern td {
+        padding: 16px;
         border-bottom: 1px solid #eef2f7;
+        text-align: left;
         vertical-align: top;
+        font-size: 14px;
+        line-height: 1.6;
     }
 
-    .premium-table th {
-        font-size: 13px;
-        font-weight: 800;
+    .table-modern th {
         color: #334155;
+        font-size: 13px;
+        font-weight: 900;
         white-space: nowrap;
     }
 
-    .premium-table td {
+    .judul-table-title {
+        font-weight: 900;
         color: #0f172a;
-        font-size: 14px;
+        line-height: 1.6;
     }
 
-    @media (max-width: 1100px) {
-        .premium-stats,
+    .muted {
+        color: #64748b;
+        font-size: 13px;
+    }
+
+    @media (max-width: 768px) {
+        .judul-grid {
+            gap: 16px;
+        }
+
+        .card-modern {
+            padding: 20px;
+            border-radius: 22px;
+        }
+
+        .card-header {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 12px;
+        }
+
+        .section-title {
+            font-size: 22px;
+        }
+
+        .section-subtitle {
+            font-size: 14px;
+        }
+
+        .judul-active-box {
+            padding: 18px;
+            border-radius: 20px;
+        }
+
+        .judul-active-title {
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .judul-meta {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .empty-modern {
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 18px;
+        }
+
         .form-grid {
             grid-template-columns: 1fr;
         }
 
-        .form-group-premium.full {
-            grid-column: auto;
+        .form-wrapper {
+            padding: 18px;
+            border-radius: 20px;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+
+        .btn-modern {
+            width: 100%;
+        }
+
+        .table-wrap {
+            border: none;
+            overflow: visible;
+        }
+
+        .mobile-table {
+            min-width: 0;
+        }
+
+        .mobile-table thead {
+            display: none;
+        }
+
+        .mobile-table,
+        .mobile-table tbody,
+        .mobile-table tr,
+        .mobile-table td {
+            display: block;
+            width: 100%;
+        }
+
+        .mobile-table tr {
+            margin-bottom: 14px;
+            padding: 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 18px;
+            background: #fff;
+            box-shadow: 0 10px 24px rgba(15,23,42,.04);
+        }
+
+        .mobile-table td {
+            border-bottom: none;
+            padding: 9px 0;
+        }
+
+        .mobile-table td::before {
+            content: attr(data-label);
+            display: block;
+            color: #64748b;
+            font-size: 12px;
+            font-weight: 900;
+            margin-bottom: 4px;
+        }
+
+        .mobile-table td[data-label="Aksi"] {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
     }
 </style>
 
 <?php
-    $riwayatJudul = $riwayatJudul ?? [];
     $judulAktif = $judulAktif ?? null;
-
-    $totalPengajuan = count($riwayatJudul);
-    $totalDiproses = 0;
-    $totalDisetujui = 0;
-
-    foreach ($riwayatJudul as $row) {
-        $status = strtolower((string) ($row['status'] ?? ''));
-        if (in_array($status, ['diajukan', 'direview', 'revisi'], true)) $totalDiproses++;
-        if ($status === 'disetujui') $totalDisetujui++;
-    }
+    $riwayatJudul = $riwayatJudul ?? ($riwayat ?? []);
 
     $badgeStatus = static function (?string $status): string {
-        $status = strtolower((string) $status);
         return match ($status) {
-            'diajukan'  => 'badge-diajukan',
-            'direview'  => 'badge-direview',
-            'revisi'    => 'badge-revisi',
-            'disetujui' => 'badge-disetujui',
-            'ditolak'   => 'badge-ditolak',
-            default     => 'badge-diajukan',
+            'disetujui' => 'badge-green',
+            'revisi' => 'badge-orange',
+            'ditolak' => 'badge-red',
+            'diajukan', 'direview' => 'badge-blue',
+            default => 'badge-gray',
         };
     };
 ?>
 
-<div class="premium-stats">
-    <div class="premium-stat-card stat-blue">
-        <div class="premium-stat-label">Total Pengajuan</div>
-        <div class="premium-stat-value"><?= esc((string) $totalPengajuan) ?></div>
-        <div class="premium-stat-desc">Seluruh riwayat judul yang pernah diajukan</div>
-    </div>
+<div class="judul-grid">
 
-    <div class="premium-stat-card stat-amber">
-        <div class="premium-stat-label">Sedang Diproses</div>
-        <div class="premium-stat-value"><?= esc((string) $totalDiproses) ?></div>
-        <div class="premium-stat-desc">Judul yang masih menunggu hasil akhir</div>
-    </div>
-
-    <div class="premium-stat-card stat-emerald">
-        <div class="premium-stat-label">Judul Disetujui</div>
-        <div class="premium-stat-value"><?= esc((string) $totalDisetujui) ?></div>
-        <div class="premium-stat-desc">Judul yang sudah final dan disetujui</div>
-    </div>
-</div>
-
-<div class="card-premium">
-    <h3 class="section-title-premium">Status Judul Aktif</h3>
-    <p class="section-subtitle-premium">Ringkasan judul yang saat ini menjadi acuan tugas akhirmu.</p>
-
-    <?php if (! empty($judulAktif)): ?>
-        <div class="premium-table-wrap">
-            <table class="premium-table">
-                <thead>
-                    <tr>
-                        <th>Judul</th>
-                        <th>Status</th>
-                        <th>Versi</th>
-                        <th>Similarity</th>
-                        <th>Tanggal</th>
-                        <th>Catatan Reviewer</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><?= esc((string) ($judulAktif['judul'] ?? '-')) ?></td>
-                        <td>
-                            <span class="status-badge <?= $badgeStatus($judulAktif['status'] ?? '') ?>">
-                                <?= esc((string) ($judulAktif['status'] ?? '-')) ?>
-                            </span>
-                        </td>
-                        <td><?= esc((string) ($judulAktif['versi_ke'] ?? '1')) ?></td>
-                        <td><?= esc((string) ($judulAktif['similarity_score'] ?? '0')) ?>%</td>
-                        <td><?= esc((string) ($judulAktif['tanggal_pengajuan'] ?? '-')) ?></td>
-                        <td><?= esc((string) (($judulAktif['catatan_reviewer'] ?? '') !== '' ? $judulAktif['catatan_reviewer'] : '-')) ?></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    <?php else: ?>
-        <div class="detail-box">
-            Belum ada judul yang disetujui. Kamu bisa mengajukan judul baru atau melakukan revisi jika diminta.
-        </div>
-    <?php endif; ?>
-</div>
-
-<div class="card-premium">
-    <h3 class="section-title-premium">Form Pengajuan Judul</h3>
-    <p class="section-subtitle-premium">Isi form berikut untuk mengajukan judul tugas akhirmu.</p>
-
-    <form action="<?= base_url('/pengajuan-judul/simpan') ?>" method="post">
-        <?= csrf_field() ?>
-
-        <div class="form-grid">
-            <div class="form-group-premium full">
-                <label for="judul">Judul</label>
-                <input type="text" name="judul" id="judul" value="<?= old('judul') ?>" required>
+    <div class="card-modern">
+        <div class="card-header">
+            <div>
+                <h2 class="section-title">Status Judul Aktif</h2>
+                <p class="section-subtitle">Judul yang sudah disetujui dan menjadi acuan tugas akhirmu.</p>
             </div>
 
-            <div class="form-group-premium">
-                <label for="bidang_topik">Bidang Topik</label>
-                <input type="text" name="bidang_topik" id="bidang_topik" value="<?= old('bidang_topik') ?>" required>
-            </div>
-
-            <div class="form-group-premium">
-                <label for="kata_kunci">Kata Kunci</label>
-                <input type="text" name="kata_kunci" id="kata_kunci" value="<?= old('kata_kunci') ?>" required>
-            </div>
-
-            <div class="form-group-premium full">
-                <label for="latar_belakang">Latar Belakang</label>
-                <textarea name="latar_belakang" id="latar_belakang" required><?= old('latar_belakang') ?></textarea>
-            </div>
+            <?php if (! empty($judulAktif)): ?>
+                <span class="badge badge-green">Aktif</span>
+            <?php else: ?>
+                <span class="badge badge-gray">Belum Ada</span>
+            <?php endif; ?>
         </div>
 
-        <button type="submit" class="btn btn-primary">Ajukan Judul</button>
-    </form>
-</div>
+        <?php if (! empty($judulAktif)): ?>
+            <div class="judul-active-box">
+                <div class="judul-active-title">
+                    <?= esc((string) ($judulAktif['judul'] ?? '-')) ?>
+                </div>
 
-<div class="card-premium">
-    <h3 class="section-title-premium">Riwayat Pengajuan Judul</h3>
-    <p class="section-subtitle-premium">Semua pengajuan dan revisi judul yang pernah kamu kirim.</p>
+                <div class="judul-meta">
+                    <span class="badge badge-green">Disetujui</span>
 
-    <?php if (! empty($riwayatJudul)): ?>
-        <div class="premium-table-wrap">
-            <table class="premium-table">
-                <thead>
-                    <tr>
-                        <th>Judul</th>
-                        <th>Status</th>
-                        <th>Versi</th>
-                        <th>Similarity</th>
-                        <th>Tanggal</th>
-                        <th>Catatan Reviewer</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($riwayatJudul as $row): ?>
+                    <?php if (! empty($judulAktif['bidang_topik'])): ?>
+                        <span class="badge badge-blue"><?= esc((string) $judulAktif['bidang_topik']) ?></span>
+                    <?php endif; ?>
+
+                    <span class="muted">
+                        ID: #<?= esc((string) ($judulAktif['id'] ?? '-')) ?>
+                    </span>
+                </div>
+            </div>
+        <?php else: ?>
+            <div class="empty-modern">
+                <div class="empty-icon">📄</div>
+                <div>
+                    <strong style="color:#0f172a;">Belum ada judul disetujui.</strong><br>
+                    Kamu bisa mengajukan judul baru dan menunggu hasil review dari dosen pembimbing.
+                </div>
+            </div>
+        <?php endif; ?>
+    </div>
+
+    <div class="card-modern">
+        <div class="card-header">
+            <div>
+                <h2 class="section-title">Ajukan Judul</h2>
+                <p class="section-subtitle">Klik tombol untuk membuka form pengajuan judul tugas akhir.</p>
+            </div>
+
+            <button type="button" class="btn-modern" onclick="toggleFormJudul()">
+                + Ajukan Judul
+            </button>
+        </div>
+
+        <div id="formJudul" class="form-wrapper">
+            <form method="post" action="<?= base_url('/pengajuan-judul/simpan') ?>">
+                <?= csrf_field() ?>
+
+                <div class="form-grid">
+                    <div class="form-group full">
+                        <label>Judul Tugas Akhir</label>
+                        <input type="text" name="judul" class="input-modern" value="<?= old('judul') ?>" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Bidang Topik</label>
+                        <input type="text" name="bidang_topik" class="input-modern" value="<?= old('bidang_topik') ?>">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Kata Kunci</label>
+                        <input type="text" name="kata_kunci" class="input-modern" value="<?= old('kata_kunci') ?>">
+                    </div>
+
+                    <div class="form-group full">
+                        <label>Latar Belakang</label>
+                        <textarea name="latar_belakang" class="input-modern"><?= old('latar_belakang') ?></textarea>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-modern">Submit Judul</button>
+                    <button type="button" class="btn-modern btn-light" onclick="toggleFormJudul()">Batal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card-modern">
+        <div class="card-header">
+            <div>
+                <h2 class="section-title">Riwayat Pengajuan Judul</h2>
+                <p class="section-subtitle">Semua pengajuan judul yang pernah kamu kirim.</p>
+            </div>
+        </div>
+
+        <?php if (! empty($riwayatJudul)): ?>
+            <div class="table-wrap">
+                <table class="table-modern mobile-table">
+                    <thead>
                         <tr>
-                            <td><?= esc((string) ($row['judul'] ?? '-')) ?></td>
-                            <td>
-                                <span class="status-badge <?= $badgeStatus($row['status'] ?? '') ?>">
-                                    <?= esc((string) ($row['status'] ?? '-')) ?>
-                                </span>
-                            </td>
-                            <td><?= esc((string) ($row['versi_ke'] ?? '1')) ?></td>
-                            <td><?= esc((string) ($row['similarity_score'] ?? '0')) ?>%</td>
-                            <td><?= esc((string) ($row['tanggal_pengajuan'] ?? '-')) ?></td>
-                            <td><?= esc((string) (($row['catatan_reviewer'] ?? '') !== '' ? $row['catatan_reviewer'] : '-')) ?></td>
+                            <th>Judul</th>
+                            <th>Bidang</th>
+                            <th>Kata Kunci</th>
+                            <th>Status</th>
+                            <th>Tanggal</th>
+                            <th>Aksi</th>
                         </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-        </div>
-    <?php else: ?>
-        <div class="detail-box">Belum ada riwayat pengajuan judul.</div>
-    <?php endif; ?>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($riwayatJudul as $row): ?>
+                            <tr>
+                                <td data-label="Judul">
+                                    <div class="judul-table-title">
+                                        <?= esc((string) ($row['judul'] ?? '-')) ?>
+                                    </div>
+                                </td>
+
+                                <td data-label="Bidang">
+                                    <?= esc((string) (($row['bidang_topik'] ?? '') !== '' ? $row['bidang_topik'] : '-')) ?>
+                                </td>
+
+                                <td data-label="Kata Kunci">
+                                    <?= esc((string) (($row['kata_kunci'] ?? '') !== '' ? $row['kata_kunci'] : '-')) ?>
+                                </td>
+
+                                <td data-label="Status">
+                                    <span class="badge <?= $badgeStatus($row['status'] ?? '') ?>">
+                                        <?= esc((string) ($row['status'] ?? '-')) ?>
+                                    </span>
+                                </td>
+
+                                <td data-label="Tanggal">
+                                    <?= esc((string) ($row['tanggal_pengajuan'] ?? $row['created_at'] ?? '-')) ?>
+                                </td>
+
+                                <td data-label="Aksi">
+                                    <a href="<?= base_url('/pengajuan-judul/detail/' . ($row['id'] ?? 0)) ?>" class="btn-modern btn-light">
+                                        Detail
+                                    </a>
+
+                                    <?php if (($row['status'] ?? '') === 'revisi'): ?>
+                                        <a href="<?= base_url('/pengajuan-judul/revisi/' . ($row['id'] ?? 0)) ?>" class="btn-modern">
+                                            Revisi
+                                        </a>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        <?php else: ?>
+            <div class="empty-modern">
+                <div class="empty-icon">📝</div>
+                <div>
+                    <strong style="color:#0f172a;">Belum ada riwayat pengajuan.</strong><br>
+                    Riwayat akan muncul setelah kamu mengirim pengajuan judul.
+                </div>
+            </div>
+        <?php endif; ?>
+    </div>
+
 </div>
+
+<script>
+function toggleFormJudul() {
+    const form = document.getElementById('formJudul');
+    form.classList.toggle('show');
+}
+</script>
 
 <?= $this->endSection() ?>

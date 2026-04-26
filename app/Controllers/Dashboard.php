@@ -362,64 +362,58 @@ public function pembimbing()
         'dosenList' => $dosenList,
     ]);
 }
-    public function pengajuanJudul()
-    {
-        $role   = session()->get('role');
-        $userId = (int) session()->get('user_id');
 
-        $db = Database::connect();
-
-        if ($role === 'mahasiswa') {
-            $mahasiswa = $db->table('mahasiswa')
-                ->where('user_id', $userId)
-                ->get()
-                ->getRowArray();
-
-            $riwayatJudul        = [];
-            $judulAktifDisetujui = null;
-            $masihDiproses       = false;
-
-            if ($mahasiswa) {
-                $riwayatJudul = $db->table('pengajuan_judul')
-                    ->where('mahasiswa_id', $mahasiswa['id'])
-                    ->orderBy('id', 'DESC')
-                    ->get()
-                    ->getResultArray();
-
-                $judulAktifDisetujui = $db->table('pengajuan_judul')
-                    ->where('mahasiswa_id', $mahasiswa['id'])
-                    ->where('status', 'disetujui')
-                    ->orderBy('id', 'DESC')
-                    ->get()
-                    ->getRowArray();
-
-                $masihDiproses = $db->table('pengajuan_judul')
-                    ->where('mahasiswa_id', $mahasiswa['id'])
-                    ->whereIn('status', ['diajukan', 'direview'])
-                    ->countAllResults() > 0;
-            }
-
-            return view('dashboard/pengajuan_judul', [
-                'title'               => 'Pengajuan Judul',
-                'pageTitle'           => 'Pengajuan Judul',
-                'pageSubtitle'        => 'Kelola pengajuan judul tugas akhir, pantau hasil review dosen, dan lihat riwayat revisi.',
-                'activeMenu'          => 'pengajuan_judul',
-                'riwayatJudul'        => $riwayatJudul,
-                'judulAktifDisetujui' => $judulAktifDisetujui,
-                'masihDiproses'       => $masihDiproses,
-            ]);
-        }
-
-        return view('dashboard/pengajuan_judul', [
-            'title'               => 'Pengajuan Judul',
-            'pageTitle'           => 'Pengajuan Judul',
-            'pageSubtitle'        => 'Kelola pengajuan judul tugas akhir, pantau hasil review dosen, dan lihat riwayat revisi',
-            'activeMenu'          => 'pengajuan_judul',
-            'riwayatJudul'        => [],
-            'judulAktifDisetujui' => null,
-            'masihDiproses'       => false,
-        ]);
+public function pengajuanJudul()
+{
+    if (! session()->get('isLoggedIn')) {
+        return redirect()->to('/login');
     }
+
+    if (session()->get('role') !== 'mahasiswa') {
+        return redirect()->to('/dashboard')->with('error', 'Halaman ini hanya untuk mahasiswa.');
+    }
+
+    $db = \Config\Database::connect();
+    $userId = (int) session()->get('user_id');
+
+    // ✅ AMBIL MAHASISWA (CUMA SEKALI)
+    $mahasiswa = $db->table('mahasiswa')
+        ->where('user_id', $userId)
+        ->get()
+        ->getRowArray();
+
+    if (! $mahasiswa) {
+        return redirect()->to('/dashboard')->with('error', 'Data mahasiswa tidak ditemukan.');
+    }
+
+    $mahasiswaId = (int) $mahasiswa['id'];
+
+    // ✅ STATUS JUDUL AKTIF
+    $judulAktif = $db->table('pengajuan_judul')
+        ->where('mahasiswa_id', $mahasiswaId)
+        ->where('status', 'disetujui')
+        ->orderBy('id', 'DESC')
+        ->get()
+        ->getRowArray();
+
+    // ✅ RIWAYAT (TANPA FILTER STATUS)
+    $riwayat = $db->table('pengajuan_judul')
+        ->where('mahasiswa_id', $mahasiswaId)
+        ->orderBy('id', 'DESC')
+        ->get()
+        ->getResultArray();
+
+    return view('dashboard/pengajuan_judul', [
+        'title'        => 'Pengajuan Judul',
+        'pageTitle'    => 'Pengajuan Judul',
+        'pageSubtitle' => 'Kelola pengajuan dan revisi judul tugas akhir',
+        'activeMenu'   => 'pengajuan_judul',
+
+        'mahasiswa'    => $mahasiswa,
+        'judulAktif'   => $judulAktif,
+        'riwayatJudul' => $riwayat,
+    ]);
+}
 
 public function proposalTa()
 {

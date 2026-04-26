@@ -37,11 +37,16 @@ class Judul extends BaseController
         if (! $mahasiswa) {
             return redirect()->back()->with('error', 'Data mahasiswa tidak ditemukan.');
         }
+$db = \Config\Database::connect();
 
-        $judulAktif = $db->table('pengajuan_judul')
-            ->where('mahasiswa_id', $mahasiswa['id'])
-            ->where('status', 'disetujui')
-            ->countAllResults();
+$judulAktif = $db->table('pengajuan_judul pj')
+    ->select('pj.*')
+    ->join('mahasiswa m', 'm.id = pj.mahasiswa_id')
+    ->where('m.user_id', session()->get('user_id'))
+    ->where('pj.status', 'disetujui')
+    ->orderBy('pj.id', 'DESC')
+    ->get()
+    ->getRowArray();
 
         if ($judulAktif > 0) {
             return redirect()->to('/pengajuan-judul')->with('error', 'Judul sudah disetujui. Anda tidak dapat mengajukan judul baru.');
@@ -516,64 +521,78 @@ public function riwayatDosen()
     ]);
 }
 
-    public function detailMahasiswa($id)
-    {
-        $userId = (int) session()->get('user_id');
-        $role   = session()->get('role');
+   public function detailMahasiswa($id)
+{
+    $db = \Config\Database::connect();
 
-        if ($role !== 'mahasiswa') {
-            return redirect()->to('/dashboard')->with('error', 'Akses ditolak.');
-        }
+    $userId = session()->get('user_id');
 
-        $db = Database::connect();
+    // ambil data mahasiswa
+    $mahasiswa = $db->table('mahasiswa')
+        ->where('user_id', $userId)
+        ->get()
+        ->getRowArray();
 
-        $mahasiswa = $db->table('mahasiswa')
-            ->where('user_id', $userId)
-            ->get()
-            ->getRowArray();
-
-        if (! $mahasiswa) {
-            return redirect()->to('/pengajuan-judul')->with('error', 'Data mahasiswa tidak ditemukan.');
-        }
-
-        $pengajuan = $db->table('pengajuan_judul')
-            ->where('id', $id)
-            ->where('mahasiswa_id', $mahasiswa['id'])
-            ->get()
-            ->getRowArray();
-
-        if (! $pengajuan) {
-            return redirect()->to('/pengajuan-judul')->with('error', 'Detail pengajuan tidak ditemukan.');
-        }
-
-        $pembimbingList = $db->table('pembimbing_mahasiswa pm')
-            ->select('pm.jenis_pembimbing, u.name AS nama_dosen')
-            ->join('dosen d', 'd.id = pm.dosen_id')
-            ->join('users u', 'u.id = d.user_id')
-            ->where('pm.mahasiswa_id', $mahasiswa['id'])
-            ->where('pm.status_aktif', 1)
-            ->orderBy('pm.jenis_pembimbing', 'ASC')
-            ->get()
-            ->getResultArray();
-
-        $riwayatReview = $db->table('review_judul rj')
-            ->select('rj.*, u.name AS nama_reviewer')
-            ->join('users u', 'u.id = rj.reviewer_user_id')
-            ->where('rj.pengajuan_judul_id', $id)
-            ->orderBy('rj.id', 'DESC')
-            ->get()
-            ->getResultArray();
-
-        return view('dashboard/detail_judul_mahasiswa', [
-            'title'         => 'Detail Judul',
-            'pageTitle'     => 'Detail Pengajuan Judul',
-            'pageSubtitle'  => 'Lihat pembimbing dan histori review judul',
-            'activeMenu'    => 'pengajuan_judul',
-            'pengajuan'     => $pengajuan,
-            'pembimbingList'=> $pembimbingList,
-            'riwayatReview' => $riwayatReview,
-        ]);
+    if (! $mahasiswa) {
+        return redirect()->to('/dashboard')->with('error', 'Data mahasiswa tidak ditemukan');
     }
+
+    // ambil detail judul
+    $judul = $db->table('pengajuan_judul')
+        ->where('id', $id)
+        ->where('mahasiswa_id', $mahasiswa['id'])
+        ->get()
+        ->getRowArray();
+
+    if (! $judul) {
+        return redirect()->to('/pengajuan-judul')->with('error', 'Data tidak ditemukan');
+    }
+
+    // =========================
+    // 🔥 AMBIL PEMBIMBING
+    // =========================
+    $pembimbingRows = $db->table('pembimbing_mahasiswa pm')
+        ->select('pm.jenis_pembimbing, u.name AS nama_dosen')
+        ->join('dosen d', 'd.id = pm.dosen_id')
+        ->join('users u', 'u.id = d.user_id')
+        ->where('pm.mahasiswa_id', $mahasiswa['id'])
+        ->where('pm.status_aktif', 1)
+        ->get()
+        ->getResultArray();
+
+    $pembimbing1 = '-';
+    $pembimbing2 = '-';
+
+foreach ($pembimbingRows as $p) {
+    if ($p['jenis_pembimbing'] === 'pembimbing_1') {
+        $pembimbing1 = $p['nama_dosen'];
+    }
+
+    if ($p['jenis_pembimbing'] === 'pembimbing_2') {
+        $pembimbing2 = $p['nama_dosen'];
+    }
+}
+
+    // =========================
+    // 🔥 AMBIL REVIEW DOSEN
+    // =========================
+$reviews = $db->table('review_judul r')
+    ->select('r.*')
+    ->where('r.pengajuan_judul_id', $id)
+    ->orderBy('r.created_at', 'DESC')
+    ->get()
+    ->getResultArray();
+
+    // =========================
+    // KIRIM KE VIEW
+    // =========================
+    return view('dashboard/detail_judul_mahasiswa', [
+        'judul'        => $judul,
+        'reviews'      => $reviews,
+        'pembimbing1'  => $pembimbing1,
+        'pembimbing2'  => $pembimbing2
+    ]);
+}
 
 public function review($id)
 {
