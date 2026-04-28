@@ -270,6 +270,251 @@
             grid-template-columns: 1fr;
         }
     }
+    @media(max-width: 760px) {
+    .stats-grid,
+    .stat-grid,
+    .dashboard-stats,
+    .mhs-stat-grid {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 10px !important;
+    }
+
+    .stat-card,
+    .dashboard-stat,
+    .admin-stat,
+    .mhs-stat-card,
+    .stat-card-premium {
+        min-height: 105px !important;
+        padding: 13px !important;
+        border-radius: 17px !important;
+        aspect-ratio: unset !important;
+    }
+
+    .stat-card h3,
+    .dashboard-stat h3,
+    .admin-stat h3,
+    .mhs-stat-label,
+    .stat-label,
+    .stat-label-premium {
+        font-size: 10.5px !important;
+        line-height: 1.2 !important;
+        margin-bottom: 8px !important;
+    }
+
+    .stat-card .number,
+    .dashboard-stat .number,
+    .admin-stat .stat-number,
+    .mhs-stat-number,
+    .stat-value-premium {
+        font-size: 26px !important;
+        line-height: 1 !important;
+        margin: 0 !important;
+    }
+
+    .stat-card p,
+    .dashboard-stat p,
+    .admin-stat .stat-desc,
+    .mhs-stat-desc,
+    .stat-desc-premium {
+        font-size: 9.5px !important;
+        line-height: 1.3 !important;
+        margin: 0 !important;
+    }
+
+    .stat-card::after,
+    .dashboard-stat::after,
+    .admin-stat::after,
+    .mhs-stat-card::after,
+    .stat-card-premium::after {
+        width: 75px !important;
+        height: 75px !important;
+        right: -25px !important;
+        bottom: -25px !important;
+    }
+}
+
+@media(max-width: 390px) {
+    .stats-grid,
+    .stat-grid,
+    .dashboard-stats,
+    .mhs-stat-grid {
+        grid-template-columns: 1fr 1fr !important;
+    }
+
+    .stat-card,
+    .dashboard-stat,
+    .admin-stat,
+    .mhs-stat-card,
+    .stat-card-premium {
+        min-height: 98px !important;
+        padding: 12px !important;
+    }
+
+    .stat-card .number,
+    .dashboard-stat .number,
+    .admin-stat .stat-number,
+    .mhs-stat-number,
+    .stat-value-premium {
+        font-size: 24px !important;
+    }
+}
+    /* =========================
+   FIX MOBILE UI (COMPACT)
+========================= */
+@media(max-width: 760px){
+
+    /* CARD GLOBAL */
+    .card,
+    .card-premium {
+        padding: 14px !important;
+        border-radius: 18px !important;
+    }
+
+    /* TITLE */
+    .section-title,
+    .section-title-premium {
+        font-size: 18px !important;
+        margin-bottom: 4px !important;
+    }
+
+    .section-subtitle,
+    .section-subtitle-premium {
+        font-size: 11.5px !important;
+        line-height: 1.35 !important;
+        margin-bottom: 10px !important;
+    }
+
+    /* =========================
+       FILTER SUPER COMPACT
+    ========================= */
+    .filter-wrap {
+        padding: 7px !important;
+        border-radius: 12px !important;
+        margin-bottom: 10px !important;
+    }
+
+    .filter-grid {
+        grid-template-columns: 1fr !important;
+        gap: 4px !important;
+    }
+
+    .form-group-premium label {
+        font-size: 9.5px !important;
+        margin-bottom: 2px !important;
+    }
+
+    .form-group-premium input,
+    .form-group-premium select {
+        height: 28px !important;
+        padding: 5px 7px !important;
+        font-size: 10px !important;
+        border-radius: 8px !important;
+    }
+
+    .filter-actions {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 5px !important;
+    }
+
+    .filter-actions .btn {
+        height: 28px !important;
+        padding: 5px !important;
+        font-size: 10px !important;
+        border-radius: 8px !important;
+    }
+
+    /* =========================
+       TABLE MOBILE FIX
+    ========================= */
+    .premium-table {
+        min-width: 1000px !important; /* scroll horizontal */
+    }
+
+    .premium-table th,
+    .premium-table td {
+        padding: 6px 6px !important;
+        font-size: 10px !important;
+        line-height: 1.2 !important;
+        white-space: nowrap !important;
+    }
+
+    .premium-table th {
+        font-size: 9.2px !important;
+    }
+
+    /* TEXT DALAM TABLE */
+    .student-name {
+        font-size: 10px !important;
+        max-width: 110px !important;
+    }
+
+    .student-sub {
+        font-size: 9px !important;
+    }
+
+    .cell-dosen {
+        max-width: 140px !important;
+    }
+
+    .cell-catatan {
+        min-width: 200px !important;
+        max-width: 200px !important;
+    }
+
+    .cell-date {
+        min-width: 110px !important;
+    }
+
+    /* BADGE */
+    .status-badge {
+        padding: 4px 6px !important;
+        font-size: 8.8px !important;
+    }
+
+    /* META TEXT */
+    .table-meta-text {
+        font-size: 10px !important;
+    }
+
+    /* PAGINATION */
+    .pagination-info {
+        font-size: 10px !important;
+    }
+
+    .page-link {
+        min-width: 30px !important;
+        height: 30px !important;
+        font-size: 10px !important;
+    }
+
+    .pagination-links {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+    }
+
+    /* =========================
+       STAT CARD (KALO ADA)
+    ========================= */
+    .stat-card-premium {
+        padding: 12px !important;
+        min-height: 95px !important;
+        border-radius: 16px !important;
+    }
+
+    .stat-label-premium {
+        font-size: 9.5px !important;
+    }
+
+    .stat-value-premium {
+        font-size: 22px !important;
+    }
+
+    .stat-desc-premium {
+        font-size: 9px !important;
+    }
+}
 </style>
 
 <?php

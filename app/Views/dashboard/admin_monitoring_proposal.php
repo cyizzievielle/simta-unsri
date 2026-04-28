@@ -2,320 +2,488 @@
 <?= $this->section('content') ?>
 
 <style>
-    .card-premium {
-        background: #fff;
-        border-radius: 26px;
-        padding: 24px;
-        box-shadow: 0 14px 35px rgba(15, 23, 42, 0.06);
-        border: 1px solid #eef2f7;
-        margin-bottom: 22px;
-    }
+.card-premium {
+    background: #fff;
+    border-radius: 26px;
+    padding: 24px;
+    box-shadow: 0 14px 35px rgba(15, 23, 42, 0.06);
+    border: 1px solid #eef2f7;
+    margin-bottom: 22px;
+}
 
-    .section-title-premium {
-        margin: 0 0 8px;
-        font-size: 28px;
-        font-weight: 800;
-        color: #0f172a;
-    }
+.section-title-premium {
+    margin: 0 0 6px;
+    font-size: 26px;
+    font-weight: 900;
+    color: #0f172a;
+}
 
-    .section-subtitle-premium {
-        margin: 0 0 18px;
-        color: #64748b;
-        line-height: 1.7;
-    }
+.section-subtitle-premium {
+    margin: 0 0 14px;
+    color: #64748b;
+    line-height: 1.45;
+    font-size: 13px;
+}
 
+.stats-grid-premium {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 14px;
+    margin-bottom: 22px;
+}
+
+.stat-card-premium {
+    border-radius: 22px;
+    padding: 18px;
+    color: #fff;
+    min-height: 128px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 14px 32px rgba(15, 23, 42, 0.10);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.stat-card-premium::after {
+    content: "";
+    position: absolute;
+    right: -22px;
+    bottom: -22px;
+    width: 88px;
+    height: 88px;
+    background: rgba(255,255,255,0.12);
+    border-radius: 50%;
+}
+
+.stat-blue { background: linear-gradient(135deg, #2563eb, #1d4ed8); }
+.stat-amber { background: linear-gradient(135deg, #d97706, #f59e0b); }
+.stat-emerald { background: linear-gradient(135deg, #059669, #10b981); }
+.stat-rose { background: linear-gradient(135deg, #e11d48, #fb7185); }
+.stat-slate { background: linear-gradient(135deg, #334155, #475569); }
+
+.stat-label-premium,
+.stat-value-premium,
+.stat-desc-premium {
+    position: relative;
+    z-index: 1;
+}
+
+.stat-label-premium {
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.stat-value-premium {
+    font-size: 31px;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.stat-desc-premium {
+    font-size: 11.5px;
+    line-height: 1.35;
+    opacity: .95;
+}
+
+.filter-wrap {
+    border: 1px solid #e5e7eb;
+    background: #f8fafc;
+    border-radius: 15px;
+    padding: 10px;
+    margin-bottom: 12px;
+}
+
+.filter-grid {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr .7fr auto;
+    gap: 9px;
+    align-items: end;
+}
+
+.form-group-premium label {
+    display: block;
+    font-size: 10.5px;
+    margin-bottom: 4px;
+    font-weight: 800;
+    color: #475569;
+}
+
+.form-group-premium input,
+.form-group-premium select {
+    width: 100%;
+    padding: 8px 9px;
+    border-radius: 10px;
+    font-size: 11.5px;
+    border: 1px solid #dbe3ef;
+    background: #fff;
+    box-sizing: border-box;
+    outline: none;
+}
+
+.form-group-premium input:focus,
+.form-group-premium select:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.10);
+}
+
+.filter-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.filter-actions .btn {
+    padding: 8px 12px;
+    font-size: 11.5px;
+    border-radius: 10px;
+    min-height: auto;
+}
+
+.table-meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+
+.table-meta-text {
+    color: #64748b;
+    font-size: 12px;
+}
+
+.premium-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    border-radius: 18px;
+    border: 1px solid #eef2f7;
+}
+
+.premium-table {
+    width: 100%;
+    min-width: 920px;
+    border-collapse: collapse;
+    background: #fff;
+}
+
+.premium-table thead tr {
+    background: linear-gradient(135deg, #f8fbff, #eff6ff);
+}
+
+.premium-table th,
+.premium-table td {
+    padding: 9px 9px;
+    text-align: left;
+    border-bottom: 1px solid #eef2f7;
+    vertical-align: top;
+    color: #0f172a;
+    font-size: 11.5px;
+    line-height: 1.35;
+}
+
+.premium-table th {
+    font-size: 10.5px;
+    font-weight: 900;
+    color: #334155;
+    white-space: nowrap;
+}
+
+.student-name {
+    font-weight: 900;
+    color: #0f172a;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    max-width: 135px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.student-sub {
+    color: #64748b;
+    font-size: 10px;
+    white-space: nowrap;
+}
+
+.judul-cell {
+    max-width: 230px;
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1.35;
+}
+
+.file-cell {
+    max-width: 200px;
+    line-height: 1.35;
+}
+
+.muted-text {
+    color: #64748b;
+    font-size: 10px;
+    line-height: 1.3;
+    margin-top: 3px;
+}
+
+.cell-nowrap {
+    white-space: nowrap;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 7px;
+    border-radius: 999px;
+    font-size: 9.8px;
+    font-weight: 900;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.badge-diajukan { background: #dbeafe; color: #1d4ed8; }
+.badge-revisi { background: #fef3c7; color: #92400e; }
+.badge-ditolak { background: #fee2e2; color: #b91c1c; }
+.badge-disetujui { background: #dcfce7; color: #166534; }
+
+.premium-empty {
+    border: 1px dashed #cbd5e1;
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    border-radius: 20px;
+    padding: 20px;
+    text-align: center;
+    color: #64748b;
+    line-height: 1.6;
+    font-size: 12.5px;
+}
+
+.pagination-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+}
+
+.pagination-info {
+    color: #64748b;
+    font-size: 12px;
+}
+
+.pagination-links {
+    display: flex;
+    gap: 7px;
+    flex-wrap: wrap;
+}
+
+.page-link {
+    min-width: 34px;
+    height: 34px;
+    padding: 0 10px;
+    border-radius: 10px;
+    border: 1px solid #dbe3ef;
+    background: #fff;
+    color: #334155;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 11.5px;
+}
+
+.page-link.active {
+    background: #2563eb;
+    color: #fff;
+    border-color: #2563eb;
+}
+
+@media(max-width: 1200px) {
     .stats-grid-premium {
-        display: grid;
-        grid-template-columns: repeat(5, 1fr);
-        gap: 18px;
-        margin-bottom: 22px;
-    }
-
-    .stat-card-premium {
-        border-radius: 24px;
-        padding: 22px;
-        color: #fff;
-        position: relative;
-        overflow: hidden;
-        box-shadow: 0 14px 35px rgba(15, 23, 42, 0.10);
-    }
-
-    .stat-card-premium::after {
-        content: "";
-        position: absolute;
-        right: -18px;
-        bottom: -18px;
-        width: 84px;
-        height: 84px;
-        background: rgba(255,255,255,0.10);
-        border-radius: 50%;
-    }
-
-    .stat-blue { background: linear-gradient(135deg, #2563eb, #1d4ed8); }
-    .stat-amber { background: linear-gradient(135deg, #d97706, #f59e0b); }
-    .stat-emerald { background: linear-gradient(135deg, #059669, #10b981); }
-    .stat-rose { background: linear-gradient(135deg, #e11d48, #fb7185); }
-    .stat-slate { background: linear-gradient(135deg, #334155, #475569); }
-
-    .stat-label-premium {
-        font-size: 13px;
-        font-weight: 700;
-        margin-bottom: 10px;
-        position: relative;
-        z-index: 1;
-    }
-
-    .stat-value-premium {
-        font-size: 34px;
-        font-weight: 800;
-        margin-bottom: 6px;
-        position: relative;
-        z-index: 1;
-    }
-
-    .stat-desc-premium {
-        font-size: 12px;
-        opacity: 0.95;
-        position: relative;
-        z-index: 1;
-    }
-
-    .filter-wrap {
-        border: 1px solid #eef2f7;
-        background: linear-gradient(135deg, #f8fbff, #f1f5f9);
-        border-radius: 20px;
-        padding: 16px;
-        margin-bottom: 18px;
+        grid-template-columns: repeat(3, 1fr);
     }
 
     .filter-grid {
-        display: grid;
-        grid-template-columns: 1.8fr 1fr 1fr auto;
-        gap: 14px;
-        align-items: end;
-    }
-
-    .form-group-premium label {
-        display: block;
-        font-weight: 700;
-        color: #334155;
-        margin-bottom: 8px;
-    }
-
-    .form-group-premium input,
-    .form-group-premium select {
-        width: 100%;
-        border: 1px solid #dbe3ef;
-        border-radius: 16px;
-        padding: 13px 15px;
-        font-size: 14px;
-        background: #fff;
-        box-sizing: border-box;
-        outline: none;
-    }
-
-    .form-group-premium input:focus,
-    .form-group-premium select:focus {
-        border-color: #2563eb;
-        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.10);
+        grid-template-columns: 1fr 1fr;
     }
 
     .filter-actions {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
+        grid-column: span 2;
+    }
+}
+
+@media(max-width: 760px) {
+    .card-premium {
+        padding: 14px;
+        border-radius: 22px;
     }
 
-    .premium-table-wrap {
-        width: 100%;
-        overflow-x: auto;
-        border-radius: 18px;
-        border: 1px solid #eef2f7;
+    .section-title-premium {
+        font-size: 21px;
+        margin-bottom: 5px;
     }
+
+    .section-subtitle-premium {
+        font-size: 12px;
+        line-height: 1.35;
+        margin-bottom: 12px;
+    }
+
+    .stats-grid-premium {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        margin-bottom: 16px;
+    }
+
+    .stat-card-premium {
+        min-height: 106px;
+        padding: 13px;
+        border-radius: 18px;
+    }
+
+    .stat-label-premium {
+        font-size: 10.5px;
+    }
+
+    .stat-value-premium {
+        font-size: 25px;
+    }
+
+    .stat-desc-premium {
+        font-size: 10px;
+    }
+
+.filter-wrap {
+    border: 1px solid #e5e7eb;
+    background: #f8fafc;
+    border-radius: 15px;
+    padding: 10px;
+    margin-bottom: 12px;
+}
+
+.filter-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr .7fr auto;
+    gap: 9px;
+    align-items: end;
+}
+
+.form-group-premium label {
+    display: block;
+    font-size: 10.5px;
+    margin-bottom: 4px;
+    font-weight: 800;
+    color: #475569;
+}
+
+.form-group-premium input,
+.form-group-premium select {
+    width: 100%;
+    padding: 8px 9px;
+    border-radius: 10px;
+    font-size: 11.5px;
+    border: 1px solid #dbe3ef;
+    background: #fff;
+}
+
+.filter-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.filter-actions .btn {
+    padding: 8px 12px;
+    font-size: 11.5px;
+    border-radius: 10px;
+    min-height: auto;
+}
 
     .premium-table {
-        width: 100%;
-        min-width: 1350px;
-        border-collapse: collapse;
-        background: #fff;
-    }
-
-    .premium-table thead tr {
-        background: linear-gradient(135deg, #f8fbff, #eff6ff);
+        min-width: 1150px;
     }
 
     .premium-table th,
     .premium-table td {
-        padding: 15px 14px;
-        text-align: left;
-        border-bottom: 1px solid #eef2f7;
-        vertical-align: top;
+        padding: 7px 7px;
+        font-size: 10.5px;
     }
 
     .premium-table th {
-        font-size: 13px;
-        font-weight: 800;
-        color: #334155;
-        white-space: nowrap;
-    }
-
-    .premium-table td {
-        color: #0f172a;
-        font-size: 14px;
-        line-height: 1.65;
+        font-size: 9.8px;
     }
 
     .student-name {
-        font-weight: 800;
-        color: #0f172a;
-        margin-bottom: 4px;
+        max-width: 115px;
+        font-size: 10.8px;
     }
 
-    .student-sub {
-        color: #64748b;
-        font-size: 13px;
+    .student-sub,
+    .muted-text {
+        font-size: 9.5px;
     }
 
     .judul-cell {
-        max-width: 380px;
-        line-height: 1.7;
-        font-weight: 700;
-        color: #0f172a;
+        max-width: 190px;
+        font-size: 10.7px;
     }
 
     .file-cell {
-        max-width: 260px;
-        line-height: 1.7;
-    }
-
-    .muted-text {
-        color: #64748b;
-        font-size: 13px;
-        line-height: 1.6;
+        max-width: 150px;
     }
 
     .status-badge {
-        display: inline-flex;
-        align-items: center;
-        padding: 8px 12px;
-        border-radius: 999px;
-        font-size: 12px;
-        font-weight: 800;
-        line-height: 1;
-        white-space: nowrap;
-    }
-
-    .badge-diajukan { background: #dbeafe; color: #1d4ed8; }
-    .badge-revisi { background: #fef3c7; color: #92400e; }
-    .badge-ditolak { background: #fee2e2; color: #b91c1c; }
-    .badge-disetujui { background: #dcfce7; color: #166534; }
-
-    .table-meta {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 12px;
-        flex-wrap: wrap;
-        margin-bottom: 14px;
-    }
-
-    .table-meta-text {
-        color: #64748b;
-        font-size: 14px;
-    }
-
-    .premium-empty {
-        border: 1px dashed #cbd5e1;
-        background: linear-gradient(135deg, #f8fafc, #f1f5f9);
-        border-radius: 22px;
-        padding: 24px;
-        text-align: center;
-        color: #64748b;
-        line-height: 1.8;
-    }
-
-    .pagination-bar {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 16px;
-        flex-wrap: wrap;
-        margin-top: 18px;
-    }
-
-    .pagination-info {
-        color: #64748b;
-        font-size: 14px;
+        padding: 4px 6px;
+        font-size: 9.2px;
     }
 
     .pagination-links {
-        display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
+        width: 100%;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        padding-bottom: 4px;
     }
 
     .page-link {
-        min-width: 40px;
-        height: 40px;
-        padding: 0 12px;
-        border-radius: 12px;
-        border: 1px solid #dbe3ef;
-        background: #fff;
-        color: #334155;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 700;
+        min-width: 31px;
+        height: 31px;
+        font-size: 10.5px;
+        flex-shrink: 0;
     }
-
-    .page-link.active {
-        background: #2563eb;
-        color: #fff;
-        border-color: #2563eb;
-    }
-
-    @media (max-width: 1200px) {
-        .stats-grid-premium,
-        .filter-grid {
-            grid-template-columns: 1fr;
-        }
-    }
+}
 </style>
 
 <?php
-    $rows = $rows ?? [];
-    $summary = $summary ?? [];
-    $keyword = $keyword ?? '';
-    $status = $status ?? '';
-    $perPage = $perPage ?? 10;
-    $page = $page ?? 1;
-    $totalRows = $totalRows ?? 0;
-    $totalPages = $totalPages ?? 1;
-    $startRow = $startRow ?? 0;
-    $endRow = $endRow ?? 0;
+$rows = $rows ?? [];
+$summary = $summary ?? [];
+$keyword = $keyword ?? '';
+$status = $status ?? '';
+$perPage = $perPage ?? 10;
+$page = $page ?? 1;
+$totalRows = $totalRows ?? 0;
+$totalPages = $totalPages ?? 1;
+$startRow = $startRow ?? 0;
+$endRow = $endRow ?? 0;
 
-    $badgeStatus = static function (?string $status): string {
-        $status = strtolower((string) $status);
-        return match ($status) {
-            'diajukan'   => 'badge-diajukan',
-            'revisi'     => 'badge-revisi',
-            'ditolak'    => 'badge-ditolak',
-            'disetujui'  => 'badge-disetujui',
-            default      => 'badge-diajukan',
-        };
+$badgeStatus = static function (?string $status): string {
+    $status = strtolower((string) $status);
+
+    return match ($status) {
+        'diajukan'  => 'badge-diajukan',
+        'revisi'    => 'badge-revisi',
+        'ditolak'   => 'badge-ditolak',
+        'disetujui' => 'badge-disetujui',
+        default     => 'badge-diajukan',
     };
+};
 
-    $queryParams = [
-        'q'        => $keyword,
-        'status'   => $status,
-        'per_page' => $perPage,
-    ];
+$queryParams = [
+    'q'        => $keyword,
+    'status'   => $status,
+    'per_page' => $perPage,
+];
 
-    $buildPageUrl = static function (int $targetPage) use ($queryParams) {
-        $params = array_merge($queryParams, ['page' => $targetPage]);
-        return base_url('/admin/monitoring-proposal?' . http_build_query($params));
-    };
+$buildPageUrl = static function (int $targetPage) use ($queryParams) {
+    $params = array_merge($queryParams, ['page' => $targetPage]);
+    return site_url('admin/monitoring-proposal?' . http_build_query($params));
+};
 ?>
 
 <div class="stats-grid-premium">
@@ -352,10 +520,12 @@
 
 <div class="card-premium">
     <h3 class="section-title-premium">Data Monitoring Proposal</h3>
-    <p class="section-subtitle-premium">Cari, filter, dan pantau proposal mahasiswa dari satu tabel yang lebih rapih dan konsisten.</p>
+    <p class="section-subtitle-premium">
+        Cari, filter, dan pantau proposal mahasiswa dari satu tabel yang lebih rapi dan konsisten.
+    </p>
 
     <div class="filter-wrap">
-        <form method="get" action="<?= base_url('/admin/monitoring-proposal') ?>">
+        <form method="get" action="<?= site_url('admin/monitoring-proposal') ?>">
             <div class="filter-grid">
                 <div class="form-group-premium">
                     <label for="q">Cari Mahasiswa / NIM / Judul / File</label>
@@ -365,7 +535,7 @@
                 <div class="form-group-premium">
                     <label for="status">Status</label>
                     <select id="status" name="status">
-                        <option value="">Semua Status</option>
+                        <option value="">Semua</option>
                         <option value="diajukan" <?= $status === 'diajukan' ? 'selected' : '' ?>>Diajukan</option>
                         <option value="revisi" <?= $status === 'revisi' ? 'selected' : '' ?>>Revisi</option>
                         <option value="ditolak" <?= $status === 'ditolak' ? 'selected' : '' ?>>Ditolak</option>
@@ -385,7 +555,7 @@
 
                 <div class="filter-actions">
                     <button type="submit" class="btn btn-primary">Terapkan</button>
-                    <a href="<?= base_url('/admin/monitoring-proposal') ?>" class="btn" style="border:1px solid #cbd5e1; color:#334155;">Reset</a>
+                    <a href="<?= site_url('admin/monitoring-proposal') ?>" class="btn" style="border:1px solid #cbd5e1; color:#334155;">Reset</a>
                 </div>
             </div>
         </form>
@@ -412,6 +582,7 @@
                         <th>Catatan</th>
                     </tr>
                 </thead>
+
                 <tbody>
                     <?php foreach ($rows as $row): ?>
                         <tr>
@@ -419,29 +590,48 @@
                                 <div class="student-name"><?= esc((string) ($row['nama_mahasiswa'] ?? '-')) ?></div>
                                 <div class="student-sub">NIM: <?= esc((string) ($row['nim'] ?? '-')) ?></div>
                             </td>
-                            <td class="judul-cell"><?= esc((string) ($row['judul'] ?? '-')) ?></td>
+
+                            <td class="judul-cell">
+                                <?= esc((string) ($row['judul'] ?? '-')) ?>
+                            </td>
+
                             <td class="file-cell">
                                 <?= esc((string) (($row['nama_file_asli'] ?? '') !== '' ? $row['nama_file_asli'] : '-')) ?>
                                 <div class="muted-text">
                                     File sistem: <?= esc((string) (($row['file_proposal'] ?? '') !== '' ? $row['file_proposal'] : '-')) ?>
                                 </div>
                             </td>
-                            <td><?= esc((string) (($row['versi_ke'] ?? '') !== '' ? $row['versi_ke'] : '-')) ?></td>
-                            <td>
+
+                            <td class="cell-nowrap">
+                                <?= esc((string) (($row['versi_ke'] ?? '') !== '' ? $row['versi_ke'] : '-')) ?>
+                            </td>
+
+                            <td class="cell-nowrap">
                                 <span class="status-badge <?= $badgeStatus($row['status'] ?? '') ?>">
                                     <?= esc((string) ($row['status'] ?? '-')) ?>
                                 </span>
                             </td>
-                            <td><?= esc((string) (($row['tanggal_upload'] ?? '') !== '' ? $row['tanggal_upload'] : '-')) ?></td>
-                            <td><?= esc((string) (($row['tanggal_review'] ?? '') !== '' ? $row['tanggal_review'] : '-')) ?></td>
-                            <td><?= esc((string) (($row['catatan_reviewer'] ?? '') !== '' ? $row['catatan_reviewer'] : '-')) ?></td>
+
+                            <td class="cell-nowrap">
+                                <?= esc((string) (($row['tanggal_upload'] ?? '') !== '' ? $row['tanggal_upload'] : '-')) ?>
+                            </td>
+
+                            <td class="cell-nowrap">
+                                <?= esc((string) (($row['tanggal_review'] ?? '') !== '' ? $row['tanggal_review'] : '-')) ?>
+                            </td>
+
+                            <td class="file-cell">
+                                <?= esc((string) (($row['catatan_reviewer'] ?? '') !== '' ? $row['catatan_reviewer'] : '-')) ?>
+                            </td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
             </table>
         </div>
     <?php else: ?>
-        <div class="premium-empty">Belum ada data monitoring proposal yang cocok dengan filter.</div>
+        <div class="premium-empty">
+            Belum ada data monitoring proposal yang cocok dengan filter.
+        </div>
     <?php endif; ?>
 
     <div class="pagination-bar">

@@ -12,6 +12,7 @@
     position: relative;
     overflow: hidden;
 }
+
 .admin-hero::after {
     content: "";
     position: absolute;
@@ -22,27 +23,218 @@
     border-radius: 999px;
     background: rgba(255,255,255,.12);
 }
+
 .admin-hero h2,
 .admin-hero p,
 .admin-hero .hero-actions {
     position: relative;
     z-index: 1;
 }
+
 .admin-hero h2 {
     margin: 0 0 10px;
     font-size: 34px;
     font-weight: 900;
 }
+
 .admin-hero p {
     margin: 0;
     max-width: 900px;
     line-height: 1.7;
     color: rgba(255,255,255,.9);
 }
+
+.hero-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
+
+.hero-btn {
+    display: inline-flex;
+    padding: 12px 16px;
+    border-radius: 15px;
+    background: rgba(255,255,255,.14);
+    border: 1px solid rgba(255,255,255,.18);
+    color: #fff;
+    font-weight: 900;
+    text-decoration: none;
+}
+
+.admin-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 18px;
+    margin-bottom: 24px;
+}
+
+.admin-stat {
+    border-radius: 24px;
+    padding: 24px;
+    color: #fff;
+    aspect-ratio: unset;
+    min-height: 155px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 16px 36px rgba(15,23,42,.10);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.admin-stat::after {
+    content: "";
+    position: absolute;
+    right: -28px;
+    bottom: -28px;
+    width: 115px;
+    height: 115px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.15);
+}
+
+.stat-blue { background: linear-gradient(135deg,#2563eb,#1d4ed8); }
+.stat-green { background: linear-gradient(135deg,#10b981,#059669); }
+.stat-purple { background: linear-gradient(135deg,#8b5cf6,#6d28d9); }
+.stat-orange { background: linear-gradient(135deg,#f59e0b,#ea580c); }
+.stat-red { background: linear-gradient(135deg,#ef4444,#be123c); }
+.stat-dark { background: linear-gradient(135deg,#1f2937,#0f172a); }
+.stat-cyan { background: linear-gradient(135deg,#06b6d4,#0284c7); }
+.stat-pink { background: linear-gradient(135deg,#db2777,#be185d); }
+
+.stat-label,
+.stat-number,
+.stat-desc {
+    position: relative;
+    z-index: 1;
+}
+
+.stat-label {
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.stat-number {
+    font-size: 42px;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.stat-desc {
+    font-size: 13px;
+    line-height: 1.5;
+    opacity: .95;
+}
+
+.dashboard-section {
+    margin-bottom: 24px;
+}
+
+.card-premium {
+    background: #fff;
+    border-radius: 28px;
+    padding: 28px;
+    border: 1px solid #edf2f7;
+    box-shadow: 0 18px 42px rgba(15,23,42,.06);
+}
+
+.section-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    margin-bottom: 22px;
+}
+
+.section-title {
+    margin: 0 0 8px;
+    font-size: 26px;
+    font-weight: 900;
+    color: #0f172a;
+}
+
+.section-subtitle {
+    margin: 0;
+    color: #64748b;
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+.see-all {
+    color: #2563eb;
+    font-weight: 900;
+    text-decoration: none;
+}
+
+.menu-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+}
+
+.menu-card {
+    min-height: 155px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 18px;
+    border-radius: 22px;
+    border: 1px solid #dbeafe;
+    background: linear-gradient(135deg,#f8fbff,#eff6ff);
+    text-decoration: none;
+    transition: .2s ease;
+}
+
+.menu-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 30px rgba(37,99,235,.11);
+}
+
+.menu-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 16px;
+    background: #2563eb;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+}
+
+.menu-title {
+    color: #0f172a;
+    font-size: 16px;
+    font-weight: 900;
+    margin-bottom: 4px;
+}
+
+.menu-desc {
+    color: #64748b;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.menu-arrow {
+    color: #2563eb;
+    font-weight: 900;
+    align-self: flex-end;
+}
+
+.chart-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+    margin-bottom: 24px;
+}
+
 .bar-list {
     display: flex;
     flex-direction: column;
-    gap: 18px;
+    gap: 16px;
 }
 
 .bar-item {
@@ -73,264 +265,15 @@
     border-radius: 999px;
 }
 
-.bar-fill.green {
-    background: linear-gradient(135deg, #22c55e, #16a34a);
-}
+.bar-fill.green { background: linear-gradient(135deg, #22c55e, #16a34a); }
+.bar-fill.orange { background: linear-gradient(135deg, #f59e0b, #ea580c); }
+.bar-fill.red { background: linear-gradient(135deg, #ef4444, #dc2626); }
+.bar-fill.blue { background: linear-gradient(135deg, #2563eb, #1d4ed8); }
 
-.bar-fill.orange {
-    background: linear-gradient(135deg, #f59e0b, #ea580c);
-}
-
-.bar-fill.red {
-    background: linear-gradient(135deg, #ef4444, #dc2626);
-}
-
-.bar-fill.blue {
-    background: linear-gradient(135deg, #2563eb, #1d4ed8);
-}
-.hero-actions {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-top: 20px;
-}
-.hero-btn {
-    display: inline-flex;
-    padding: 12px 16px;
-    border-radius: 15px;
-    background: rgba(255,255,255,.14);
-    border: 1px solid rgba(255,255,255,.18);
-    color: #fff;
-    font-weight: 900;
-    text-decoration: none;
-}
-
-.admin-stat-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 18px;
-    margin-bottom: 24px;
-}
-.admin-stat {
-    border-radius: 24px;
-    padding: 24px;
-    color: #fff;
-    min-height: 145px;
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 16px 36px rgba(15,23,42,.10);
-}
-.admin-stat::after {
-    content: "";
-    position: absolute;
-    right: -28px;
-    bottom: -28px;
-    width: 115px;
-    height: 115px;
-    border-radius: 999px;
-    background: rgba(255,255,255,.15);
-}
-.stat-blue { background: linear-gradient(135deg,#2563eb,#1d4ed8); }
-.stat-green { background: linear-gradient(135deg,#10b981,#059669); }
-.stat-purple { background: linear-gradient(135deg,#8b5cf6,#6d28d9); }
-.stat-orange { background: linear-gradient(135deg,#f59e0b,#ea580c); }
-.stat-red { background: linear-gradient(135deg,#ef4444,#be123c); }
-.stat-dark { background: linear-gradient(135deg,#1f2937,#0f172a); }
-.stat-cyan { background: linear-gradient(135deg,#06b6d4,#0284c7); }
-.stat-pink { background: linear-gradient(135deg,#db2777,#be185d); }
-
-.stat-label,
-.stat-number,
-.stat-desc {
-    position: relative;
-    z-index: 1;
-}
-.stat-label {
-    font-size: 14px;
-    font-weight: 800;
-    margin-bottom: 14px;
-}
-.stat-number {
-    font-size: 42px;
-    font-weight: 900;
-    margin-bottom: 8px;
-}
-.stat-desc {
-    font-size: 13px;
-    line-height: 1.5;
-    opacity: .95;
-}
-
-.admin-grid {
-    display: grid;
-    grid-template-columns: 1.15fr .85fr;
-    gap: 22px;
-    margin-bottom: 24px;
-    align-items: start;
-}
-.admin-grid-2 {
+.latest-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 22px;
-    align-items: start;
-}
-.card-premium {
-    background: #fff;
-    border-radius: 28px;
-    padding: 28px;
-    border: 1px solid #edf2f7;
-    box-shadow: 0 18px 42px rgba(15,23,42,.06);
-}
-.section-head {
-    display: flex;
-    justify-content: space-between;
-    gap: 14px;
-    align-items: flex-start;
-    flex-wrap: wrap;
-    margin-bottom: 22px;
-}
-.section-title {
-    margin: 0 0 8px;
-    font-size: 26px;
-    font-weight: 900;
-    color: #0f172a;
-}
-.section-subtitle {
-    margin: 0;
-    color: #64748b;
-    font-size: 15px;
-    line-height: 1.6;
-}
-.see-all {
-    color: #2563eb;
-    font-weight: 900;
-    text-decoration: none;
-}
-
-.menu-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 14px;
-}
-.menu-card {
-    display: grid;
-    grid-template-columns: 44px 1fr auto;
-    align-items: center;
-    gap: 14px;
-    padding: 18px;
-    border-radius: 22px;
-    border: 1px solid #dbeafe;
-    background: linear-gradient(135deg,#f8fbff,#eff6ff);
-    text-decoration: none;
-    transition: .2s ease;
-}
-.menu-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 14px 30px rgba(37,99,235,.11);
-}
-.menu-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 16px;
-    background: #2563eb;
-    color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 900;
-}
-.menu-title {
-    color: #0f172a;
-    font-size: 16px;
-    font-weight: 900;
-    margin-bottom: 4px;
-}
-.menu-desc {
-    color: #64748b;
-    font-size: 13px;
-    line-height: 1.4;
-}
-.menu-arrow {
-    color: #2563eb;
-    font-weight: 900;
-}
-
-.alert-list {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-}
-.alert-card {
-    border-radius: 22px;
-    padding: 18px;
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-}
-.alert-title {
-    font-weight: 900;
-    color: #0f172a;
-    margin-bottom: 10px;
-}
-.badge {
-    display: inline-flex;
-    align-items: center;
-    padding: 8px 12px;
-    border-radius: 999px;
-    font-size: 12px;
-    font-weight: 900;
-}
-.badge-blue { background: #dbeafe; color: #1d4ed8; }
-.badge-green { background: #dcfce7; color: #166534; }
-.badge-orange { background: #fef3c7; color: #92400e; }
-.badge-gray { background: #e2e8f0; color: #475569; }
-
-.table-wrap {
-    width: 100%;
-    overflow-x: auto;
-    border-radius: 22px;
-    border: 1px solid #eef2f7;
-}
-.table-modern {
-    width: 100%;
-    min-width: 760px;
-    border-collapse: collapse;
-    background: #fff;
-}
-.table-modern thead {
-    background: linear-gradient(135deg,#f8fbff,#eff6ff);
-}
-.table-modern th,
-.table-modern td {
-    padding: 16px;
-    border-bottom: 1px solid #eef2f7;
-    text-align: left;
-    vertical-align: top;
-    font-size: 14px;
-}
-.table-modern th {
-    color: #334155;
-    font-size: 13px;
-    font-weight: 900;
-    white-space: nowrap;
-}
-.row-title {
-    color: #0f172a;
-    font-weight: 900;
-    line-height: 1.5;
-}
-.row-sub {
-    color: #64748b;
-    font-size: 13px;
-    margin-top: 4px;
-    line-height: 1.4;
-}
-.empty-box {
-    padding: 24px;
-    border-radius: 22px;
-    border: 1px dashed #cbd5e1;
-    background: #f8fafc;
-    color: #64748b;
-    text-align: center;
 }
 
 .activity-list {
@@ -394,35 +337,117 @@
     font-weight: 700;
 }
 
-@media (max-width: 700px) {
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+.badge-green { background: #dcfce7; color: #166534; }
+.badge-orange { background: #fef3c7; color: #92400e; }
+
+.empty-box {
+    padding: 24px;
+    border-radius: 22px;
+    border: 1px dashed #cbd5e1;
+    background: #f8fafc;
+    color: #64748b;
+    text-align: center;
+}
+
+@media(max-width: 1200px) {
+    .admin-stat-grid,
+    .menu-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .admin-stat {
+        aspect-ratio: auto;
+    }
+
+    .chart-grid,
+    .latest-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media(max-width: 700px) {
+    .admin-hero {
+        padding: 24px;
+        border-radius: 24px;
+    }
+
+    .admin-hero h2 {
+        font-size: 27px;
+    }
+
+    .hero-actions {
+        flex-direction: column;
+    }
+
+    .hero-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .admin-stat-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    .admin-stat {
+        min-height: 135px;
+        padding: 16px;
+        border-radius: 20px;
+    }
+
+    .stat-label {
+        font-size: 12px;
+    }
+
+    .stat-number {
+        font-size: 30px;
+    }
+
+    .stat-desc {
+        font-size: 11.5px;
+    }
+
+    .card-premium {
+        padding: 20px;
+        border-radius: 24px;
+    }
+
+    .section-title {
+        font-size: 22px;
+    }
+
+    .menu-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .menu-card {
+        min-height: auto;
+        display: grid;
+        grid-template-columns: 44px 1fr auto;
+        align-items: center;
+    }
+
+    .menu-arrow {
+        align-self: center;
+    }
+
     .activity-card {
         grid-template-columns: 1fr;
     }
 
     .activity-top {
         flex-direction: column;
-    }
-}
-
-@media(max-width:1200px) {
-    .admin-stat-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    .admin-grid,
-    .admin-grid-2 {
-        grid-template-columns: 1fr;
-    }
-}
-@media(max-width:700px) {
-    .admin-stat-grid,
-    .menu-grid {
-        grid-template-columns: 1fr;
-    }
-    .admin-hero h2 {
-        font-size: 27px;
-    }
-    .card-premium {
-        padding: 22px;
+        gap: 10px;
     }
 }
 </style>
@@ -443,6 +468,19 @@ $proposalDiproses   = $proposalDiproses ?? 0;
 
 $judulTerbaru    = $judulTerbaru ?? [];
 $proposalTerbaru = $proposalTerbaru ?? [];
+
+$judulDisetujui = $judulDisetujui ?? 0;
+$judulRevisi    = $judulRevisi ?? 0;
+$judulDitolak   = $judulDitolak ?? 0;
+$judulDiproses  = $judulDiproses ?? 0;
+
+$proposalDisetujui = $proposalDisetujui ?? 0;
+$proposalRevisi    = $proposalRevisi ?? 0;
+$proposalDitolak   = $proposalDitolak ?? 0;
+$proposalDiproses  = $proposalDiproses ?? 0;
+
+$totalGrafikJudul = max(1, $judulDisetujui + $judulRevisi + $judulDitolak + $judulDiproses);
+$totalGrafikProposal = max(1, $proposalDisetujui + $proposalRevisi + $proposalDitolak + $proposalDiproses);
 ?>
 
 <div class="admin-hero">
@@ -509,7 +547,7 @@ $proposalTerbaru = $proposalTerbaru ?? [];
     </div>
 </div>
 
-<div class="admin-grid">
+<div class="dashboard-section">
     <div class="card-premium">
         <div class="section-head">
             <div>
@@ -592,8 +630,9 @@ $proposalTerbaru = $proposalTerbaru ?? [];
             </a>
         </div>
     </div>
+</div>
 
-    <div class="admin-grid-2">
+<div class="chart-grid">
     <div class="card-premium">
         <div class="section-head">
             <div>
@@ -601,15 +640,6 @@ $proposalTerbaru = $proposalTerbaru ?? [];
                 <p class="section-subtitle">Ringkasan status pengajuan judul mahasiswa.</p>
             </div>
         </div>
-
-        <?php
-            $judulDisetujui = $judulDisetujui ?? 0;
-            $judulRevisi    = $judulRevisi ?? 0;
-            $judulDitolak   = $judulDitolak ?? 0;
-            $judulDiproses  = $judulDiproses ?? 0;
-
-            $totalGrafikJudul = max(1, $judulDisetujui + $judulRevisi + $judulDitolak + $judulDiproses);
-        ?>
 
         <div class="bar-list">
             <div class="bar-item">
@@ -662,15 +692,6 @@ $proposalTerbaru = $proposalTerbaru ?? [];
             </div>
         </div>
 
-        <?php
-            $proposalDisetujui = $proposalDisetujui ?? 0;
-            $proposalRevisi    = $proposalRevisi ?? 0;
-            $proposalDitolak   = $proposalDitolak ?? 0;
-            $proposalDiproses  = $proposalDiproses ?? 0;
-
-            $totalGrafikProposal = max(1, $proposalDisetujui + $proposalRevisi + $proposalDitolak + $proposalDiproses);
-        ?>
-
         <div class="bar-list">
             <div class="bar-item">
                 <div class="bar-top">
@@ -715,88 +736,90 @@ $proposalTerbaru = $proposalTerbaru ?? [];
     </div>
 </div>
 
-<div class="card-premium">
-    <div class="section-head">
-        <div>
-            <h3 class="section-title">Pengajuan Judul Terbaru</h3>
-            <p class="section-subtitle">Data pengajuan judul terbaru yang masuk ke sistem.</p>
+<div class="latest-grid">
+    <div class="card-premium">
+        <div class="section-head">
+            <div>
+                <h3 class="section-title">Pengajuan Judul Terbaru</h3>
+                <p class="section-subtitle">Data pengajuan judul terbaru yang masuk ke sistem.</p>
+            </div>
+            <a class="see-all" href="<?= base_url('/admin/monitoring-judul') ?>">Lihat semua</a>
         </div>
-        <a class="see-all" href="<?= base_url('/admin/monitoring-judul') ?>">Lihat semua</a>
-    </div>
 
-    <?php if (! empty($judulTerbaru)): ?>
-        <div class="activity-list">
-            <?php foreach ($judulTerbaru as $row): ?>
-                <div class="activity-card">
-                    <div class="activity-avatar">J</div>
-                    <div class="activity-body">
-                        <div class="activity-top">
-                            <div>
-                                <div class="activity-title"><?= esc((string) ($row['nama_mahasiswa'] ?? '-')) ?></div>
-                                <div class="activity-sub"><?= esc((string) ($row['nim'] ?? '-')) ?></div>
+        <?php if (! empty($judulTerbaru)): ?>
+            <div class="activity-list">
+                <?php foreach ($judulTerbaru as $row): ?>
+                    <div class="activity-card">
+                        <div class="activity-avatar">J</div>
+                        <div class="activity-body">
+                            <div class="activity-top">
+                                <div>
+                                    <div class="activity-title"><?= esc((string) ($row['nama_mahasiswa'] ?? '-')) ?></div>
+                                    <div class="activity-sub"><?= esc((string) ($row['nim'] ?? '-')) ?></div>
+                                </div>
+
+                                <span class="badge <?= (($row['status'] ?? '') === 'disetujui') ? 'badge-green' : 'badge-orange' ?>">
+                                    <?= esc((string) ($row['status'] ?? '-')) ?>
+                                </span>
                             </div>
 
-                            <span class="badge <?= (($row['status'] ?? '') === 'disetujui') ? 'badge-green' : 'badge-orange' ?>">
-                                <?= esc((string) ($row['status'] ?? '-')) ?>
-                            </span>
-                        </div>
-
-                        <div class="activity-desc">
-                            <?= esc((string) ($row['judul'] ?? '-')) ?>
-                        </div>
-
-                        <div class="activity-date">
-                            <?= esc((string) ($row['tanggal_pengajuan'] ?? $row['created_at'] ?? '-')) ?>
-                        </div>
-                    </div>
-                </div>
-            <?php endforeach; ?>
-        </div>
-    <?php else: ?>
-        <div class="empty-box">Belum ada pengajuan judul terbaru.</div>
-    <?php endif; ?>
-</div>
-
-<div class="card-premium">
-    <div class="section-head">
-        <div>
-            <h3 class="section-title">Proposal Terbaru</h3>
-            <p class="section-subtitle">Data proposal terbaru mahasiswa.</p>
-        </div>
-        <a class="see-all" href="<?= base_url('/admin/monitoring-proposal') ?>">Lihat semua</a>
-    </div>
-
-    <?php if (! empty($proposalTerbaru)): ?>
-        <div class="activity-list">
-            <?php foreach ($proposalTerbaru as $row): ?>
-                <div class="activity-card">
-                    <div class="activity-avatar">P</div>
-                    <div class="activity-body">
-                        <div class="activity-top">
-                            <div>
-                                <div class="activity-title"><?= esc((string) ($row['nama_mahasiswa'] ?? '-')) ?></div>
-                                <div class="activity-sub"><?= esc((string) ($row['nim'] ?? '-')) ?></div>
+                            <div class="activity-desc">
+                                <?= esc((string) ($row['judul'] ?? '-')) ?>
                             </div>
 
-                            <span class="badge <?= (($row['status'] ?? '') === 'disetujui') ? 'badge-green' : 'badge-orange' ?>">
-                                <?= esc((string) ($row['status'] ?? '-')) ?>
-                            </span>
-                        </div>
-
-                        <div class="activity-desc">
-                            <?= esc((string) ($row['nama_file_asli'] ?? '-')) ?>
-                        </div>
-
-                        <div class="activity-date">
-                            <?= esc((string) ($row['tanggal_upload'] ?? $row['created_at'] ?? '-')) ?>
+                            <div class="activity-date">
+                                <?= esc((string) ($row['tanggal_pengajuan'] ?? $row['created_at'] ?? '-')) ?>
+                            </div>
                         </div>
                     </div>
-                </div>
-            <?php endforeach; ?>
+                <?php endforeach; ?>
+            </div>
+        <?php else: ?>
+            <div class="empty-box">Belum ada pengajuan judul terbaru.</div>
+        <?php endif; ?>
+    </div>
+
+    <div class="card-premium">
+        <div class="section-head">
+            <div>
+                <h3 class="section-title">Proposal Terbaru</h3>
+                <p class="section-subtitle">Data proposal terbaru mahasiswa.</p>
+            </div>
+            <a class="see-all" href="<?= base_url('/admin/monitoring-proposal') ?>">Lihat semua</a>
         </div>
-    <?php else: ?>
-        <div class="empty-box">Belum ada proposal terbaru.</div>
-    <?php endif; ?>
+
+        <?php if (! empty($proposalTerbaru)): ?>
+            <div class="activity-list">
+                <?php foreach ($proposalTerbaru as $row): ?>
+                    <div class="activity-card">
+                        <div class="activity-avatar">P</div>
+                        <div class="activity-body">
+                            <div class="activity-top">
+                                <div>
+                                    <div class="activity-title"><?= esc((string) ($row['nama_mahasiswa'] ?? '-')) ?></div>
+                                    <div class="activity-sub"><?= esc((string) ($row['nim'] ?? '-')) ?></div>
+                                </div>
+
+                                <span class="badge <?= (($row['status'] ?? '') === 'disetujui') ? 'badge-green' : 'badge-orange' ?>">
+                                    <?= esc((string) ($row['status'] ?? '-')) ?>
+                                </span>
+                            </div>
+
+                            <div class="activity-desc">
+                                <?= esc((string) ($row['nama_file_asli'] ?? '-')) ?>
+                            </div>
+
+                            <div class="activity-date">
+                                <?= esc((string) ($row['tanggal_upload'] ?? $row['created_at'] ?? '-')) ?>
+                            </div>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        <?php else: ?>
+            <div class="empty-box">Belum ada proposal terbaru.</div>
+        <?php endif; ?>
+    </div>
 </div>
 
 <?= $this->endSection() ?>

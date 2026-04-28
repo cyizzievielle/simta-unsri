@@ -13,7 +13,15 @@ $routes->get('/logout', 'Auth::logout');
 
 $routes->group('', ['filter' => 'auth'], static function ($routes) {
     $routes->get('/dashboard', 'Dashboard::index');
+    
+    $routes->get('users', 'Admin\UserController::index');
+    $routes->get('users/create', 'Admin\UserController::create');
+    $routes->post('users/store', 'Admin\UserController::store');
 
+    $routes->get('users/edit/(:num)', 'Admin\UserController::edit/$1');
+    $routes->post('users/update/(:num)', 'Admin\UserController::update/$1');
+    $routes->post('users/delete/(:num)', 'Admin\UserController::delete/$1');
+    
     $routes->get('admin/surat-keputusan', 'Admin::suratKeputusan');
     $routes->get('admin/surat-keputusan/create', 'Admin::createSK');
     $routes->post('admin/surat-keputusan/store', 'Admin::storeSK');

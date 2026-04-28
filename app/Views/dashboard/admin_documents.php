@@ -2,290 +2,456 @@
 <?= $this->section('content') ?>
 
 <style>
-    .docs-hero {
-        background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 55%, #2563eb 100%);
-        color: #fff;
-        border-radius: 28px;
-        padding: 28px 30px;
-        margin-bottom: 22px;
-        box-shadow: 0 18px 40px rgba(37, 99, 235, 0.18);
-        position: relative;
-        overflow: hidden;
+.docs-hero {
+    background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 55%, #2563eb 100%);
+    color: #fff;
+    border-radius: 24px;
+    padding: 24px;
+    margin-bottom: 18px;
+    box-shadow: 0 16px 36px rgba(37, 99, 235, 0.16);
+    position: relative;
+    overflow: hidden;
+}
+
+.docs-hero::after {
+    content: "";
+    position: absolute;
+    right: -45px;
+    top: -45px;
+    width: 160px;
+    height: 160px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 50%;
+}
+
+.docs-hero h2 {
+    margin: 0 0 6px;
+    font-size: 26px;
+    font-weight: 900;
+    position: relative;
+    z-index: 1;
+}
+
+.docs-hero p {
+    margin: 0;
+    color: rgba(255,255,255,0.9);
+    line-height: 1.5;
+    font-size: 13px;
+    position: relative;
+    z-index: 1;
+}
+
+.docs-top-grid {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+.docs-summary-card,
+.docs-side-card,
+.docs-main-card {
+    background: #fff;
+    border-radius: 22px;
+    padding: 20px;
+    box-shadow: 0 14px 35px rgba(15, 23, 42, 0.06);
+    border: 1px solid #eef2f7;
+}
+
+.docs-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.docs-mini-stat {
+    border-radius: 18px;
+    padding: 15px;
+    color: #fff;
+    min-height: 100px;
+    position: relative;
+    overflow: hidden;
+}
+
+.docs-mini-stat::after {
+    content: "";
+    position: absolute;
+    right: -16px;
+    bottom: -16px;
+    width: 72px;
+    height: 72px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 50%;
+}
+
+.docs-stat-blue { background: linear-gradient(135deg, #2563eb, #1d4ed8); }
+.docs-stat-emerald { background: linear-gradient(135deg, #059669, #10b981); }
+.docs-stat-slate { background: linear-gradient(135deg, #334155, #0f172a); }
+
+.docs-mini-label,
+.docs-mini-value,
+.docs-mini-desc {
+    position: relative;
+    z-index: 1;
+}
+
+.docs-mini-label {
+    font-size: 11.5px;
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+
+.docs-mini-value {
+    font-size: 28px;
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 6px;
+}
+
+.docs-mini-desc {
+    font-size: 10.5px;
+    line-height: 1.35;
+    opacity: .95;
+}
+
+.docs-side-card h3,
+.docs-main-card h3 {
+    margin: 0 0 6px;
+    font-size: 22px;
+    font-weight: 900;
+    color: #0f172a;
+}
+
+.docs-side-card p,
+.docs-main-card p {
+    margin: 0;
+    color: #64748b;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.docs-header-inline {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+}
+
+.premium-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    border-radius: 16px;
+    border: 1px solid #eef2f7;
+}
+
+.premium-table {
+    width: 100%;
+    min-width: 1300px;
+    border-collapse: collapse;
+    background: #fff;
+}
+
+.premium-table thead tr {
+    background: linear-gradient(135deg, #f8fbff, #eff6ff);
+}
+
+.premium-table th,
+.premium-table td {
+    padding: 9px 9px;
+    text-align: left;
+    border-bottom: 1px solid #eef2f7;
+    vertical-align: middle;
+    color: #0f172a;
+    font-size: 11.5px;
+    line-height: 1.3;
+    white-space: nowrap;
+}
+
+.premium-table th {
+    font-size: 10.5px;
+    font-weight: 900;
+    color: #334155;
+}
+
+.cell-name {
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: 900;
+}
+
+.cell-title-long {
+    min-width: 420px;
+    max-width: 420px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.cell-file {
+    min-width: 230px;
+    max-width: 230px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.cell-sk {
+    min-width: 150px;
+    max-width: 180px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 7px;
+    border-radius: 999px;
+    font-size: 9.8px;
+    font-weight: 900;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.badge-terbit { background: #dcfce7; color: #166534; }
+.badge-draft { background: #dbeafe; color: #1d4ed8; }
+.badge-arsip { background: #f3f4f6; color: #374151; }
+
+.action-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: nowrap;
+}
+
+.action-icon {
+    width: 29px;
+    height: 29px;
+    border-radius: 9px;
+    border: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-size: 12px;
+    cursor: pointer;
+    font-weight: 900;
+}
+
+.action-icon.view {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.action-icon.delete {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.premium-empty {
+    border: 1px dashed #cbd5e1;
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    border-radius: 20px;
+    padding: 22px;
+    text-align: center;
+    color: #64748b;
+    font-size: 13px;
+}
+
+.report-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+}
+
+.report-card {
+    background: linear-gradient(135deg, #ffffff, #f8fbff);
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    padding: 18px;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.04);
+}
+
+.report-card .label {
+    font-size: 12px;
+    font-weight: 800;
+    color: #64748b;
+    margin-bottom: 10px;
+}
+
+.report-card .value {
+    font-size: 30px;
+    font-weight: 900;
+    color: #0f172a;
+    line-height: 1;
+    margin-bottom: 8px;
+}
+
+.report-card .desc {
+    color: #64748b;
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+@media(max-width: 1100px) {
+    .docs-top-grid {
+        grid-template-columns: 1fr;
     }
 
-    .docs-hero::after {
-        content: "";
-        position: absolute;
-        right: -45px;
-        top: -45px;
-        width: 180px;
-        height: 180px;
-        background: rgba(255,255,255,0.08);
-        border-radius: 50%;
+    .report-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media(max-width: 760px) {
+    .docs-hero {
+        padding: 18px;
+        border-radius: 20px;
+        margin-bottom: 14px;
     }
 
     .docs-hero h2 {
-        margin: 0 0 8px;
-        font-size: 28px;
-        font-weight: 800;
-        position: relative;
-        z-index: 1;
+        font-size: 22px;
     }
 
     .docs-hero p {
-        margin: 0;
-        color: rgba(255,255,255,0.92);
-        line-height: 1.7;
-        position: relative;
-        z-index: 1;
-    }
-
-    .docs-top-grid {
-        display: grid;
-        grid-template-columns: 1fr 320px;
-        gap: 22px;
-        margin-bottom: 22px;
+        font-size: 12px;
+        line-height: 1.4;
     }
 
     .docs-summary-card,
     .docs-side-card,
     .docs-main-card {
-        background: #fff;
-        border-radius: 24px;
-        padding: 24px;
-        box-shadow: 0 14px 35px rgba(15, 23, 42, 0.06);
-        border: 1px solid #eef2f7;
+        padding: 14px;
+        border-radius: 20px;
     }
 
     .docs-summary-grid {
-        display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 14px;
-        margin-top: 14px;
+        gap: 8px;
     }
 
     .docs-mini-stat {
-        border-radius: 20px;
-        padding: 18px;
-        color: #fff;
-        position: relative;
-        overflow: hidden;
-        min-height: 108px;
+        min-height: 86px;
+        padding: 11px;
+        border-radius: 15px;
     }
-
-    .docs-mini-stat::after {
-        content: "";
-        position: absolute;
-        right: -16px;
-        bottom: -16px;
-        width: 78px;
-        height: 78px;
-        background: rgba(255,255,255,0.08);
-        border-radius: 50%;
-    }
-
-    .docs-stat-blue { background: linear-gradient(135deg, #2563eb, #1d4ed8); }
-    .docs-stat-emerald { background: linear-gradient(135deg, #059669, #10b981); }
-    .docs-stat-slate { background: linear-gradient(135deg, #334155, #0f172a); }
 
     .docs-mini-label {
-        font-size: 13px;
-        font-weight: 700;
-        margin-bottom: 10px;
-        position: relative;
-        z-index: 1;
+        font-size: 9.8px;
     }
 
     .docs-mini-value {
-        font-size: 30px;
-        font-weight: 800;
-        margin-bottom: 6px;
-        position: relative;
-        z-index: 1;
+        font-size: 23px;
     }
 
     .docs-mini-desc {
-        font-size: 12px;
-        opacity: 0.95;
-        position: relative;
-        z-index: 1;
+        font-size: 9px;
     }
 
     .docs-side-card h3,
     .docs-main-card h3 {
-        margin: 0 0 8px;
-        font-size: 22px;
-        color: #0f172a;
+        font-size: 19px;
     }
 
     .docs-side-card p,
     .docs-main-card p {
-        margin: 0;
-        color: #64748b;
-        line-height: 1.7;
+        font-size: 12px;
     }
 
-    .docs-header-inline {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 16px;
-        flex-wrap: wrap;
-        margin-bottom: 18px;
-    }
-
-    .premium-table-wrap {
-        width: 100%;
-        overflow-x: auto;
-        border-radius: 18px;
-        border: 1px solid #eef2f7;
+    .docs-side-card .btn {
+        padding: 9px 12px;
+        border-radius: 12px;
+        font-size: 12px;
     }
 
     .premium-table {
-        width: 100%;
-        min-width: 1350px;
-        border-collapse: collapse;
-        background: #fff;
-    }
-
-    .premium-table thead tr {
-        background: linear-gradient(135deg, #f8fbff, #eff6ff);
+        min-width: 1320px;
     }
 
     .premium-table th,
     .premium-table td {
-        padding: 16px 14px;
-        text-align: left;
-        border-bottom: 1px solid #eef2f7;
-        vertical-align: top;
+        padding: 7px 7px;
+        font-size: 10.5px;
     }
 
     .premium-table th {
-        font-size: 13px;
-        font-weight: 800;
-        color: #334155;
-        white-space: nowrap;
+        font-size: 9.8px;
     }
 
-    .premium-table td {
-        color: #0f172a;
-        font-size: 14px;
-    }
-
-    .premium-table tbody tr:hover {
-        background: #fafcff;
-    }
-
-    .status-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 8px 12px;
-        border-radius: 999px;
-        font-size: 12px;
-        font-weight: 800;
-        line-height: 1;
-        white-space: nowrap;
-    }
-
-    .badge-terbit {
-        background: #dcfce7;
-        color: #166534;
-    }
-
-    .badge-draft {
-        background: #dbeafe;
-        color: #1d4ed8;
-    }
-
-    .badge-arsip {
-        background: #f3f4f6;
-        color: #374151;
-    }
-
-    .premium-empty {
-        border: 1px dashed #cbd5e1;
-        background: linear-gradient(135deg, #f8fafc, #f1f5f9);
-        border-radius: 22px;
-        padding: 28px;
-        text-align: center;
-        color: #64748b;
+    .cell-title-long {
+        min-width: 420px;
+        max-width: 420px;
     }
 
     .report-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 18px;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
     }
 
     .report-card {
-        background: linear-gradient(135deg, #ffffff, #f8fbff);
-        border: 1px solid #e2e8f0;
-        border-radius: 22px;
-        padding: 22px;
-        box-shadow: 0 10px 24px rgba(15, 23, 42, 0.04);
+        padding: 14px;
+        border-radius: 17px;
     }
 
     .report-card .label {
-        font-size: 13px;
-        font-weight: 700;
-        color: #64748b;
-        margin-bottom: 12px;
+        font-size: 10.5px;
+        margin-bottom: 7px;
     }
 
     .report-card .value {
-        font-size: 34px;
-        font-weight: 800;
-        color: #0f172a;
-        margin-bottom: 8px;
+        font-size: 24px;
     }
 
     .report-card .desc {
-        color: #64748b;
-        font-size: 13px;
-        line-height: 1.6;
+        font-size: 10.5px;
     }
-
-    @media (max-width: 1100px) {
-        .docs-top-grid,
-        .report-grid,
-        .docs-summary-grid {
-            grid-template-columns: 1fr;
-        }
-    }
+}
 </style>
 
 <?php
-    $pageType = (string) ($pageType ?? '');
+$pageType = (string) ($pageType ?? '');
 
-    $badgeClass = static function (?string $status): string {
-        $status = strtolower((string) $status);
-        return match ($status) {
-            'draft'  => 'badge-draft',
-            'terbit' => 'badge-terbit',
-            'arsip'  => 'badge-arsip',
-            default  => 'badge-draft',
-        };
+$badgeClass = static function (?string $status): string {
+    $status = strtolower((string) $status);
+
+    return match ($status) {
+        'draft'  => 'badge-draft',
+        'terbit' => 'badge-terbit',
+        'arsip'  => 'badge-arsip',
+        default  => 'badge-draft',
     };
+};
 
-    $rows = $rows ?? [];
-    $totalRows = count($rows);
+$rows = $rows ?? [];
+$totalRows = count($rows);
 
-    $countDraft = 0;
-    $countTerbit = 0;
-    $countArsip = 0;
+$countDraft = 0;
+$countTerbit = 0;
+$countArsip = 0;
 
-    foreach ($rows as $r) {
-        $status = strtolower((string) ($r['status'] ?? ''));
-        if ($status === 'draft') $countDraft++;
-        if ($status === 'terbit') $countTerbit++;
-        if ($status === 'arsip') $countArsip++;
+foreach ($rows as $r) {
+    $status = strtolower((string) ($r['status'] ?? ''));
+
+    if ($status === 'draft') {
+        $countDraft++;
     }
 
-    $heroTitle = $pageType === 'surat_keputusan' ? 'Surat Keputusan' : 'Laporan / Arsip';
-    $heroDesc = $pageType === 'surat_keputusan'
-        ? 'Kelola penerbitan, penyimpanan, dan arsip Surat Keputusan berdasarkan proposal yang sudah disetujui.'
-        : 'Lihat ringkasan statistik operasional sistem dan arsip data utama dalam satu panel yang rapi.';
+    if ($status === 'terbit') {
+        $countTerbit++;
+    }
+
+    if ($status === 'arsip') {
+        $countArsip++;
+    }
+}
+
+$heroTitle = $pageType === 'surat_keputusan' ? 'Surat Keputusan' : 'Laporan / Arsip';
+$heroDesc = $pageType === 'surat_keputusan'
+    ? 'Kelola penerbitan, penyimpanan, dan arsip Surat Keputusan berdasarkan proposal yang sudah disetujui.'
+    : 'Lihat ringkasan statistik operasional sistem dan arsip data utama dalam satu panel yang rapi.';
 ?>
 
 <div class="docs-hero">
@@ -324,8 +490,8 @@
             <h3>Quick Action</h3>
             <p>Admin dapat langsung menambah SK baru dari proposal yang sudah disetujui.</p>
 
-            <div style="margin-top:18px;">
-                <a href="<?= base_url('/admin/surat-keputusan/create') ?>" class="btn btn-primary">
+            <div style="margin-top:14px;">
+                <a href="<?= site_url('admin/surat-keputusan/create') ?>" class="btn btn-primary">
                     + Tambah SK
                 </a>
             </div>
@@ -356,57 +522,84 @@
                             <th>Aksi</th>
                         </tr>
                     </thead>
+
                     <tbody>
                         <?php foreach (($rows ?? []) as $row): ?>
+                            <?php
+                            $files = [];
+
+                            if (! empty($row['file_sk'])) {
+                                $decoded = json_decode((string) $row['file_sk'], true);
+
+                                if (is_array($decoded)) {
+                                    $files = $decoded;
+                                } else {
+                                    $files[] = [
+                                        'nama_asli' => basename((string) $row['file_sk']),
+                                        'path'      => (string) $row['file_sk'],
+                                    ];
+                                }
+                            }
+                            ?>
+
                             <tr>
-                                <td><?= esc((string) ($row['nama_mahasiswa'] ?? '-')) ?></td>
-                                <td><?= esc((string) ($row['nim'] ?? '-')) ?></td>
-                                <td><?= esc((string) ($row['judul'] ?? '-')) ?></td>
-                                <td><?= esc((string) ($row['nama_file_asli'] ?? '-')) ?></td>
-                                <td><?= esc((string) ($row['nomor_sk'] ?? '-')) ?></td>
-                                <td><?= esc((string) ($row['tanggal_terbit'] ?? '-')) ?></td>
+                                <td class="cell-name">
+                                    <?= esc((string) ($row['nama_mahasiswa'] ?? '-')) ?>
+                                </td>
+
                                 <td>
-    <?php
-    $files = [];
+                                    <?= esc((string) ($row['nim'] ?? '-')) ?>
+                                </td>
 
-    if (! empty($row['file_sk'])) {
-        $decoded = json_decode($row['file_sk'], true);
+                                <td class="cell-title-long">
+                                    <?= esc((string) ($row['judul'] ?? '-')) ?>
+                                </td>
 
-        if (is_array($decoded)) {
-            $files = $decoded;
-        } else {
-            $files[] = [
-                'nama_asli' => basename((string) $row['file_sk']),
-                'path'      => (string) $row['file_sk'],
-            ];
-        }
-    }
-    ?>
+                                <td class="cell-file">
+                                    <?= esc((string) ($row['nama_file_asli'] ?? '-')) ?>
+                                </td>
 
-    <?php if (! empty($files)): ?>
-        <div style="display:flex; gap:8px; flex-wrap:wrap;">
-            <?php foreach ($files as $file): ?>
-                <a href="<?= base_url($file['path'] ?? '') ?>" 
-                   target="_blank" 
-                   class="btn btn-primary">
-                    📄 Lihat
-                </a>
-            <?php endforeach; ?>
-        </div>
-    <?php else: ?>
-        -
-    <?php endif; ?>
-</td>
+                                <td class="cell-sk">
+                                    <?= esc((string) ($row['nomor_sk'] ?? '-')) ?>
+                                </td>
+
+                                <td>
+                                    <?= esc((string) ($row['tanggal_terbit'] ?? '-')) ?>
+                                </td>
+
+                                <td>
+                                    <?php if (! empty($files)): ?>
+                                        <div class="action-group">
+                                            <?php foreach ($files as $file): ?>
+                                                <a
+                                                    href="<?= base_url($file['path'] ?? '') ?>"
+                                                    target="_blank"
+                                                    class="action-icon view"
+                                                    title="Lihat File"
+                                                >
+                                                    📄
+                                                </a>
+                                            <?php endforeach; ?>
+                                        </div>
+                                    <?php else: ?>
+                                        -
+                                    <?php endif; ?>
+                                </td>
+
                                 <td>
                                     <span class="status-badge <?= $badgeClass($row['status'] ?? '') ?>">
                                         <?= esc((string) ($row['status'] ?? '-')) ?>
                                     </span>
                                 </td>
+
                                 <td>
-                                    <a href="<?= base_url('/admin/surat-keputusan/delete/' . (string) ($row['id'] ?? '')) ?>"
-                                       class="btn btn-danger"
-                                       onclick="return confirm('Hapus SK ini?')">
-                                        Hapus
+                                    <a
+                                        href="<?= site_url('admin/surat-keputusan/delete/' . (string) ($row['id'] ?? '')) ?>"
+                                        class="action-icon delete"
+                                        title="Hapus"
+                                        onclick="return confirm('Hapus SK ini?')"
+                                    >
+                                        🗑
                                     </a>
                                 </td>
                             </tr>
