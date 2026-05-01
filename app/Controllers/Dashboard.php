@@ -441,8 +441,13 @@ public function proposalTa()
                 ->getRowArray();
 
             $riwayatProposal = $db->table('proposal_ta pt')
-                ->select('pt.*, pj.judul')
-                ->join('pengajuan_judul pj', 'pj.id = pt.pengajuan_judul_id')
+                ->select('
+                    pt.*,
+                    pj.judul,
+                    pj.bidang_topik,
+                    pj.kata_kunci
+                ')
+                ->join('pengajuan_judul pj', 'pj.id = pt.pengajuan_judul_id', 'left')
                 ->where('pt.mahasiswa_id', $mahasiswa['id'])
                 ->orderBy('pt.id', 'DESC')
                 ->get()

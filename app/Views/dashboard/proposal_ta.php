@@ -1,501 +1,562 @@
 <?= $this->extend('layouts/dashboard') ?>
-
 <?= $this->section('content') ?>
 
 <style>
-    .page-hero {
-        background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 55%, #2563eb 100%);
-        color: #fff;
-        border-radius: 28px;
-        padding: 28px 30px;
-        margin-bottom: 22px;
-        box-shadow: 0 18px 40px rgba(37, 99, 235, 0.18);
-        position: relative;
-        overflow: hidden;
+.proposal-page {
+    display: grid;
+    gap: 18px;
+}
+
+.proposal-hero {
+    background:
+        radial-gradient(circle at top right, rgba(96,165,250,.32), transparent 30%),
+        linear-gradient(135deg, #eff6ff, #ffffff);
+    border: 1px solid #dbeafe;
+    border-radius: 28px;
+    padding: 26px;
+    box-shadow: 0 18px 45px rgba(37,99,235,.08);
+}
+
+.proposal-hero h2 {
+    margin: 0 0 8px;
+    font-size: 28px;
+    font-weight: 900;
+    color: #0f172a;
+}
+
+.proposal-hero p {
+    margin: 0;
+    color: #64748b;
+    line-height: 1.6;
+}
+
+.stat-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+}
+
+.stat-card {
+    background: #fff;
+    border: 1px solid #e5efff;
+    border-radius: 22px;
+    padding: 18px;
+    box-shadow: 0 14px 30px rgba(37,99,235,.06);
+}
+
+.stat-label {
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 900;
+}
+
+.stat-value {
+    margin: 8px 0 4px;
+    font-size: 30px;
+    font-weight: 900;
+    color: #0f172a;
+}
+
+.stat-desc {
+    color: #64748b;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.card-soft {
+    background: #fff;
+    border: 1px solid #e5efff;
+    border-radius: 26px;
+    padding: 22px;
+    box-shadow: 0 14px 34px rgba(37,99,235,.06);
+}
+
+.grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+}
+
+.card-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: flex-start;
+    margin-bottom: 16px;
+}
+
+.card-title {
+    margin: 0 0 6px;
+    font-size: 22px;
+    font-weight: 900;
+    color: #0f172a;
+}
+
+.card-subtitle {
+    margin: 0;
+    color: #64748b;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.highlight-box {
+    border: 1px solid #bfdbfe;
+    background: linear-gradient(135deg, #f8fbff, #eef6ff);
+    border-radius: 22px;
+    padding: 18px;
+}
+
+.highlight-title {
+    font-size: 17px;
+    font-weight: 900;
+    color: #0f172a;
+    line-height: 1.55;
+    margin-bottom: 12px;
+}
+
+.meta-list {
+    display: grid;
+    gap: 9px;
+    color: #64748b;
+    font-size: 13px;
+}
+
+.meta-list strong {
+    color: #334155;
+}
+
+.note-box {
+    border: 1px dashed #bfdbfe;
+    background: #f8fbff;
+    border-radius: 20px;
+    padding: 16px;
+    color: #64748b;
+    line-height: 1.7;
+    font-size: 14px;
+}
+
+.btn-soft {
+    border: none;
+    border-radius: 15px;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, #60a5fa, #2563eb);
+    color: #fff;
+    font-weight: 900;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 14px 28px rgba(37,99,235,.18);
+}
+
+.btn-light {
+    background: #fff;
+    color: #2563eb;
+    border: 1px solid #bfdbfe;
+    box-shadow: none;
+}
+
+.upload-panel {
+    display: none;
+    margin-top: 16px;
+    border-radius: 22px;
+    border: 1px solid #dbeafe;
+    background: #f8fbff;
+    padding: 18px;
+}
+
+.upload-panel.show {
+    display: block;
+}
+
+.form-grid {
+    display: grid;
+    gap: 14px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 7px;
+    font-size: 13px;
+    font-weight: 900;
+    color: #334155;
+}
+
+.input,
+textarea,
+input[type="file"] {
+    width: 100%;
+    border: 1px solid #dbe3ef;
+    border-radius: 15px;
+    padding: 12px 14px;
+    background: #fff;
+    font-size: 14px;
+    outline: none;
+}
+
+.input:focus,
+textarea:focus,
+input[type="file"]:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 4px rgba(59,130,246,.12);
+}
+
+textarea {
+    min-height: 105px;
+    resize: vertical;
+}
+
+.help-text {
+    margin-top: 7px;
+    color: #64748b;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.status-pill {
+    display: inline-flex;
+    padding: 7px 11px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 900;
+    text-transform: capitalize;
+}
+
+.status-diajukan { background: #dbeafe; color: #1d4ed8; }
+.status-direview { background: #fef3c7; color: #92400e; }
+.status-revisi { background: #ffedd5; color: #c2410c; }
+.status-disetujui { background: #dcfce7; color: #166534; }
+.status-ditolak { background: #fee2e2; color: #b91c1c; }
+
+.table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    border-radius: 18px;
+    border: 1px solid #eef2f7;
+    -webkit-overflow-scrolling: touch;
+}
+
+.proposal-table {
+    width: 100%;
+    min-width: 1080px;
+    border-collapse: collapse;
+    background: #fff;
+}
+
+.proposal-table thead {
+    background: #f8fbff;
+}
+
+.proposal-table th,
+.proposal-table td {
+    padding: 14px;
+    border-bottom: 1px solid #eef2f7;
+    text-align: left;
+    vertical-align: top;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.proposal-table th {
+    color: #334155;
+    font-size: 12px;
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+.row-title {
+    font-weight: 900;
+    color: #0f172a;
+    max-width: 260px;
+}
+
+.empty-box {
+    padding: 22px;
+    border-radius: 20px;
+    border: 1px dashed #cbd5e1;
+    background: #f8fafc;
+    text-align: center;
+    color: #64748b;
+    line-height: 1.6;
+}
+
+.action-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+@media (max-width: 1100px) {
+    .grid-2,
+    .stat-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .proposal-page {
+        gap: 14px;
     }
 
-    .page-hero::after {
-        content: "";
-        position: absolute;
-        right: -45px;
-        top: -45px;
-        width: 180px;
-        height: 180px;
-        background: rgba(255,255,255,0.08);
-        border-radius: 50%;
+    .proposal-hero,
+    .card-soft {
+        padding: 16px;
+        border-radius: 20px;
     }
 
-    .page-hero h2 {
-        margin: 0 0 8px;
-        font-size: 28px;
-        font-weight: 800;
-        position: relative;
-        z-index: 1;
+    .proposal-hero h2 {
+        font-size: 22px;
     }
 
-    .page-hero p {
-        margin: 0;
-        color: rgba(255,255,255,0.92);
-        line-height: 1.7;
-        position: relative;
-        z-index: 1;
-    }
-
-    .premium-stats {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 18px;
-        margin-bottom: 22px;
-    }
-
-    .premium-stat-card {
-        border-radius: 24px;
-        padding: 22px;
-        color: #fff;
-        position: relative;
-        overflow: hidden;
-        box-shadow: 0 14px 35px rgba(15, 23, 42, 0.10);
-    }
-
-    .premium-stat-card::after {
-        content: "";
-        position: absolute;
-        right: -18px;
-        bottom: -18px;
-        width: 85px;
-        height: 85px;
-        background: rgba(255,255,255,0.10);
-        border-radius: 50%;
-    }
-
-    .stat-blue { background: linear-gradient(135deg, #2563eb, #1d4ed8); }
-    .stat-amber { background: linear-gradient(135deg, #d97706, #f59e0b); }
-    .stat-emerald { background: linear-gradient(135deg, #059669, #10b981); }
-
-    .premium-stat-label {
+    .proposal-hero p,
+    .card-subtitle {
         font-size: 13px;
-        font-weight: 700;
-        margin-bottom: 10px;
-        position: relative;
-        z-index: 1;
     }
 
-    .premium-stat-value {
-        font-size: 34px;
-        font-weight: 800;
-        margin-bottom: 6px;
-        position: relative;
-        z-index: 1;
-    }
-
-    .premium-stat-desc {
-        font-size: 12px;
-        opacity: 0.95;
-        position: relative;
-        z-index: 1;
-    }
-
-    .premium-grid-2 {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 22px;
-        margin-bottom: 22px;
-    }
-
-    .card-premium {
-        background: #fff;
-        border-radius: 26px;
-        padding: 24px;
-        box-shadow: 0 14px 35px rgba(15, 23, 42, 0.06);
-        border: 1px solid #eef2f7;
-        margin-bottom: 22px;
-    }
-
-    .section-head {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 12px;
-        flex-wrap: wrap;
-        margin-bottom: 16px;
-    }
-
-    .section-title-premium {
-        margin: 0 0 6px;
-        font-size: 24px;
-        font-weight: 800;
-        color: #0f172a;
-    }
-
-    .section-subtitle-premium {
-        margin: 0;
-        color: #64748b;
-        line-height: 1.7;
-    }
-
-    .proposal-highlight {
-        border: 1px solid #dbeafe;
-        background: linear-gradient(135deg, #f8fbff, #eef4ff);
-        border-radius: 22px;
-        padding: 20px;
-    }
-
-    .proposal-highlight-title {
-        font-size: 20px;
-        font-weight: 800;
-        color: #0f172a;
-        line-height: 1.5;
-        margin-bottom: 10px;
-    }
-
-    .proposal-meta {
-        display: grid;
-        gap: 8px;
-        color: #64748b;
-        font-size: 14px;
-        line-height: 1.7;
-    }
-
-    .proposal-meta strong {
-        color: #334155;
-    }
-
-    .form-grid {
-        display: grid;
-        gap: 16px;
-    }
-
-    .form-group-premium label {
-        display: block;
-        font-weight: 700;
-        color: #334155;
-        margin-bottom: 8px;
-    }
-
-    .form-group-premium .input,
-    .form-group-premium textarea,
-    .form-group-premium input[type="file"] {
-        width: 100%;
-        border: 1px solid #dbe3ef;
-        border-radius: 16px;
-        padding: 13px 15px;
-        font-size: 14px;
-        background: #fff;
-        outline: none;
-        box-sizing: border-box;
-    }
-
-    .form-group-premium .input:focus,
-    .form-group-premium textarea:focus,
-    .form-group-premium input[type="file"]:focus {
-        border-color: #2563eb;
-        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.10);
-    }
-
-    .form-group-premium textarea {
-        min-height: 120px;
-        resize: vertical;
-    }
-
-    .help-text {
-        color: #64748b;
-        font-size: 13px;
-        margin-top: 8px;
-        line-height: 1.6;
-    }
-
-    .info-note {
-        border: 1px dashed #cbd5e1;
-        background: linear-gradient(135deg, #f8fafc, #f1f5f9);
-        border-radius: 22px;
-        padding: 20px;
-        color: #64748b;
-        line-height: 1.75;
-    }
-
-    .premium-table-wrap {
-        width: 100%;
-        overflow-x: auto;
+    .stat-card {
         border-radius: 18px;
-        border: 1px solid #eef2f7;
+        padding: 15px;
     }
 
-    .premium-table {
+    .stat-value {
+        font-size: 25px;
+    }
+
+    .card-head {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .card-title {
+        font-size: 19px;
+    }
+
+    .btn-soft {
         width: 100%;
-        min-width: 1250px;
-        border-collapse: collapse;
-        background: #fff;
-    }
-
-    .premium-table thead tr {
-        background: linear-gradient(135deg, #f8fbff, #eff6ff);
-    }
-
-    .premium-table th,
-    .premium-table td {
-        padding: 16px 14px;
-        text-align: left;
-        border-bottom: 1px solid #eef2f7;
-        vertical-align: top;
-    }
-
-    .premium-table th {
+        padding: 11px 14px;
         font-size: 13px;
-        font-weight: 800;
-        color: #334155;
-        white-space: nowrap;
     }
 
-    .premium-table td {
-        color: #0f172a;
+    .upload-panel {
+        padding: 14px;
+        border-radius: 18px;
+    }
+
+    .highlight-box {
+        padding: 14px;
+        border-radius: 18px;
+    }
+
+    .highlight-title {
         font-size: 14px;
     }
 
-    .premium-table tbody tr:hover {
-        background: #fafcff;
+    .proposal-table {
+        min-width: 880px;
     }
 
-    .proposal-row-title {
-        font-weight: 800;
-        color: #0f172a;
-        line-height: 1.5;
-        margin-bottom: 6px;
+    .proposal-table th,
+    .proposal-table td {
+        padding: 10px;
+        font-size: 11px;
     }
 
-    .proposal-row-sub {
-        color: #64748b;
-        font-size: 13px;
-        line-height: 1.6;
+    .status-pill {
+        padding: 5px 8px;
+        font-size: 10px;
     }
 
-    .status-text {
-        font-weight: 700;
+    .row-title {
+        max-width: 190px;
+        font-size: 11px;
     }
-
-    .status-diajukan { color: #2563eb; }
-    .status-direview { color: #b45309; }
-    .status-revisi { color: #dc2626; }
-    .status-disetujui { color: #15803d; }
-    .status-ditolak { color: #475569; }
-
-    .action-row {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-    }
-
-    .premium-empty {
-        border: 1px dashed #cbd5e1;
-        background: linear-gradient(135deg, #f8fafc, #f1f5f9);
-        border-radius: 22px;
-        padding: 28px;
-        text-align: center;
-        color: #64748b;
-    }
-
-    @media (max-width: 1100px) {
-        .premium-stats,
-        .premium-grid-2 {
-            grid-template-columns: 1fr;
-        }
-    }
+}
 </style>
 
 <?php
-    $judulDisetujui  = $judulDisetujui ?? null;
-    $riwayatProposal = $riwayatProposal ?? [];
-    $masihDiproses   = $masihDiproses ?? false;
-    $totalProposal   = $totalProposal ?? count($riwayatProposal);
-    $totalDisetujui  = $totalDisetujui ?? 0;
-    $totalRevisi     = $totalRevisi ?? 0;
+$judulDisetujui  = $judulDisetujui ?? null;
+$riwayatProposal = $riwayatProposal ?? [];
+$masihDiproses   = $masihDiproses ?? false;
+$totalProposal   = $totalProposal ?? count($riwayatProposal);
+$totalDisetujui  = $totalDisetujui ?? 0;
 
-    $statusClass = static function (?string $status): string {
-        $status = strtolower((string) $status);
-        return match ($status) {
-            'diajukan'  => 'status-diajukan',
-            'direview'  => 'status-direview',
-            'revisi'    => 'status-revisi',
-            'disetujui' => 'status-disetujui',
-            'ditolak'   => 'status-ditolak',
-            default     => 'status-diajukan',
-        };
+$statusClass = static function (?string $status): string {
+    return match (strtolower((string) $status)) {
+        'diajukan'  => 'status-diajukan',
+        'direview'  => 'status-direview',
+        'revisi'    => 'status-revisi',
+        'disetujui' => 'status-disetujui',
+        'ditolak'   => 'status-ditolak',
+        default     => 'status-diajukan',
     };
+};
 ?>
 
-<div class="page-hero">
-    <h2>Proposal Tugas Akhir</h2>
-    <p>Unggah proposal tugas akhir, pantau hasil review dosen, dan lihat seluruh riwayat revisi serta persetujuan proposalmu dalam satu halaman.</p>
-</div>
+<div class="proposal-page">
 
-<div class="premium-stats">
-    <div class="premium-stat-card stat-blue">
-        <div class="premium-stat-label">Total Proposal</div>
-        <div class="premium-stat-value"><?= esc((string) $totalProposal) ?></div>
-        <div class="premium-stat-desc">Seluruh riwayat proposal yang pernah diunggah</div>
+    <div class="grid-2">
+        <div class="card-soft">
+            <div class="card-head">
+                <div>
+                    <h3 class="card-title">Dasar Pengajuan</h3>
+                    <p class="card-subtitle">Proposal dapat diajukan setelah judul TA disetujui.</p>
+                </div>
+            </div>
+
+            <?php if ($judulDisetujui): ?>
+                <div class="highlight-box">
+                    <div class="highlight-title">
+                        <?= esc((string) ($judulDisetujui['judul'] ?? '-')) ?>
+                    </div>
+
+                    <div class="meta-list">
+                        <div><strong>Status Judul:</strong> <span class="status-pill status-disetujui"><?= esc((string) ($judulDisetujui['status'] ?? 'disetujui')) ?></span></div>
+                        <div><strong>Bidang Topik:</strong> <?= esc((string) (($judulDisetujui['bidang_topik'] ?? '') !== '' ? $judulDisetujui['bidang_topik'] : '-')) ?></div>
+                        <div><strong>Kata Kunci:</strong> <?= esc((string) (($judulDisetujui['kata_kunci'] ?? '') !== '' ? $judulDisetujui['kata_kunci'] : '-')) ?></div>
+                        <div><strong>Tanggal Persetujuan:</strong> <?= esc((string) ($judulDisetujui['tanggal_review'] ?? $judulDisetujui['updated_at'] ?? $judulDisetujui['tanggal_pengajuan'] ?? '-')) ?></div>
+                    </div>
+                </div>
+            <?php else: ?>
+                <div class="note-box">
+                    Belum ada judul yang berstatus <strong>disetujui</strong>, jadi proposal belum bisa diajukan.
+                </div>
+            <?php endif; ?>
+        </div>
+
+        <div class="card-soft">
+            <div class="card-head">
+                <div>
+                    <h3 class="card-title">Upload Proposal</h3>
+                    <p class="card-subtitle">Form upload tidak langsung terbuka. Klik tombol di bawah untuk mulai.</p>
+                </div>
+            </div>
+
+            <?php if (! $judulDisetujui): ?>
+                <div class="note-box">Form upload belum aktif karena judul belum disetujui.</div>
+            <?php elseif ($masihDiproses): ?>
+                <div class="note-box">Masih ada proposal yang sedang diproses. Tunggu review dosen terlebih dahulu.</div>
+            <?php else: ?>
+                <button type="button" class="btn-soft" onclick="toggleUploadProposal()">
+                    Upload Proposal Baru
+                </button>
+
+                <div class="upload-panel" id="uploadProposalPanel">
+                    <form action="<?= base_url('/proposal-ta/upload') ?>" method="post" enctype="multipart/form-data">
+                        <?= csrf_field() ?>
+
+                        <input type="hidden" name="pengajuan_judul_id" value="<?= esc((string) ($judulDisetujui['id'] ?? '')) ?>">
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Judul Disetujui</label>
+                                <input type="text" class="input" value="<?= esc((string) ($judulDisetujui['judul'] ?? '-')) ?>" readonly>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="file_proposal">File Proposal</label>
+                                <input type="file" name="file_proposal" id="file_proposal" required>
+                                <div class="help-text">Format disarankan PDF/DOCX. Sesuaikan dengan validasi controller.</div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="catatan_mahasiswa">Catatan Mahasiswa</label>
+                                <textarea name="catatan_mahasiswa" id="catatan_mahasiswa" placeholder="Tulis catatan tambahan jika perlu..."></textarea>
+                            </div>
+
+                            <button type="submit" class="btn-soft">Simpan Proposal</button>
+                        </div>
+                    </form>
+                </div>
+            <?php endif; ?>
+        </div>
     </div>
 
-    <div class="premium-stat-card stat-amber">
-        <div class="premium-stat-label">Sedang Diproses</div>
-        <div class="premium-stat-value"><?= $masihDiproses ? '1' : '0' ?></div>
-        <div class="premium-stat-desc">Proposal yang masih direview dosen</div>
-    </div>
-
-    <div class="premium-stat-card stat-emerald">
-        <div class="premium-stat-label">Proposal Disetujui</div>
-        <div class="premium-stat-value"><?= esc((string) $totalDisetujui) ?></div>
-        <div class="premium-stat-desc">Proposal yang sudah final dan disetujui</div>
-    </div>
-</div>
-
-<div class="premium-grid-2">
-    <div class="card-premium">
-        <div class="section-head">
+    <div class="card-soft">
+        <div class="card-head">
             <div>
-                <h3 class="section-title-premium">Dasar Pengajuan Proposal</h3>
-                <p class="section-subtitle-premium">Proposal hanya bisa diajukan jika judul tugas akhir sudah disetujui.</p>
+                <h3 class="card-title">Riwayat Proposal</h3>
+                <p class="card-subtitle">Data proposal yang pernah diunggah akan muncul di sini.</p>
             </div>
         </div>
 
-        <?php if ($judulDisetujui): ?>
-            <div class="proposal-highlight">
-                <div class="proposal-highlight-title">
-                    <?= esc((string) ($judulDisetujui['judul'] ?? '-')) ?>
-                </div>
-
-                <div class="proposal-meta">
-                    <div><strong>Status Judul:</strong> <span class="status-text status-disetujui"><?= esc((string) ($judulDisetujui['status'] ?? '-')) ?></span></div>
-                    <div><strong>Bidang Topik:</strong> <?= esc((string) (($judulDisetujui['bidang_topik'] ?? '') !== '' ? $judulDisetujui['bidang_topik'] : '-')) ?></div>
-                    <div><strong>Kata Kunci:</strong> <?= esc((string) (($judulDisetujui['kata_kunci'] ?? '') !== '' ? $judulDisetujui['kata_kunci'] : '-')) ?></div>
-                    <div><strong>Tanggal Persetujuan:</strong> <?= esc((string) ($judulDisetujui['tanggal_review'] ?? $judulDisetujui['tanggal_pengajuan'] ?? '-')) ?></div>
-                </div>
-            </div>
-        <?php else: ?>
-            <div class="info-note">
-                Kamu belum bisa mengajukan proposal karena belum ada judul yang berstatus <strong>disetujui</strong>. Selesaikan proses pengajuan judul terlebih dahulu.
-            </div>
-        <?php endif; ?>
-    </div>
-
-    <div class="card-premium">
-        <div class="section-head">
-            <div>
-                <h3 class="section-title-premium">Upload Proposal</h3>
-                <p class="section-subtitle-premium">Unggah proposal baru langsung dari halaman ini.</p>
-            </div>
-        </div>
-
-        <?php if (! $judulDisetujui): ?>
-            <div class="info-note">
-                Form upload belum aktif karena judul belum disetujui.
-            </div>
-        <?php elseif ($masihDiproses): ?>
-            <div class="info-note">
-                Kamu masih memiliki proposal yang sedang diproses. Tunggu hasil review dosen terlebih dahulu sebelum mengunggah proposal baru.
-            </div>
-        <?php else: ?>
-            <form action="<?= base_url('/proposal-ta/upload') ?>" method="post" enctype="multipart/form-data">
-                <?= csrf_field() ?>
-
-                <input type="hidden" name="pengajuan_judul_id" value="<?= esc((string) ($judulDisetujui['id'] ?? '')) ?>">
-
-                <div class="form-grid">
-                    <div class="form-group-premium">
-                        <label>Judul Disetujui</label>
-                        <input type="text" class="input" value="<?= esc((string) ($judulDisetujui['judul'] ?? '-')) ?>" readonly>
-                    </div>
-
-                    <div class="form-group-premium">
-                        <label for="file_proposal">File Proposal</label>
-                        <input type="file" name="file_proposal" id="file_proposal" required>
-                        <div class="help-text">Unggah file proposal dalam format yang diizinkan sistem, misalnya PDF atau DOCX sesuai validasi controller.</div>
-                    </div>
-
-                    <div class="form-group-premium">
-                        <label for="catatan_mahasiswa">Catatan Mahasiswa</label>
-                        <textarea name="catatan_mahasiswa" id="catatan_mahasiswa" placeholder="Tulis catatan tambahan jika diperlukan..."></textarea>
-                    </div>
-
-                    <div>
-                        <button type="submit" class="btn btn-primary">Upload Proposal</button>
-                    </div>
-                </div>
-            </form>
-        <?php endif; ?>
-    </div>
-</div>
-
-<div class="card-premium">
-    <div class="section-head">
-        <div>
-            <h3 class="section-title-premium">Riwayat Proposal</h3>
-            <p class="section-subtitle-premium">Lihat file proposal yang pernah kamu unggah, status review, revisi, dan catatan dosen.</p>
-        </div>
-    </div>
-
-    <?php if (! empty($riwayatProposal)): ?>
-        <div class="premium-table-wrap">
-            <table class="premium-table">
-                <thead>
-                    <tr>
-                        <th>Judul</th>
-                        <th>File Proposal</th>
-                        <th>Status</th>
-                        <th>Versi</th>
-                        <th>Tanggal Upload</th>
-                        <th>Tanggal Review</th>
-                        <th>Catatan Reviewer</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($riwayatProposal as $row): ?>
+        <?php if (! empty($riwayatProposal)): ?>
+            <div class="table-wrap">
+                <table class="proposal-table">
+                    <thead>
                         <tr>
-                            <td>
-                                <div class="proposal-row-title"><?= esc((string) ($row['judul'] ?? '-')) ?></div>
-                            </td>
-                            <td>
-                                <?php if (! empty($row['file_proposal'])): ?>
-                                    <a href="<?= base_url('uploads/proposal/' . $row['file_proposal']) ?>"
-                                    target="_blank"
-                                    class="btn btn-primary">
-                                        Buka
-                                    </a>
-                                <?php else: ?>
-                                    -
-                                <?php endif; ?>
-                            </td>
-                            <td>
-                                <span class="status-text <?= $statusClass($row['status'] ?? '') ?>">
-                                    <?= esc((string) ($row['status'] ?? '-')) ?>
-                                </span>
-                            </td>
-                            <td><?= esc((string) ($row['versi_ke'] ?? '1')) ?></td>
-                            <td><?= esc((string) ($row['tanggal_upload'] ?? '-')) ?></td>
-                            <td><?= esc((string) ($row['tanggal_review'] ?? '-')) ?></td>
-                            <td><?= esc((string) (($row['catatan_reviewer'] ?? '') !== '' ? $row['catatan_reviewer'] : '-')) ?></td>
-                            <td>
-                                <div class="action-row">
-                                    <?php
-                                        $status = strtolower((string) ($row['status'] ?? ''));
-                                        $proposalId = (string) ($row['id'] ?? '');
-                                    ?>
-                                    <?php if (in_array($status, ['revisi', 'ditolak'], true) && $proposalId !== ''): ?>
-                                        <a href="<?= base_url('/proposal-ta/revisi/' . $proposalId) ?>" class="btn btn-primary" style="padding:10px 14px;">
-                                            Revisi
-                                        </a>
-                                    <?php else: ?>
-                                        <span style="color:#94a3b8;">-</span>
-                                    <?php endif; ?>
-                                </div>
-                            </td>
+                            <th>Judul</th>
+                            <th>File</th>
+                            <th>Status</th>
+                            <th>Versi</th>
+                            <th>Tanggal Upload</th>
+                            <th>Tanggal Review</th>
+                            <th>Catatan Reviewer</th>
+                            <th>Aksi</th>
                         </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-        </div>
-    <?php else: ?>
-        <div class="premium-empty">Belum ada riwayat proposal tugas akhir.</div>
-    <?php endif; ?>
+                    </thead>
+
+                    <tbody>
+                        <?php foreach ($riwayatProposal as $row): ?>
+                            <?php
+                                $status = strtolower((string) ($row['status'] ?? ''));
+                                $proposalId = (string) ($row['id'] ?? '');
+                            ?>
+
+                            <tr>
+                                <td>
+                                    <div class="row-title"><?= esc((string) ($row['judul'] ?? '-')) ?></div>
+                                </td>
+
+                                    <td>
+                                        <?php if (! empty($row['file_proposal'])): ?>
+                                            <span style="color:#2563eb;font-weight:700;">File tersedia</span>
+                                        <?php else: ?>
+                                            -
+                                        <?php endif; ?>
+                                    </td>
+
+                                <td>
+                                    <span class="status-pill <?= $statusClass($row['status'] ?? '') ?>">
+                                        <?= esc((string) ($row['status'] ?? '-')) ?>
+                                    </span>
+                                </td>
+
+                                <td><?= esc((string) ($row['versi_ke'] ?? '1')) ?></td>
+                                <td><?= esc((string) ($row['tanggal_upload'] ?? $row['created_at'] ?? '-')) ?></td>
+                                <td><?= esc((string) ($row['tanggal_review'] ?? '-')) ?></td>
+                                <td><?= esc((string) (($row['catatan_reviewer'] ?? '') !== '' ? $row['catatan_reviewer'] : '-')) ?></td>
+
+                                <td>
+                                    <div class="action-row">
+                                        <?php if (in_array($status, ['revisi', 'ditolak'], true) && $proposalId !== ''): ?>
+                                            <a href="<?= base_url('/proposal-ta/revisi/' . $proposalId) ?>" class="btn-soft">
+                                                Revisi
+                                            </a>
+                                        <?php else: ?>
+                                            <span style="color:#94a3b8;">-</span>
+                                        <?php endif; ?>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        <?php else: ?>
+            <div class="empty-box">Belum ada riwayat proposal tugas akhir.</div>
+        <?php endif; ?>
+    </div>
+
 </div>
+
+<script>
+function toggleUploadProposal() {
+    const panel = document.getElementById('uploadProposalPanel');
+    if (panel) {
+        panel.classList.toggle('show');
+    }
+}
+</script>
 
 <?= $this->endSection() ?>

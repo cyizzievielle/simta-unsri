@@ -2,517 +2,503 @@
 <?= $this->section('content') ?>
 
 <style>
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-bottom: 22px;
+}
+
+.stat-card {
+    border-radius: 20px;
+    padding: 18px;
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 14px 28px rgba(15,23,42,.09);
+    min-height: 118px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.stat-card::after {
+    content: "";
+    position: absolute;
+    right: -22px;
+    bottom: -22px;
+    width: 86px;
+    height: 86px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.14);
+}
+
+.stat-blue { background: linear-gradient(135deg,#2563eb,#1d4ed8); }
+.stat-orange { background: linear-gradient(135deg,#f59e0b,#ea580c); }
+.stat-green { background: linear-gradient(135deg,#10b981,#059669); }
+
+.stat-label,
+.stat-value,
+.stat-desc {
+    position: relative;
+    z-index: 1;
+}
+
+.stat-label {
+    font-weight: 900;
+    font-size: 13px;
+    line-height: 1.25;
+}
+
+.stat-value {
+    font-size: 34px;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.stat-desc {
+    font-size: 12px;
+    line-height: 1.35;
+    opacity: .95;
+}
+
+.card-premium {
+    background: #fff;
+    border-radius: 24px;
+    padding: 24px;
+    border: 1px solid #edf2f7;
+    box-shadow: 0 14px 34px rgba(15,23,42,.06);
+    margin-bottom: 22px;
+}
+
+.section-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+}
+
+.section-title {
+    margin: 0 0 6px;
+    font-size: 24px;
+    font-weight: 900;
+    color: #0f172a;
+}
+
+.section-subtitle {
+    margin: 0;
+    color: #64748b;
+    font-size: 13px;
+    line-height: 1.55;
+}
+
+.pembimbing-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+}
+
+.dosen-card {
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    padding: 18px;
+    background: linear-gradient(135deg,#ffffff,#f8fbff);
+    transition: .2s ease;
+}
+
+.dosen-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 28px rgba(15,23,42,.07);
+}
+
+.dosen-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: flex-start;
+    margin-bottom: 12px;
+}
+
+.dosen-name {
+    font-size: 18px;
+    font-weight: 900;
+    color: #0f172a;
+    line-height: 1.35;
+}
+
+.dosen-meta {
+    color: #475569;
+    margin-top: 7px;
+    line-height: 1.55;
+    font-size: 13px;
+}
+
+.dosen-meta strong {
+    color: #334155;
+}
+
+.divider {
+    height: 1px;
+    background: #eef2f7;
+    margin: 13px 0;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 9px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+.badge-p1 { background: #ede9fe; color: #6d28d9; }
+.badge-p2 { background: #e0f2fe; color: #0369a1; }
+.badge-aktif { background: #dcfce7; color: #166534; }
+.badge-menunggu { background: #dbeafe; color: #1d4ed8; }
+.badge-disetujui { background: #dcfce7; color: #166534; }
+.badge-ditolak { background: #fee2e2; color: #b91c1c; }
+.badge-kuota { background: #fef3c7; color: #92400e; }
+
+.empty-box {
+    border: 1px dashed #cbd5e1;
+    border-radius: 18px;
+    padding: 20px;
+    color: #64748b;
+    background: linear-gradient(135deg,#f8fafc,#f1f5f9);
+    text-align: center;
+    line-height: 1.55;
+    font-size: 13px;
+}
+
+.table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    border-radius: 18px;
+    border: 1px solid #eef2f7;
+}
+
+.table-premium {
+    width: 100%;
+    min-width: 820px;
+    border-collapse: collapse;
+    background: #fff;
+}
+
+.table-premium thead {
+    background: linear-gradient(135deg,#f8fbff,#eff6ff);
+}
+
+.table-premium th,
+.table-premium td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #eef2f7;
+    vertical-align: top;
+}
+
+.table-premium th {
+    font-size: 11px;
+    font-weight: 900;
+    color: #334155;
+    white-space: nowrap;
+}
+
+.table-premium td {
+    color: #0f172a;
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+.form-panel {
+    display: none;
+    margin-top: 18px;
+    border: 1px solid #e2e8f0;
+    border-radius: 22px;
+    padding: 18px;
+    background: linear-gradient(135deg,#f8fbff,#f1f5f9);
+}
+
+.form-panel.show {
+    display: block;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+}
+
+.form-group.full {
+    grid-column: 1 / -1;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 7px;
+    font-weight: 800;
+    color: #334155;
+    font-size: 13px;
+}
+
+.input {
+    width: 100%;
+    border: 1px solid #dbe3ef;
+    border-radius: 14px;
+    padding: 12px 13px;
+    font-size: 13px;
+    outline: none;
+    background: #fff;
+    box-sizing: border-box;
+}
+
+.input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 4px rgba(37,99,235,.10);
+}
+
+textarea.input {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.btn-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+}
+
+/* TABLET: 3 CARD TETAP SEJAJAR */
+@media (max-width: 1000px) {
     .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 18px;
-        margin-bottom: 24px;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
     }
 
     .stat-card {
-        border-radius: 24px;
-        padding: 24px;
-        color: #fff;
-        position: relative;
-        overflow: hidden;
-        box-shadow: 0 16px 34px rgba(15,23,42,.10);
+        min-height: 100px;
+        padding: 13px;
+        border-radius: 17px;
     }
-
-    .stat-card::after {
-        content: "";
-        position: absolute;
-        right: -24px;
-        bottom: -24px;
-        width: 110px;
-        height: 110px;
-        border-radius: 50%;
-        background: rgba(255,255,255,.14);
-    }
-
-    .stat-blue { background: linear-gradient(135deg,#2563eb,#1d4ed8); }
-    .stat-orange { background: linear-gradient(135deg,#f59e0b,#ea580c); }
-    .stat-green { background: linear-gradient(135deg,#10b981,#059669); }
 
     .stat-label {
-        font-weight: 800;
-        font-size: 15px;
-        margin-bottom: 14px;
-        position: relative;
-        z-index: 1;
+        font-size: 10.5px;
     }
 
     .stat-value {
-        font-size: 40px;
-        font-weight: 900;
-        margin-bottom: 8px;
-        position: relative;
-        z-index: 1;
+        font-size: 25px;
     }
 
     .stat-desc {
-        font-size: 14px;
-        opacity: .95;
-        position: relative;
-        z-index: 1;
+        font-size: 9.5px;
     }
 
-    .card-premium {
-        background: #fff;
-        border-radius: 28px;
-        padding: 28px;
-        border: 1px solid #edf2f7;
-        box-shadow: 0 18px 42px rgba(15,23,42,.06);
-        margin-bottom: 24px;
+    .pembimbing-grid,
+    .form-grid {
+        grid-template-columns: 1fr;
     }
+}
 
-    .section-head {
-        display: flex;
-        justify-content: space-between;
-        gap: 18px;
-        align-items: flex-start;
-        flex-wrap: wrap;
-        margin-bottom: 22px;
-    }
-
-    .section-title {
-        margin: 0 0 8px;
-        font-size: 28px;
-        font-weight: 900;
-        color: #0f172a;
-    }
-
-    .section-subtitle {
-        margin: 0;
-        color: #64748b;
-        font-size: 15px;
-        line-height: 1.7;
-    }
-
-    .pembimbing-grid {
+/* MOBILE: 3 CARD KECIL KESAMPING */
+@media(max-width: 760px) {
+    .stats-grid {
         display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 18px;
-    }
-
-    .dosen-card {
-        border: 1px solid #e2e8f0;
-        border-radius: 24px;
-        padding: 24px;
-        background: linear-gradient(135deg,#ffffff,#f8fbff);
-        transition: .2s ease;
-    }
-
-    .dosen-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 18px 34px rgba(15,23,42,.08);
-    }
-
-    .dosen-top {
-        display: flex;
-        justify-content: space-between;
-        gap: 14px;
-        align-items: flex-start;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 7px;
         margin-bottom: 14px;
     }
 
-    .dosen-name {
-        font-size: 22px;
-        font-weight: 900;
-        color: #0f172a;
+    .stat-card {
+        min-height: 82px;
+        padding: 9px;
+        border-radius: 14px;
+        box-shadow: 0 8px 18px rgba(15,23,42,.08);
+    }
+
+    .stat-card::after {
+        width: 58px;
+        height: 58px;
+        right: -20px;
+        bottom: -20px;
+    }
+
+    .stat-label {
+        font-size: 8.4px;
+        line-height: 1.15;
+    }
+
+    .stat-value {
+        font-size: 18px;
+        line-height: 1;
+    }
+
+    .stat-desc {
+        font-size: 7.4px;
+        line-height: 1.15;
+    }
+
+    .card-premium {
+        padding: 13px;
+        border-radius: 18px;
+        margin-bottom: 13px;
+    }
+
+    .section-head {
+        margin-bottom: 12px;
+        gap: 9px;
+    }
+
+    .section-title {
+        font-size: 17px;
+        margin-bottom: 4px;
+    }
+
+    .section-subtitle {
+        font-size: 10.5px;
         line-height: 1.35;
     }
 
-    .dosen-meta {
-        color: #475569;
-        margin-top: 8px;
-        line-height: 1.7;
-        font-size: 14px;
+    .section-head .btn {
+        padding: 8px 10px;
+        font-size: 10.5px;
+        border-radius: 10px;
     }
 
-    .dosen-meta strong {
-        color: #334155;
+    .pembimbing-grid {
+        grid-template-columns: 1fr;
+        gap: 9px;
+    }
+
+    .dosen-card {
+        padding: 11px;
+        border-radius: 16px;
+    }
+
+    .dosen-top {
+        gap: 8px;
+        margin-bottom: 8px;
+    }
+
+    .dosen-name {
+        font-size: 12px;
+        line-height: 1.3;
+    }
+
+    .dosen-meta {
+        font-size: 10px;
+        line-height: 1.35;
+        margin-top: 5px;
     }
 
     .divider {
-        height: 1px;
-        background: #eef2f7;
-        margin: 16px 0;
+        margin: 9px 0;
     }
 
     .badge {
-        display: inline-flex;
-        align-items: center;
-        padding: 8px 12px;
-        border-radius: 999px;
-        font-size: 12px;
-        font-weight: 900;
-        white-space: nowrap;
+        padding: 4px 6px;
+        font-size: 8.5px;
     }
 
-    .badge-p1 { background: #ede9fe; color: #6d28d9; }
-    .badge-p2 { background: #e0f2fe; color: #0369a1; }
-    .badge-aktif { background: #dcfce7; color: #166534; }
-    .badge-menunggu { background: #dbeafe; color: #1d4ed8; }
-    .badge-disetujui { background: #dcfce7; color: #166534; }
-    .badge-ditolak { background: #fee2e2; color: #b91c1c; }
-    .badge-kuota { background: #fef3c7; color: #92400e; }
-
     .empty-box {
-        border: 1px dashed #cbd5e1;
-        border-radius: 22px;
-        padding: 24px;
-        color: #64748b;
-        background: linear-gradient(135deg,#f8fafc,#f1f5f9);
-        text-align: center;
-        line-height: 1.7;
+        padding: 13px;
+        border-radius: 15px;
+        font-size: 10px;
+        line-height: 1.35;
     }
 
     .table-wrap {
-        width: 100%;
-        overflow-x: auto;
-        border-radius: 20px;
-        border: 1px solid #eef2f7;
+        border-radius: 15px;
     }
 
     .table-premium {
-        width: 100%;
-        min-width: 900px;
-        border-collapse: collapse;
-        background: #fff;
-    }
-
-    .table-premium thead {
-        background: linear-gradient(135deg,#f8fbff,#eff6ff);
+        min-width: 540px;
     }
 
     .table-premium th,
     .table-premium td {
-        padding: 16px;
-        text-align: left;
-        border-bottom: 1px solid #eef2f7;
-        vertical-align: top;
-    }
-
-    .table-premium th {
-        font-size: 13px;
-        font-weight: 900;
-        color: #334155;
+        padding: 7px 7px;
+        font-size: 9.8px;
+        line-height: 1.25;
         white-space: nowrap;
     }
 
-    .table-premium td {
-        color: #0f172a;
-        font-size: 14px;
-        line-height: 1.6;
+    .table-premium th {
+        font-size: 8.8px;
+    }
+
+    .table-premium td:nth-child(1) strong {
+        display: inline-block;
+        max-width: 125px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
     .form-panel {
-        display: none;
-        margin-top: 22px;
-        border: 1px solid #e2e8f0;
-        border-radius: 24px;
-        padding: 22px;
-        background: linear-gradient(135deg,#f8fbff,#f1f5f9);
-    }
-
-    .form-panel.show {
-        display: block;
+        padding: 11px;
+        border-radius: 16px;
+        margin-top: 12px;
     }
 
     .form-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 18px;
-    }
-
-    .form-group.full {
-        grid-column: 1 / -1;
+        grid-template-columns: 1fr;
+        gap: 8px;
     }
 
     .form-group label {
-        display: block;
-        margin-bottom: 8px;
-        font-weight: 800;
-        color: #334155;
+        font-size: 10px;
+        margin-bottom: 5px;
     }
 
     .input {
-        width: 100%;
-        border: 1px solid #dbe3ef;
-        border-radius: 16px;
-        padding: 14px 16px;
-        font-size: 15px;
-        outline: none;
-        background: #fff;
-    }
-
-    .input:focus {
-        border-color: #2563eb;
-        box-shadow: 0 0 0 4px rgba(37,99,235,.10);
+        padding: 8px 9px;
+        border-radius: 10px;
+        font-size: 10px;
     }
 
     textarea.input {
-        min-height: 120px;
-        resize: vertical;
+        min-height: 76px;
     }
 
     .btn-row {
-        display: flex;
-        gap: 12px;
-        flex-wrap: wrap;
-        margin-top: 18px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 7px;
+        margin-top: 11px;
     }
 
-    @media (max-width: 1000px) {
-        .stats-grid,
-        .pembimbing-grid,
-        .form-grid {
-            grid-template-columns: 1fr;
-        }
-    }
-    @media(max-width: 760px) {
-    .stats-grid,
-    .stat-grid,
-    .dashboard-stats,
-    .mhs-stat-grid {
-        display: grid !important;
-        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-        gap: 10px !important;
-    }
-
-    .stat-card,
-    .dashboard-stat,
-    .admin-stat,
-    .mhs-stat-card,
-    .stat-card-premium {
-        min-height: 105px !important;
-        padding: 13px !important;
-        border-radius: 17px !important;
-        aspect-ratio: unset !important;
-    }
-
-    .stat-card h3,
-    .dashboard-stat h3,
-    .admin-stat h3,
-    .mhs-stat-label,
-    .stat-label,
-    .stat-label-premium {
-        font-size: 10.5px !important;
-        line-height: 1.2 !important;
-        margin-bottom: 8px !important;
-    }
-
-    .stat-card .number,
-    .dashboard-stat .number,
-    .admin-stat .stat-number,
-    .mhs-stat-number,
-    .stat-value-premium {
-        font-size: 26px !important;
-        line-height: 1 !important;
-        margin: 0 !important;
-    }
-
-    .stat-card p,
-    .dashboard-stat p,
-    .admin-stat .stat-desc,
-    .mhs-stat-desc,
-    .stat-desc-premium {
-        font-size: 9.5px !important;
-        line-height: 1.3 !important;
-        margin: 0 !important;
-    }
-
-    .stat-card::after,
-    .dashboard-stat::after,
-    .admin-stat::after,
-    .mhs-stat-card::after,
-    .stat-card-premium::after {
-        width: 75px !important;
-        height: 75px !important;
-        right: -25px !important;
-        bottom: -25px !important;
+    .btn-row .btn {
+        padding: 8px 9px;
+        font-size: 10px;
+        border-radius: 10px;
     }
 }
 
+/* HP KECIL: TETAP 3 CARD, FONT LEBIH KECIL */
 @media(max-width: 390px) {
-    .stats-grid,
-    .stat-grid,
-    .dashboard-stats,
-    .mhs-stat-grid {
-        grid-template-columns: 1fr 1fr !important;
+    .stats-grid {
+        gap: 6px;
     }
 
-    .stat-card,
-    .dashboard-stat,
-    .admin-stat,
-    .mhs-stat-card,
-    .stat-card-premium {
-        min-height: 98px !important;
-        padding: 12px !important;
+    .stat-card {
+        padding: 8px;
+        min-height: 78px;
     }
 
-    .stat-card .number,
-    .dashboard-stat .number,
-    .admin-stat .stat-number,
-    .mhs-stat-number,
-    .stat-value-premium {
-        font-size: 24px !important;
-    }
-}
-    /* =========================
-   FIX MOBILE UI (COMPACT)
-========================= */
-@media(max-width: 760px){
-
-    /* CARD GLOBAL */
-    .card,
-    .card-premium {
-        padding: 14px !important;
-        border-radius: 18px !important;
+    .stat-label {
+        font-size: 7.8px;
     }
 
-    /* TITLE */
-    .section-title,
-    .section-title-premium {
-        font-size: 18px !important;
-        margin-bottom: 4px !important;
+    .stat-value {
+        font-size: 17px;
     }
 
-    .section-subtitle,
-    .section-subtitle-premium {
-        font-size: 11.5px !important;
-        line-height: 1.35 !important;
-        margin-bottom: 10px !important;
-    }
-
-    /* =========================
-       FILTER SUPER COMPACT
-    ========================= */
-    .filter-wrap {
-        padding: 7px !important;
-        border-radius: 12px !important;
-        margin-bottom: 10px !important;
-    }
-
-    .filter-grid {
-        grid-template-columns: 1fr !important;
-        gap: 4px !important;
-    }
-
-    .form-group-premium label {
-        font-size: 9.5px !important;
-        margin-bottom: 2px !important;
-    }
-
-    .form-group-premium input,
-    .form-group-premium select {
-        height: 28px !important;
-        padding: 5px 7px !important;
-        font-size: 10px !important;
-        border-radius: 8px !important;
-    }
-
-    .filter-actions {
-        display: grid !important;
-        grid-template-columns: 1fr 1fr !important;
-        gap: 5px !important;
-    }
-
-    .filter-actions .btn {
-        height: 28px !important;
-        padding: 5px !important;
-        font-size: 10px !important;
-        border-radius: 8px !important;
-    }
-
-    /* =========================
-       TABLE MOBILE FIX
-    ========================= */
-    .premium-table {
-        min-width: 1000px !important; /* scroll horizontal */
-    }
-
-    .premium-table th,
-    .premium-table td {
-        padding: 6px 6px !important;
-        font-size: 10px !important;
-        line-height: 1.2 !important;
-        white-space: nowrap !important;
-    }
-
-    .premium-table th {
-        font-size: 9.2px !important;
-    }
-
-    /* TEXT DALAM TABLE */
-    .student-name {
-        font-size: 10px !important;
-        max-width: 110px !important;
-    }
-
-    .student-sub {
-        font-size: 9px !important;
-    }
-
-    .cell-dosen {
-        max-width: 140px !important;
-    }
-
-    .cell-catatan {
-        min-width: 200px !important;
-        max-width: 200px !important;
-    }
-
-    .cell-date {
-        min-width: 110px !important;
-    }
-
-    /* BADGE */
-    .status-badge {
-        padding: 4px 6px !important;
-        font-size: 8.8px !important;
-    }
-
-    /* META TEXT */
-    .table-meta-text {
-        font-size: 10px !important;
-    }
-
-    /* PAGINATION */
-    .pagination-info {
-        font-size: 10px !important;
-    }
-
-    .page-link {
-        min-width: 30px !important;
-        height: 30px !important;
-        font-size: 10px !important;
-    }
-
-    .pagination-links {
-        overflow-x: auto;
-        flex-wrap: nowrap;
-    }
-
-    /* =========================
-       STAT CARD (KALO ADA)
-    ========================= */
-    .stat-card-premium {
-        padding: 12px !important;
-        min-height: 95px !important;
-        border-radius: 16px !important;
-    }
-
-    .stat-label-premium {
-        font-size: 9.5px !important;
-    }
-
-    .stat-value-premium {
-        font-size: 22px !important;
-    }
-
-    .stat-desc-premium {
-        font-size: 9px !important;
+    .stat-desc {
+        font-size: 7px;
     }
 }
 </style>
@@ -553,26 +539,6 @@
         };
     };
 ?>
-
-<div class="stats-grid">
-    <div class="stat-card stat-blue">
-        <div class="stat-label">Pembimbing Aktif</div>
-        <div class="stat-value"><?= esc((string) $totalAktif) ?></div>
-        <div class="stat-desc">Dosen pembimbing yang sudah ditetapkan</div>
-    </div>
-
-    <div class="stat-card stat-orange">
-        <div class="stat-label">Permohonan Menunggu</div>
-        <div class="stat-value"><?= esc((string) $totalMenunggu) ?></div>
-        <div class="stat-desc">Masih menunggu keputusan dosen</div>
-    </div>
-
-    <div class="stat-card stat-green">
-        <div class="stat-label">Riwayat Persetujuan</div>
-        <div class="stat-value"><?= esc((string) $totalDisetujui) ?></div>
-        <div class="stat-desc">Permohonan yang sudah disetujui</div>
-    </div>
-</div>
 
 <div class="card-premium">
     <div class="section-head">

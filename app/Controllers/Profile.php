@@ -70,7 +70,7 @@ class Profile extends BaseController
         return view('dashboard/index', [
             'title'        => 'Edit Profil',
             'pageTitle'    => 'Edit Profil',
-            'pageSubtitle' => 'Perbarui informasi akun dan data pribadi',
+            'pageSubtitle' => 'Perbarui informasi akun dan foto profil',
             'activeMenu'   => 'profile',
             'mode'         => 'edit',
             'user'         => $user,
@@ -97,6 +97,10 @@ class Profile extends BaseController
             return redirect()->back()->withInput()->with('error', 'Nama dan email wajib diisi.');
         }
 
+        if (! filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return redirect()->back()->withInput()->with('error', 'Format email tidak valid.');
+        }
+
         $cekEmail = $db->table('users')
             ->where('email', $email)
             ->where('id !=', $userId)
@@ -106,6 +110,45 @@ class Profile extends BaseController
             return redirect()->back()->withInput()->with('error', 'Email sudah digunakan user lain.');
         }
 
+        $userLama = $db->table('users')
+            ->where('id', $userId)
+            ->get()
+            ->getRowArray();
+
+        $fotoName = $userLama['foto'] ?? null;
+        $fotoFile = $this->request->getFile('foto');
+
+        if ($fotoFile && $fotoFile->isValid() && ! $fotoFile->hasMoved()) {
+            $allowedMime = ['image/jpg', 'image/jpeg', 'image/png', 'image/webp'];
+
+            if (! in_array($fotoFile->getMimeType(), $allowedMime, true)) {
+                return redirect()->back()->withInput()->with('error', 'Format foto harus JPG, JPEG, PNG, atau WEBP.');
+            }
+
+            if ($fotoFile->getSizeByUnit('mb') > 2) {
+                return redirect()->back()->withInput()->with('error', 'Ukuran foto maksimal 2MB.');
+            }
+
+            $uploadPath = FCPATH . 'uploads/profile';
+
+            if (! is_dir($uploadPath)) {
+                mkdir($uploadPath, 0777, true);
+            }
+
+            $fotoNameBaru = $fotoFile->getRandomName();
+            $fotoFile->move($uploadPath, $fotoNameBaru);
+
+            if (! empty($fotoName)) {
+                $oldPath = $uploadPath . DIRECTORY_SEPARATOR . $fotoName;
+
+                if (is_file($oldPath)) {
+                    unlink($oldPath);
+                }
+            }
+
+            $fotoName = $fotoNameBaru;
+        }
+
         $db->transStart();
 
         $db->table('users')
@@ -113,6 +156,7 @@ class Profile extends BaseController
             ->update([
                 'name'       => $name,
                 'email'      => $email,
+                'foto'       => $fotoName,
                 'updated_at' => date('Y-m-d H:i:s'),
             ]);
 
@@ -149,6 +193,7 @@ class Profile extends BaseController
         session()->set([
             'name'  => $name,
             'email' => $email,
+            'foto'  => $fotoName,
         ]);
 
         return redirect()->to('/profile')->with('success', 'Profil berhasil diperbarui.');
