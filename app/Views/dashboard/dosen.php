@@ -214,11 +214,11 @@ $totalProposal = $totalProposal ?? 0;
                         <div class="timeline-dot">📌</div>
                         <div>
                             <div class="timeline-title">
-                                <?= esc($row['nama_mahasiswa']) ?>
+                                <?= esc((string) ($row['nama_mahasiswa'] ?? '-')) ?>
                             </div>
                             <div class="timeline-text">
-                                <?= esc($row['keterangan']) ?><br>
-                                <small><?= esc($row['tanggal']) ?></small>
+                                <?= esc((string) ($row['keterangan'] ?? '-')) ?><br>
+                                <small><?= esc((string) ($row['tanggal'] ?? '-')) ?></small>
                             </div>
                         </div>
                     </div>
@@ -244,8 +244,8 @@ $totalProposal = $totalProposal ?? 0;
                     margin-bottom:10px;
                     background:#f8fafc;
                 ">
-                    <strong><?= esc($mhs['nama']) ?></strong><br>
-                    <small><?= esc($mhs['nim']) ?></small>
+                    <strong><?= esc((string) ($mhs['nama'] ?? '-')) ?></strong><br>
+                    <small><?= esc((string) ($mhs['nim'] ?? '-')) ?></small>
                 </div>
             <?php endforeach; ?>
         <?php else: ?>

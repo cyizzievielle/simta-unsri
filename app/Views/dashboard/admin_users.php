@@ -1,5 +1,7 @@
 <?= $this->extend('layouts/dashboard') ?>
 <?= $this->section('content') ?>
+<?php $totalPages = $totalPages ?? 1; ?>
+<?php $currentPage = $currentPage ?? 1; ?>
 
 <style>
 .users-card {

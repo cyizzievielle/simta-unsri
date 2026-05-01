@@ -1,5 +1,6 @@
 <?= $this->extend('layouts/dashboard') ?>
 <?= $this->section('content') ?>
+<?php $review = $review ?? []; ?>
 
 <style>
     .edit-wrap {

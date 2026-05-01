@@ -125,12 +125,12 @@
                     <?php foreach ($sk_list as $row): ?>
                         <tr>
                             <td>
-                                <strong><?= esc($row['nomor_sk']) ?></strong>
+                                <strong><?= esc((string) ($row['nomor_sk'] ?? '-')) ?></strong>
                             </td>
 
                             <td>
                                 <div class="judul">
-                                    <?= esc($row['judul'] ?? '-') ?>
+                                    <?= esc((string) ($row['judul'] ?? '-')) ?>
                                 </div>
                             </td>
 

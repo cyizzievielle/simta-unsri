@@ -282,17 +282,30 @@
     </div>
 
     <div class="user-form-card">
-        <?php if (session()->getFlashdata('error')): ?>
-            <div class="flash-alert flash-error">
-                <?= esc(session()->getFlashdata('error')) ?>
-            </div>
-        <?php endif; ?>
+    <?php
+    $errorMsg = session()->getFlashdata('error');
+    $successMsg = session()->getFlashdata('success');
 
-        <?php if (session()->getFlashdata('success')): ?>
-            <div class="flash-alert flash-success">
-                <?= esc(session()->getFlashdata('success')) ?>
-            </div>
-        <?php endif; ?>
+    $safeFlash = static function ($value): string {
+        if (is_array($value)) {
+            return implode(', ', array_map('strval', $value));
+        }
+
+        return (string) ($value ?? '');
+    };
+    ?>
+
+    <?php if (! empty($errorMsg)): ?>
+        <div class="flash-alert flash-error">
+            <?= esc($safeFlash($errorMsg)) ?>
+        </div>
+    <?php endif; ?>
+
+    <?php if (! empty($successMsg)): ?>
+        <div class="flash-alert flash-success">
+            <?= esc($safeFlash($successMsg)) ?>
+        </div>
+    <?php endif; ?>
 
         <form action="<?= $isEdit ? site_url('admin/users/update/' . (string) ($user['id'] ?? '')) : site_url('admin/users/store') ?>" method="post">
             <?= csrf_field() ?>

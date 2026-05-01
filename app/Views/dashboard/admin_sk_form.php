@@ -23,9 +23,9 @@
                             data-mahasiswa="<?= esc((string) $row['mahasiswa_id']) ?>"
                             data-judul="<?= esc((string) $row['pengajuan_judul_id']) ?>"
                         >
-                            <?= esc($row['nama_mahasiswa']) ?> 
-                            (<?= esc($row['nim']) ?>) - 
-                            <?= esc($row['judul']) ?>
+                            <?= esc((string) ($row['nama_mahasiswa'] ?? '-')) ?> 
+                            (<?= esc((string) ($row['nim'] ?? '-')) ?>) - 
+                            <?= esc((string) ($row['judul'] ?? '-')) ?>
                         </option>
                     <?php endforeach; ?>
                 </select>

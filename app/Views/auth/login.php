@@ -7,6 +7,27 @@
     <link rel="stylesheet" href="<?= base_url('assets/css/app.css') ?>">
 </head>
 <body>
+    
+<?php
+function safeText(mixed $value, string $default = ''): string
+{
+    if ($value === null || $value === '') {
+        return $default;
+    }
+
+    if (is_array($value)) {
+        return implode(', ', array_map(static fn ($item): string => is_array($item) ? implode(', ', array_map('strval', $item)) : (string) $item, $value));
+    }
+
+    return (string) $value;
+}
+
+$errorMsg   = session()->getFlashdata('error');
+$successMsg = session()->getFlashdata('success');
+$errors     = session()->getFlashdata('errors');
+$oldEmail   = old('email');
+?>
+
     <div class="auth-page">
         <div class="auth-left">
             <div class="brand">
@@ -28,10 +49,12 @@
                     <strong>Manajemen Pembimbing</strong>
                     <span class="muted">Atur pembimbing 1 dan pembimbing 2 dengan kuota dosen.</span>
                 </div>
+
                 <div class="auth-feature">
                     <strong>Review Judul & Proposal</strong>
                     <span class="muted">Pemantauan status akademik lebih tertata dan transparan.</span>
                 </div>
+
                 <div class="auth-feature">
                     <strong>Arsip Dokumen</strong>
                     <span class="muted">Semua data penting tersimpan rapi dalam satu sistem.</span>
@@ -44,24 +67,27 @@
                 <h2>Masuk</h2>
                 <p>Silakan login menggunakan akun yang telah terdaftar.</p>
 
-                <?php if (session()->getFlashdata('error')): ?>
+                <?php if (! empty($errorMsg)): ?>
                     <div class="alert alert-danger">
-                        <?= session()->getFlashdata('error') ?>
+                        <?= esc(safeText($errorMsg)) ?>
                     </div>
                 <?php endif; ?>
 
-                <?php if (session()->getFlashdata('success')): ?>
+                <?php if (! empty($successMsg)): ?>
                     <div class="alert alert-success">
-                        <?= session()->getFlashdata('success') ?>
+                        <?= esc(safeText($successMsg)) ?>
                     </div>
                 <?php endif; ?>
 
-                <?php $errors = session()->getFlashdata('errors'); ?>
-                <?php if ($errors): ?>
+                <?php if (! empty($errors)): ?>
                     <div class="alert alert-danger">
-                        <?php foreach ($errors as $error): ?>
-                            <div><?= esc($error) ?></div>
-                        <?php endforeach; ?>
+                        <?php if (is_array($errors)): ?>
+                            <?php foreach ($errors as $error): ?>
+                                <div><?= esc(safeText($error)) ?></div>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <div><?= esc(safeText($errors)) ?></div>
+                        <?php endif; ?>
                     </div>
                 <?php endif; ?>
 
@@ -70,15 +96,30 @@
 
                     <div class="form-group">
                         <label class="form-label" for="email">Email</label>
-                        <input class="form-control" type="email" name="email" id="email" value="<?= old('email') ?>" required>
+                        <input
+                            class="form-control"
+                            type="email"
+                            name="email"
+                            id="email"
+                            value="<?= esc(is_array($oldEmail) ? '' : safeText($oldEmail)) ?>"
+                            required
+                        >
                     </div>
 
                     <div class="form-group">
                         <label class="form-label" for="password">Password</label>
-                        <input class="form-control" type="password" name="password" id="password" required>
+                        <input
+                            class="form-control"
+                            type="password"
+                            name="password"
+                            id="password"
+                            required
+                        >
                     </div>
 
-                    <button type="submit" class="btn btn-primary" style="width:100%;">Login ke Sistem</button>
+                    <button type="submit" class="btn btn-primary" style="width:100%;">
+                        Login ke Sistem
+                    </button>
                 </form>
 
                 <p class="muted" style="margin-top:18px;">
