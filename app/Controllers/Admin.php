@@ -451,7 +451,7 @@ public function storeUser()
     return redirect()->to('/admin/users')->with('success', 'User berhasil ditambahkan.');
 }
 
-public function editUser($id)
+public function editUser(int $id)
 {
     if ($redirect = $this->guardAdmin()) {
         return $redirect;
@@ -501,7 +501,7 @@ public function editUser($id)
     ]);
 }
 
-public function updateUser($id)
+public function updateUser(int $id)
 {
     if ($redirect = $this->guardAdmin()) {
         return $redirect;
@@ -612,7 +612,7 @@ public function updateUser($id)
     return redirect()->to('/admin/users')->with('success', 'User berhasil diupdate.');
 }
 
-    public function deleteUser($id)
+    public function deleteUser(int $id)
     {
         if ($redirect = $this->guardAdmin()) {
             return $redirect;
@@ -737,7 +737,7 @@ public function storePeriodeAkademik()
     return redirect()->to('/admin/periode-akademik')->with('success', 'Periode akademik berhasil ditambahkan.');
 }
 
-public function editPeriodeAkademik($id)
+public function editPeriodeAkademik(int $id)
 {
     if ($redirect = $this->guardAdmin()) {
         return $redirect;
@@ -761,7 +761,7 @@ public function editPeriodeAkademik($id)
     ]);
 }
 
-public function updatePeriodeAkademik($id)
+public function updatePeriodeAkademik(int $id)
 {
     if ($redirect = $this->guardAdmin()) {
         return $redirect;
@@ -810,7 +810,7 @@ public function updatePeriodeAkademik($id)
     return redirect()->to('/admin/periode-akademik')->with('success', 'Periode akademik berhasil diperbarui.');
 }
 
-public function deletePeriodeAkademik($id)
+public function deletePeriodeAkademik(int $id)
 {
     if ($redirect = $this->guardAdmin()) {
         return $redirect;
@@ -870,7 +870,7 @@ public function storeProgramStudi()
     return redirect()->to('/admin/program-studi')->with('success', 'Program studi berhasil ditambahkan.');
 }
 
-public function editProgramStudi($id)
+public function editProgramStudi(int $id)
 {
     if ($redirect = $this->guardAdmin()) {
         return $redirect;
@@ -894,7 +894,7 @@ public function editProgramStudi($id)
     ]);
 }
 
-public function updateProgramStudi($id)
+public function updateProgramStudi(int $id)
 {
     if ($redirect = $this->guardAdmin()) {
         return $redirect;
@@ -926,7 +926,7 @@ public function updateProgramStudi($id)
     return redirect()->to('/admin/program-studi')->with('success', 'Program studi berhasil diperbarui.');
 }
 
-public function deleteProgramStudi($id)
+public function deleteProgramStudi(int $id)
 {
     if ($redirect = $this->guardAdmin()) {
         return $redirect;
@@ -1475,7 +1475,7 @@ public function storeSK()
     return redirect()->to('/admin/surat-keputusan')->with('success', 'SK berhasil dibuat.');
 }
 
-public function deleteSK($id)
+public function deleteSK(int $id)
 {
     if ($redirect = $this->guardAdmin()) {
         return $redirect;

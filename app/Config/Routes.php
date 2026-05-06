@@ -9,7 +9,7 @@ use CodeIgniter\Router\RouteCollection;
 $routes->get('/', 'Auth::login');
 $routes->get('/login', 'Auth::login');
 $routes->post('/login', 'Auth::attemptLogin');
-$routes->get('/logout', 'Auth::logout');
+$routes->post('/logout', 'Auth::logout');
 
 $routes->group('', ['filter' => 'auth'], static function ($routes) {
     $routes->get('/dashboard', 'Dashboard::index');
@@ -57,6 +57,7 @@ $routes->group('', ['filter' => 'auth'], static function ($routes) {
     $routes->get('/dosen/permohonan', 'Pembimbing::permohonanDosen');
     $routes->get('/dosen/permohonan/detail/(:num)', 'Pembimbing::detailPermohonan/$1');
     $routes->post('/dosen/permohonan/(:num)/respon', 'Pembimbing::responPermohonan/$1');
+    $routes->post('/dosen/permohonan/update-riwayat/(:num)', 'Dashboard::updateRiwayatPermohonan/$1');
 
     // dosen judul
     $routes->get('/dosen/pengajuan-judul', 'Judul::indexDosen');

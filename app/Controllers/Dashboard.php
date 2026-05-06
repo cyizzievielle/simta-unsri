@@ -547,4 +547,29 @@ public function suratKeputusan()
         'rows'         => $rows,
     ]);
 }
+
+public function updateRiwayatPermohonan(int $id)
+{
+    $db = \Config\Database::connect();
+
+    $status  = (string) $this->request->getPost('status');
+    $catatan = (string) ($this->request->getPost('catatan') ?? '');
+
+    $allowedStatus = ['menunggu', 'disetujui', 'ditolak', 'kuota_penuh'];
+
+    if (! in_array($status, $allowedStatus, true)) {
+        return redirect()->back()->with('error', 'Status tidak valid.');
+    }
+
+    $db->table('permohonan_pembimbing')
+        ->where('id', $id)
+        ->update([
+            'status'         => $status,
+            'catatan'        => $catatan,
+            'tanggal_respon' => date('Y-m-d H:i:s'),
+            'edited_at'      => date('Y-m-d H:i:s'),
+        ]);
+
+    return redirect()->back()->with('success', 'Riwayat keputusan berhasil diperbarui.');
+}
 }

@@ -33,7 +33,9 @@
             </tr>
         </thead>
         <tbody>
-            <?php foreach ($rows as $i => $row): ?>
+<?php $rows = $rows ?? []; ?>
+
+<?php foreach ($rows as $i => $row): ?>
                 <tr>
                     <td><?= $i + 1 ?></td>
                     <td><?= esc((string) ($row['nama_mahasiswa'] ?? '-')) ?></td>

@@ -1,101 +1,119 @@
 <?= $this->extend('layouts/dashboard') ?>
-
 <?= $this->section('content') ?>
 
+<?php
+$rows         = $rows ?? [];
+$pageType     = $pageType ?? '';
+$pageTitle    = $pageTitle ?? 'Master Data';
+$pageSubtitle = $pageSubtitle ?? '';
+
+$safe = static function (mixed $value, string $default = '-'): string {
+    if ($value === null || $value === '') return $default;
+    if (is_array($value)) return implode(', ', array_map('strval', $value));
+    return (string) $value;
+};
+?>
+
 <style>
-.master-card {
+.master-page {
     background: #fff;
-    border-radius: 26px;
-    padding: 24px;
     border: 1px solid #eef2f7;
-    box-shadow: 0 14px 35px rgba(15, 23, 42, 0.06);
+    border-radius: 22px;
+    padding: 18px;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, .05);
 }
 
-.master-toolbar {
+.master-head {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
-    gap: 16px;
+    gap: 12px;
     flex-wrap: wrap;
-    margin-bottom: 20px;
+    margin-bottom: 14px;
 }
 
-.master-title {
-    margin: 0 0 6px;
-    font-size: 24px;
+.master-head h3 {
+    margin: 0 0 5px;
+    font-size: 21px;
     font-weight: 900;
     color: #0f172a;
 }
 
-.master-subtitle {
+.master-head p {
     margin: 0;
     color: #64748b;
-    font-size: 14px;
-    line-height: 1.6;
+    font-size: 13px;
+    line-height: 1.5;
 }
 
-.master-table-wrap {
-    width: 100%;
+.btn-add {
+    height: 36px;
+    padding: 0 13px;
+    border-radius: 12px;
+    background: #2563eb;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 900;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+}
+
+.table-wrap {
     overflow-x: auto;
-    border-radius: 18px;
     border: 1px solid #eef2f7;
+    border-radius: 16px;
+    background: #fff;
 }
 
 .master-table {
     width: 100%;
     border-collapse: collapse;
-    background: #fff;
 }
 
 .master-table.periode {
-    min-width: 620px;
+    min-width: 560px;
 }
 
 .master-table.prodi {
     min-width: 760px;
 }
 
-.master-table thead tr {
-    background: linear-gradient(135deg, #f8fbff, #eff6ff);
-}
-
-.master-table th,
-.master-table td {
-    padding: 13px 12px;
+.master-table th {
+    background: #f8fafc;
+    color: #334155;
+    font-size: 10.5px;
+    font-weight: 900;
     text-align: left;
-    border-bottom: 1px solid #eef2f7;
-    vertical-align: middle;
-    font-size: 13px;
-    color: #0f172a;
+    padding: 11px 10px;
     white-space: nowrap;
 }
 
-.master-table th {
+.master-table td {
+    padding: 11px 10px;
+    border-top: 1px solid #eef2f7;
     font-size: 12px;
-    font-weight: 900;
-    color: #334155;
+    color: #0f172a;
+    vertical-align: middle;
+    white-space: nowrap;
 }
 
 .cell-strong {
     font-weight: 900;
-    color: #0f172a;
 }
 
 .cell-long {
     max-width: 260px;
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space: nowrap;
 }
 
-.status-badge {
+.badge {
     display: inline-flex;
-    align-items: center;
-    padding: 6px 9px;
+    padding: 5px 9px;
     border-radius: 999px;
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 900;
-    white-space: nowrap;
 }
 
 .badge-active {
@@ -108,89 +126,71 @@
     color: #b91c1c;
 }
 
-.action-group {
+.actions {
     display: flex;
-    align-items: center;
-    gap: 7px;
+    gap: 6px;
     flex-wrap: nowrap;
 }
 
-.action-icon {
-    width: 32px;
-    height: 32px;
-    border-radius: 11px;
+.icon-btn {
+    width: 29px;
+    height: 29px;
+    border-radius: 10px;
     border: 0;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     text-decoration: none;
-    font-size: 14px;
+    font-size: 13px;
     cursor: pointer;
-    transition: .2s ease;
     font-weight: 900;
 }
 
-.action-icon.edit {
+.icon-edit {
     background: #dbeafe;
     color: #1d4ed8;
 }
 
-.action-icon.delete {
-    background: #fee2e2;
-    color: #b91c1c;
+.icon-delete {
+    background: #fff5f5;
+    color: #dc2626;
+    border: 1px solid #fecaca;
 }
 
-.action-icon:hover {
-    transform: translateY(-1px);
-    filter: brightness(.98);
-}
-
-.action-form {
+.delete-form {
     margin: 0;
     display: inline-flex;
 }
 
-.empty-state {
-    margin-top: 16px;
-    padding: 28px;
-    border-radius: 22px;
+.empty-box {
+    padding: 22px;
     border: 1px dashed #cbd5e1;
-    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
-    text-align: center;
+    border-radius: 16px;
+    background: #f8fafc;
     color: #64748b;
+    text-align: center;
+    font-size: 13px;
     font-weight: 700;
 }
 
-@media(max-width: 760px) {
-    .master-card {
-        padding: 14px;
-        border-radius: 22px;
+@media (max-width: 600px) {
+    .master-page {
+        padding: 13px;
+        border-radius: 18px;
     }
 
-    .master-toolbar {
-        gap: 10px;
-        margin-bottom: 14px;
+    .master-head h3 {
+        font-size: 18px;
     }
 
-    .master-title {
-        font-size: 21px;
-        margin-bottom: 4px;
+    .master-head p {
+        font-size: 11.5px;
     }
 
-    .master-subtitle {
-        font-size: 12.5px;
-        line-height: 1.35;
-    }
-
-    .master-toolbar .btn {
-        width: auto;
-        padding: 10px 14px;
-        border-radius: 14px;
-        font-size: 13px;
-    }
-
-    .master-table-wrap {
-        border-radius: 16px;
+    .btn-add {
+        height: 34px;
+        font-size: 11px;
+        padding: 0 11px;
     }
 
     .master-table.periode {
@@ -198,73 +198,58 @@
     }
 
     .master-table.prodi {
-        min-width: 620px;
+        min-width: 680px;
     }
 
     .master-table th,
     .master-table td {
-        padding: 8px 8px;
-        font-size: 11.5px;
+        padding: 9px 8px;
+        font-size: 11px;
     }
 
     .master-table th {
-        font-size: 11px;
+        font-size: 10px;
     }
 
     .cell-long {
         max-width: 160px;
     }
 
-    .status-badge {
+    .badge {
+        font-size: 9.5px;
         padding: 5px 7px;
-        font-size: 10px;
     }
 
-    .action-group {
-        gap: 6px;
-    }
-
-    .action-icon {
+    .icon-btn {
         width: 27px;
         height: 27px;
-        border-radius: 9px;
-        font-size: 11px;
-    }
-
-    .empty-state {
-        padding: 20px;
-        border-radius: 18px;
-        font-size: 13px;
+        font-size: 12px;
     }
 }
 </style>
 
-<div class="master-card">
-    <div class="master-toolbar">
+<div class="master-page">
+    <div class="master-head">
         <div>
-            <h3 class="master-title">
-                <?= esc((string) ($pageTitle ?? 'Master Data')) ?>
-            </h3>
-            <p class="master-subtitle">
-                <?= esc((string) ($pageSubtitle ?? '')) ?>
-            </p>
+            <h3><?= esc($safe($pageTitle, 'Master Data')) ?></h3>
+            <p><?= esc($safe($pageSubtitle, 'Kelola data master sistem.')) ?></p>
         </div>
 
-        <?php if (($pageType ?? '') === 'periode_akademik'): ?>
-            <a href="<?= site_url('admin/periode-akademik/create') ?>" class="btn btn-primary">
-                Tambah Periode
+        <?php if ($pageType === 'periode_akademik'): ?>
+            <a href="<?= site_url('admin/periode-akademik/create') ?>" class="btn-add">
+                + Tambah Periode
             </a>
-        <?php elseif (($pageType ?? '') === 'program_studi'): ?>
-            <a href="<?= site_url('admin/program-studi/create') ?>" class="btn btn-primary">
-                Tambah Program Studi
+        <?php elseif ($pageType === 'program_studi'): ?>
+            <a href="<?= site_url('admin/program-studi/create') ?>" class="btn-add">
+                + Tambah Prodi
             </a>
         <?php endif; ?>
     </div>
 
-    <?php if (! empty($rows)): ?>
+    <?php if (! empty($rows) && is_array($rows)): ?>
 
-        <?php if (($pageType ?? '') === 'periode_akademik'): ?>
-            <div class="master-table-wrap">
+        <?php if ($pageType === 'periode_akademik'): ?>
+            <div class="table-wrap">
                 <table class="master-table periode">
                     <thead>
                         <tr>
@@ -276,47 +261,43 @@
                     </thead>
 
                     <tbody>
-                        <?php foreach (($rows ?? []) as $row): ?>
+                        <?php foreach ($rows as $row): ?>
                             <tr>
                                 <td class="cell-strong">
-                                    <?= esc((string) ($row['tahun_ajaran'] ?? '-')) ?>
+                                    <?= esc($safe($row['tahun_ajaran'] ?? '-')) ?>
                                 </td>
 
                                 <td>
-                                    <?= esc((string) ($row['semester'] ?? '-')) ?>
+                                    <?= esc($safe($row['semester'] ?? '-')) ?>
                                 </td>
 
                                 <td>
                                     <?php if ((int) ($row['is_active'] ?? 0) === 1): ?>
-                                        <span class="status-badge badge-active">Aktif</span>
+                                        <span class="badge badge-active">Aktif</span>
                                     <?php else: ?>
-                                        <span class="status-badge badge-inactive">Nonaktif</span>
+                                        <span class="badge badge-inactive">Nonaktif</span>
                                     <?php endif; ?>
                                 </td>
 
                                 <td>
-                                    <div class="action-group">
+                                    <div class="actions">
                                         <a
-                                            href="<?= site_url('admin/periode-akademik/edit/' . (string) ($row['id'] ?? '')) ?>"
-                                            class="action-icon edit"
+                                            href="<?= site_url('admin/periode-akademik/edit/' . $safe($row['id'] ?? '')) ?>"
+                                            class="icon-btn icon-edit"
                                             title="Edit"
                                         >
                                             ✎
                                         </a>
 
                                         <form
-                                            action="<?= site_url('admin/periode-akademik/delete/' . (string) ($row['id'] ?? '')) ?>"
+                                            action="<?= site_url('admin/periode-akademik/delete/' . $safe($row['id'] ?? '')) ?>"
                                             method="post"
-                                            class="action-form"
+                                            class="delete-form"
+                                            onsubmit="return confirm('Yakin ingin menghapus periode ini?');"
                                         >
                                             <?= csrf_field() ?>
-                                            <button
-                                                type="submit"
-                                                class="action-icon delete"
-                                                title="Hapus"
-                                                onclick="return confirm('Yakin ingin menghapus periode ini?')"
-                                            >
-                                                🗑
+                                            <button type="submit" class="icon-btn icon-delete" title="Hapus">
+                                                ×
                                             </button>
                                         </form>
                                     </div>
@@ -328,8 +309,8 @@
             </div>
         <?php endif; ?>
 
-        <?php if (($pageType ?? '') === 'program_studi'): ?>
-            <div class="master-table-wrap">
+        <?php if ($pageType === 'program_studi'): ?>
+            <div class="table-wrap">
                 <table class="master-table prodi">
                     <thead>
                         <tr>
@@ -342,47 +323,47 @@
                     </thead>
 
                     <tbody>
-                        <?php foreach (($rows ?? []) as $row): ?>
+                        <?php foreach ($rows as $row): ?>
                             <tr>
                                 <td class="cell-strong">
-                                    <?= esc((string) ($row['kode_prodi'] ?? '-')) ?>
-                                </td>
-
-                                <td class="cell-long">
-                                    <?= esc((string) ($row['nama_prodi'] ?? '-')) ?>
+                                    <?= esc($safe($row['kode_prodi'] ?? '-')) ?>
                                 </td>
 
                                 <td>
-                                    <?= esc((string) ($row['jenjang'] ?? '-')) ?>
-                                </td>
-
-                                <td class="cell-long">
-                                    <?= esc((string) ($row['fakultas'] ?? '-')) ?>
+                                    <div class="cell-long">
+                                        <?= esc($safe($row['nama_prodi'] ?? '-')) ?>
+                                    </div>
                                 </td>
 
                                 <td>
-                                    <div class="action-group">
+                                    <?= esc($safe($row['jenjang'] ?? '-')) ?>
+                                </td>
+
+                                <td>
+                                    <div class="cell-long">
+                                        <?= esc($safe($row['fakultas'] ?? '-')) ?>
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <div class="actions">
                                         <a
-                                            href="<?= site_url('admin/program-studi/edit/' . (string) ($row['id'] ?? '')) ?>"
-                                            class="action-icon edit"
+                                            href="<?= site_url('admin/program-studi/edit/' . $safe($row['id'] ?? '')) ?>"
+                                            class="icon-btn icon-edit"
                                             title="Edit"
                                         >
                                             ✎
                                         </a>
 
                                         <form
-                                            action="<?= site_url('admin/program-studi/delete/' . (string) ($row['id'] ?? '')) ?>"
+                                            action="<?= site_url('admin/program-studi/delete/' . $safe($row['id'] ?? '')) ?>"
                                             method="post"
-                                            class="action-form"
+                                            class="delete-form"
+                                            onsubmit="return confirm('Yakin ingin menghapus program studi ini?');"
                                         >
                                             <?= csrf_field() ?>
-                                            <button
-                                                type="submit"
-                                                class="action-icon delete"
-                                                title="Hapus"
-                                                onclick="return confirm('Yakin ingin menghapus program studi ini?')"
-                                            >
-                                                🗑
+                                            <button type="submit" class="icon-btn icon-delete" title="Hapus">
+                                                ×
                                             </button>
                                         </form>
                                     </div>
@@ -395,7 +376,7 @@
         <?php endif; ?>
 
     <?php else: ?>
-        <div class="empty-state">
+        <div class="empty-box">
             Belum ada data.
         </div>
     <?php endif; ?>

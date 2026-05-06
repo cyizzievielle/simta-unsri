@@ -99,7 +99,7 @@ class Pembimbing extends BaseController
         return redirect()->to('/pembimbing')->with('success', 'Permohonan pembimbing berhasil diajukan.');
     }
 
-public function responPermohonan($id)
+public function responPermohonan(int $id)
 {
     $userId = (int) session()->get('user_id');
     $role   = session()->get('role');
@@ -204,7 +204,7 @@ public function responPermohonan($id)
     return redirect()->to('/dosen/permohonan')->with('success', 'Permohonan berhasil diproses.');
 }
 
-public function detailPermohonan($id)
+public function detailPermohonan(int $id)
 {
     $userId = (int) session()->get('user_id');
     $role   = session()->get('role');
@@ -352,7 +352,7 @@ public function permohonanDosen()
     ]);
 }
 
-    public function setujui($id)
+    public function setujui(int $id)
     {
         $userId = (int) session()->get('user_id');
         $role   = session()->get('role');
@@ -451,7 +451,7 @@ public function permohonanDosen()
         return redirect()->back()->with('success', 'Permohonan berhasil disetujui.');
     }
 
-    public function tolak($id)
+    public function tolak(int $id)
     {
         $userId = (int) session()->get('user_id');
         $role   = session()->get('role');

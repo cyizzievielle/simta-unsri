@@ -1,29 +1,82 @@
 <?= $this->extend('layouts/dashboard') ?>
 <?= $this->section('content') ?>
-<?php $totalPages = $totalPages ?? 1; ?>
-<?php $currentPage = $currentPage ?? 1; ?>
+
+<?php
+$users        = $users ?? [];
+$keyword      = $keyword ?? '';
+$roleFilter   = $roleFilter ?? '';
+$statusFilter = $statusFilter ?? '';
+$totalRows    = $totalRows ?? 0;
+$totalPages   = $totalPages ?? 1;
+$currentPage  = $currentPage ?? 1;
+
+$safe = static function (mixed $value, string $default = '-'): string {
+    if ($value === null || $value === '') {
+        return $default;
+    }
+
+    if (is_array($value)) {
+        return implode(', ', array_map('strval', $value));
+    }
+
+    return (string) $value;
+};
+
+$roleBadge = static function (mixed $role) use ($safe): string {
+    return match (strtolower($safe($role, ''))) {
+        'admin'     => 'badge-role-admin',
+        'mahasiswa' => 'badge-role-mahasiswa',
+        'dosen'     => 'badge-role-dosen',
+        default     => 'badge-role-admin',
+    };
+};
+
+$userCode = static function (array $row) use ($safe): string {
+    if (($row['role'] ?? '') === 'mahasiswa') {
+        return $safe($row['nim'] ?? '-');
+    }
+
+    if (($row['role'] ?? '') === 'dosen') {
+        return $safe($row['nidn'] ?? '-');
+    }
+
+    return '-';
+};
+
+$queryParams = [
+    'keyword' => $keyword,
+    'role'    => $roleFilter,
+    'status'  => $statusFilter,
+];
+?>
 
 <style>
+.users-page {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
 .users-card {
     background: #fff;
-    border-radius: 26px;
-    padding: 24px;
-    box-shadow: 0 14px 35px rgba(15, 23, 42, 0.06);
+    border-radius: 24px;
+    padding: 18px;
     border: 1px solid #eef2f7;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, .055);
 }
 
 .users-toolbar {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    gap: 18px;
+    gap: 14px;
     flex-wrap: wrap;
-    margin-bottom: 20px;
+    margin-bottom: 14px;
 }
 
 .users-toolbar h3 {
-    margin: 0 0 6px;
-    font-size: 22px;
+    margin: 0 0 5px;
+    font-size: 21px;
     font-weight: 900;
     color: #0f172a;
 }
@@ -31,55 +84,125 @@
 .users-toolbar p {
     margin: 0;
     color: #64748b;
-    line-height: 1.6;
+    font-size: 12.5px;
+    line-height: 1.55;
+}
+
+.btn-add {
+    height: 38px;
+    padding: 0 13px;
+    border-radius: 12px;
+    background: #2563eb;
+    color: #fff;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 900;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+}
+
+/* FILTER COMPACT */
+.filter-box {
+    width: fit-content;
+    max-width: 100%;
+    border: 1px solid #e2e8f0;
+    background: linear-gradient(135deg, #f8fbff, #f1f5f9);
+    border-radius: 16px;
+    padding: 10px;
+    margin-bottom: 14px;
 }
 
 .users-filter-form {
     display: grid;
-    grid-template-columns: 1.4fr .8fr .8fr .9fr auto auto;
-    gap: 12px;
-    margin-bottom: 18px;
+    grid-template-columns: 150px 92px 98px;
+    gap: 7px;
+    align-items: end;
 }
 
-.users-filter-form .input,
-.users-filter-form select {
+.filter-field label {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 10px;
+    font-weight: 900;
+    color: #334155;
+}
+
+.filter-field input,
+.filter-field select {
     width: 100%;
+    height: 33px;
     border: 1px solid #dbe3ef;
-    border-radius: 14px;
-    padding: 12px 14px;
-    font-size: 14px;
+    border-radius: 10px;
+    padding: 6px 8px;
+    font-size: 10.5px;
     background: #fff;
     outline: none;
+    color: #0f172a;
 }
 
-.users-filter-form .input:focus,
-.users-filter-form select:focus {
-    border-color: #2563eb;
-    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.10);
+.filter-field input:focus,
+.filter-field select:focus {
+    border-color: #93c5fd;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, .10);
+}
+
+.filter-actions {
+    grid-column: 1 / -1;
+    display: flex;
+    gap: 7px;
+}
+
+.btn-filter {
+    height: 32px;
+    padding: 0 12px;
+    border-radius: 10px;
+    border: 0;
+    cursor: pointer;
+    font-size: 10.5px;
+    font-weight: 900;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-apply {
+    background: #2563eb;
+    color: #fff;
+}
+
+.btn-reset {
+    background: #fff;
+    border: 1px solid #cbd5e1;
+    color: #334155;
 }
 
 .users-summary-line {
     display: flex;
     justify-content: space-between;
-    gap: 12px;
+    gap: 10px;
     flex-wrap: wrap;
-    margin-bottom: 16px;
+    margin-bottom: 12px;
     color: #64748b;
-    font-size: 14px;
+    font-size: 12px;
+    font-weight: 750;
 }
 
 .premium-table-wrap {
     width: 100%;
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
     border-radius: 18px;
     border: 1px solid #eef2f7;
+    background: #fff;
 }
 
 .premium-table {
     width: 100%;
-    min-width: 760px;
+    min-width: 780px;
     border-collapse: collapse;
-    background: #fff;
 }
 
 .premium-table thead tr {
@@ -88,22 +211,19 @@
 
 .premium-table th,
 .premium-table td {
-    padding: 14px 12px;
+    padding: 11px 10px;
     text-align: left;
     border-bottom: 1px solid #eef2f7;
     vertical-align: middle;
+    font-size: 12px;
+    color: #0f172a;
 }
 
 .premium-table th {
-    font-size: 11px;
-    font-weight: 900;
+    font-size: 10.5px;
+    font-weight: 950;
     color: #334155;
     white-space: nowrap;
-}
-
-.premium-table td {
-    color: #0f172a;
-    font-size: 12px;
 }
 
 .cell-title {
@@ -112,7 +232,15 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 220px; /* desktop */
+    max-width: 190px;
+}
+
+.email-cell {
+    max-width: 220px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #475569;
 }
 
 .status-badge {
@@ -120,37 +248,58 @@
     align-items: center;
     padding: 6px 9px;
     border-radius: 999px;
-    font-size: 11px;
-    font-weight: 900;
+    font-size: 10.5px;
+    font-weight: 950;
     white-space: nowrap;
 }
 
-.badge-role-admin { background: #ede9fe; color: #6d28d9; }
-.badge-role-mahasiswa { background: #dbeafe; color: #1d4ed8; }
-.badge-role-dosen { background: #dcfce7; color: #166534; }
-.badge-aktif { background: #dcfce7; color: #166534; }
-.badge-nonaktif { background: #fee2e2; color: #b91c1c; }
+.badge-role-admin {
+    background: #ede9fe;
+    color: #6d28d9;
+}
+
+.badge-role-mahasiswa {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.badge-role-dosen {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.badge-aktif {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.badge-nonaktif {
+    background: #fee2e2;
+    color: #b91c1c;
+}
 
 .action-group {
     display: flex;
     align-items: center;
-    gap: 7px;
+    gap: 6px;
     flex-wrap: nowrap;
 }
 
 .action-icon {
-    width: 34px;
-    height: 34px;
+    width: 30px;
+    height: 30px;
     border-radius: 11px;
     border: 0;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     text-decoration: none;
-    font-size: 15px;
+    font-size: 13px;
     cursor: pointer;
-    transition: .2s ease;
+    transition: .18s ease;
     font-weight: 900;
+    line-height: 1;
+    padding: 0;
 }
 
 .action-icon.edit {
@@ -159,347 +308,328 @@
 }
 
 .action-icon.delete {
-    background: #fee2e2;
+    background: #fff5f5;
     color: #b91c1c;
+    border: 1px solid #fecaca;
 }
 
 .action-icon:hover {
     transform: translateY(-1px);
-    filter: brightness(.98);
 }
 
 .action-form {
     margin: 0;
+    padding: 0;
     display: inline-flex;
 }
 
 .premium-empty {
     border: 1px dashed #cbd5e1;
     background: linear-gradient(135deg, #f8fafc, #f1f5f9);
-    border-radius: 22px;
-    padding: 28px;
+    border-radius: 18px;
+    padding: 24px;
     text-align: center;
     color: #64748b;
+    font-size: 13px;
+    line-height: 1.7;
 }
 
 .pagination-wrap {
     display: flex;
     justify-content: center;
-    gap: 8px;
+    gap: 7px;
     flex-wrap: wrap;
-    margin-top: 20px;
+    margin-top: 16px;
 }
 
 .page-link {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 42px;
-    height: 42px;
-    padding: 0 14px;
-    border-radius: 12px;
+    min-width: 34px;
+    height: 34px;
+    padding: 0 10px;
+    border-radius: 11px;
     border: 1px solid #dbe3ef;
     background: #fff;
     color: #334155;
     text-decoration: none;
-    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 850;
+    font-size: 12px;
 }
 
 .page-link.active {
-    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    background: #2563eb;
     color: #fff;
     border-color: #2563eb;
 }
 
-@media(max-width: 1200px) {
-    .users-filter-form {
-        grid-template-columns: 1fr 1fr;
-    }
-}
-
-@media(max-width: 760px) {
+@media (max-width: 760px) {
     .users-card {
-        padding: 14px;
-        border-radius: 22px;
+        padding: 13px;
+        border-radius: 18px;
     }
 
     .users-toolbar {
         gap: 10px;
-        margin-bottom: 14px;
-    }
-
-    .users-toolbar h3 {
-        font-size: 21px;
-        margin-bottom: 4px;
-    }
-
-    .users-toolbar p {
-        font-size: 13px;
-        line-height: 1.35;
-    }
-
-    .users-toolbar .btn {
-        width: auto;
-        padding: 10px 14px;
-        border-radius: 14px;
-        font-size: 13px;
-    }
-
-    .users-filter-form {
-        grid-template-columns: 1fr;
-        gap: 9px;
         margin-bottom: 12px;
     }
 
-    .users-filter-form .input,
-    .users-filter-form select {
-        padding: 10px 12px;
-        border-radius: 13px;
-        font-size: 13px;
+    .users-toolbar h3 {
+        font-size: 18px;
     }
 
-    .users-filter-form .btn {
-        min-height: 40px;
-        padding: 10px 12px;
-        border-radius: 13px;
-        font-size: 13px;
+    .users-toolbar p {
+        font-size: 11.5px;
     }
 
-    .users-summary-line {
-        padding: 0;
-        margin-bottom: 10px;
-        background: transparent;
-        border: 0;
-        font-size: 12px;
+    .btn-add {
+        height: 36px;
+        font-size: 11.5px;
+        padding: 0 11px;
+        border-radius: 12px;
     }
 
-    .premium-table-wrap {
+    .filter-box {
+        width: 100%;
+        padding: 10px;
         border-radius: 16px;
     }
 
+    .users-filter-form {
+        grid-template-columns: 1.25fr .8fr .8fr;
+        gap: 6px;
+    }
+
+    .filter-field label {
+        font-size: 9.5px;
+    }
+
+    .filter-field input,
+    .filter-field select {
+        height: 32px;
+        font-size: 10px;
+        padding: 6px 7px;
+    }
+
+    .btn-filter {
+        height: 32px;
+        font-size: 10px;
+        padding: 0 11px;
+    }
+
+    .users-summary-line {
+        font-size: 11px;
+        margin-bottom: 10px;
+    }
+
     .premium-table {
-        min-width: 580px;
+        min-width: 700px;
     }
 
     .premium-table th,
     .premium-table td {
-        padding: 9px 9px;
-        font-size: 11.5px;
+        padding: 9px 8px;
+        font-size: 11px;
     }
 
     .premium-table th {
-        font-size: 11.5px;
+        font-size: 10px;
     }
 
     .cell-title {
-        font-size: 12.5px;
-        max-width: 135px;
+        max-width: 130px;
+        font-size: 11px;
+    }
+
+    .email-cell {
+        max-width: 160px;
+        font-size: 11px;
     }
 
     .status-badge {
-        padding: 6px 8px;
-        font-size: 10.5px;
-    }
-
-    .action-group {
-        gap: 6px;
+        padding: 5px 7px;
+        font-size: 9.5px;
     }
 
     .action-icon {
-        width: 26px;
-        height: 26px;
+        width: 28px;
+        height: 28px;
         border-radius: 10px;
         font-size: 12px;
+    }
+
+    .pagination-wrap {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        padding-bottom: 4px;
+    }
+
+    .page-link {
+        min-width: 31px;
+        height: 31px;
+        font-size: 10.5px;
+        flex-shrink: 0;
     }
 }
 </style>
 
-<?php
-$roleBadge = static function (?string $role): string {
-    $role = strtolower((string) $role);
+<div class="users-page">
+    <div class="users-card">
+        <div class="users-toolbar">
+            <div>
+                <h3>Kelola Data Users</h3>
+                <p>Gunakan search dan filter untuk menemukan user dengan cepat.</p>
+            </div>
 
-    return match ($role) {
-        'admin'     => 'badge-role-admin',
-        'mahasiswa' => 'badge-role-mahasiswa',
-        'dosen'     => 'badge-role-dosen',
-        default     => 'badge-role-admin',
-    };
-};
-
-$userCode = static function (array $row): string {
-    if (($row['role'] ?? '') === 'mahasiswa') {
-        return (string) ($row['nim'] ?? '-');
-    }
-
-    if (($row['role'] ?? '') === 'dosen') {
-        return (string) ($row['nidn'] ?? '-');
-    }
-
-    return '-';
-};
-
-$queryParams = [
-    'keyword' => $keyword ?? '',
-    'role'    => $roleFilter ?? '',
-    'status'  => $statusFilter ?? '',
-    'sort'    => $sortFilter ?? 'newest',
-];
-?>
-
-<div class="users-card">
-    <div class="users-toolbar">
-        <div>
-            <h3>Kelola Data Users</h3>
-            <p>Gunakan search, filter, dan sorting untuk menemukan user dengan cepat.</p>
+            <a href="<?= site_url('admin/users/create') ?>" class="btn-add">
+                + Tambah User
+            </a>
         </div>
 
-        <a href="<?= site_url('admin/users/create') ?>" class="btn btn-primary">
-            Tambah User
-        </a>
-    </div>
+        <div class="filter-box">
+            <form method="get" action="<?= site_url('admin/users') ?>" class="users-filter-form">
+                <div class="filter-field">
+                    <label for="keyword">Cari User</label>
+                    <input
+                        type="text"
+                        id="keyword"
+                        name="keyword"
+                        placeholder="Cari nama/email"
+                        value="<?= esc($safe($keyword, '')) ?>"
+                    >
+                </div>
 
-    <form method="get" action="<?= site_url('admin/users') ?>" class="users-filter-form">
-        <input
-            type="text"
-            name="keyword"
-            class="input"
-            placeholder="Cari nama atau email..."
-            value="<?= esc((string) ($keyword ?? '')) ?>"
-        >
+                <div class="filter-field">
+                    <label for="role">Role</label>
+                    <select id="role" name="role">
+                        <option value="">Semua</option>
+                        <option value="admin" <?= $roleFilter === 'admin' ? 'selected' : '' ?>>Admin</option>
+                        <option value="mahasiswa" <?= $roleFilter === 'mahasiswa' ? 'selected' : '' ?>>Mahasiswa</option>
+                        <option value="dosen" <?= $roleFilter === 'dosen' ? 'selected' : '' ?>>Dosen</option>
+                    </select>
+                </div>
 
-        <select name="role">
-            <option value="">Semua Role</option>
-            <option value="admin" <?= (($roleFilter ?? '') === 'admin') ? 'selected' : '' ?>>Admin</option>
-            <option value="mahasiswa" <?= (($roleFilter ?? '') === 'mahasiswa') ? 'selected' : '' ?>>Mahasiswa</option>
-            <option value="dosen" <?= (($roleFilter ?? '') === 'dosen') ? 'selected' : '' ?>>Dosen</option>
-        </select>
+                <div class="filter-field">
+                    <label for="status">Status</label>
+                    <select id="status" name="status">
+                        <option value="">Semua</option>
+                        <option value="aktif" <?= $statusFilter === 'aktif' ? 'selected' : '' ?>>Aktif</option>
+                        <option value="nonaktif" <?= $statusFilter === 'nonaktif' ? 'selected' : '' ?>>Nonaktif</option>
+                    </select>
+                </div>
 
-        <select name="status">
-            <option value="">Semua Status</option>
-            <option value="aktif" <?= (($statusFilter ?? '') === 'aktif') ? 'selected' : '' ?>>Aktif</option>
-            <option value="nonaktif" <?= (($statusFilter ?? '') === 'nonaktif') ? 'selected' : '' ?>>Nonaktif</option>
-        </select>
+                <div class="filter-actions">
+                    <button type="submit" class="btn-filter btn-apply">Terapkan</button>
+                    <a href="<?= site_url('admin/users') ?>" class="btn-filter btn-reset">Reset</a>
+                </div>
+            </form>
+        </div>
 
-        <select name="sort">
-            <option value="newest" <?= (($sortFilter ?? '') === 'newest') ? 'selected' : '' ?>>Terbaru</option>
-            <option value="oldest" <?= (($sortFilter ?? '') === 'oldest') ? 'selected' : '' ?>>Terlama</option>
-            <option value="name_asc" <?= (($sortFilter ?? '') === 'name_asc') ? 'selected' : '' ?>>Nama A-Z</option>
-            <option value="name_desc" <?= (($sortFilter ?? '') === 'name_desc') ? 'selected' : '' ?>>Nama Z-A</option>
-            <option value="email_asc" <?= (($sortFilter ?? '') === 'email_asc') ? 'selected' : '' ?>>Email A-Z</option>
-            <option value="email_desc" <?= (($sortFilter ?? '') === 'email_desc') ? 'selected' : '' ?>>Email Z-A</option>
-        </select>
+        <div class="users-summary-line">
+            <div>Total hasil: <strong><?= esc($safe($totalRows, '0')) ?></strong></div>
+            <div>Halaman <strong><?= esc($safe($currentPage, '1')) ?></strong> dari <strong><?= esc($safe($totalPages, '1')) ?></strong></div>
+        </div>
 
-        <button type="submit" class="btn btn-primary">Terapkan</button>
-
-        <a href="<?= site_url('admin/users') ?>" class="btn" style="border:1px solid #cbd5e1; color:#334155;">
-            Reset
-        </a>
-    </form>
-
-    <div class="users-summary-line">
-        <div>Total hasil: <strong><?= esc((string) ($totalRows ?? 0)) ?></strong></div>
-        <div>Halaman <strong><?= esc((string) ($currentPage ?? 1)) ?></strong> dari <strong><?= esc((string) ($totalPages ?? 1)) ?></strong></div>
-    </div>
-
-    <?php if (! empty($users)): ?>
-        <div class="premium-table-wrap">
-            <table class="premium-table">
-                <thead>
-                    <tr>
-                        <th>Nama</th>
-                        <th>Email</th>
-                        <th>Role</th>
-                        <th>NIM / NIDN</th>
-                        <th>Status</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    <?php foreach ($users as $row): ?>
+        <?php if (! empty($users) && is_array($users)): ?>
+            <div class="premium-table-wrap">
+                <table class="premium-table">
+                    <thead>
                         <tr>
-                            <td>
-                                <div class="cell-title">
-                                    <?= esc((string) ($row['name'] ?? '-')) ?>
-                                </div>
-                            </td>
-
-                            <td>
-                                <?= esc((string) ($row['email'] ?? '-')) ?>
-                            </td>
-
-                            <td>
-                                <span class="status-badge <?= $roleBadge($row['role'] ?? '') ?>">
-                                    <?= esc((string) ($row['role'] ?? '-')) ?>
-                                </span>
-                            </td>
-
-                            <td>
-                                <?= esc($userCode($row)) ?>
-                            </td>
-
-                            <td>
-                                <?php if ((int) ($row['is_active'] ?? 0) === 1): ?>
-                                    <span class="status-badge badge-aktif">Aktif</span>
-                                <?php else: ?>
-                                    <span class="status-badge badge-nonaktif">Nonaktif</span>
-                                <?php endif; ?>
-                            </td>
-
-                            <td>
-                                <div class="action-group">
-                                    <a
-                                        href="<?= site_url('admin/users/edit/' . (string) ($row['id'] ?? '')) ?>"
-                                        class="action-icon edit"
-                                        title="Edit"
-                                    >
-                                        ✎
-                                    </a>
-
-                                    <form
-                                        action="<?= site_url('admin/users/delete/' . (string) ($row['id'] ?? '')) ?>"
-                                        method="post"
-                                        class="action-form"
-                                    >
-                                        <?= csrf_field() ?>
-
-                                        <button
-                                            type="submit"
-                                            class="action-icon delete"
-                                            title="Hapus"
-                                            onclick="return confirm('Yakin ingin menghapus user ini?')"
-                                        >
-                                            🗑
-                                        </button>
-                                    </form>
-                                </div>
-                            </td>
+                            <th>Nama</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>NIM / NIDN</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
                         </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-        </div>
+                    </thead>
 
-        <?php if (($totalPages ?? 1) > 1): ?>
-            <div class="pagination-wrap">
-                <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                    <?php
-                    $linkParams = $queryParams;
-                    $linkParams['page'] = $i;
-                    $url = site_url('admin/users?' . http_build_query($linkParams));
-                    ?>
+                    <tbody>
+                        <?php foreach ($users as $row): ?>
+                            <tr>
+                                <td>
+                                    <div class="cell-title">
+                                        <?= esc($safe($row['name'] ?? '-')) ?>
+                                    </div>
+                                </td>
 
-                    <a href="<?= $url ?>" class="page-link <?= ((int) ($currentPage ?? 1) === $i) ? 'active' : '' ?>">
-                        <?= $i ?>
-                    </a>
-                <?php endfor; ?>
+                                <td>
+                                    <div class="email-cell">
+                                        <?= esc($safe($row['email'] ?? '-')) ?>
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <span class="status-badge <?= esc($roleBadge($row['role'] ?? '')) ?>">
+                                        <?= esc($safe($row['role'] ?? '-')) ?>
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <?= esc($userCode($row)) ?>
+                                </td>
+
+                                <td>
+                                    <?php if ((int) ($row['is_active'] ?? 0) === 1): ?>
+                                        <span class="status-badge badge-aktif">Aktif</span>
+                                    <?php else: ?>
+                                        <span class="status-badge badge-nonaktif">Nonaktif</span>
+                                    <?php endif; ?>
+                                </td>
+
+                                <td>
+                                    <div class="action-group">
+                                        <a
+                                            href="<?= site_url('admin/users/edit/' . $safe($row['id'] ?? '')) ?>"
+                                            class="action-icon edit"
+                                            title="Edit"
+                                        >
+                                            ✎
+                                        </a>
+
+                                        <form
+                                            action="<?= site_url('admin/users/delete/' . $safe($row['id'] ?? '')) ?>"
+                                            method="post"
+                                            class="action-form"
+                                            onsubmit="return confirm('Yakin ingin menghapus user ini?');"
+                                        >
+                                            <?= csrf_field() ?>
+
+                                            <button type="submit" class="action-icon delete" title="Hapus">
+                                                ×
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+
+            <?php if ((int) $totalPages > 1): ?>
+                <div class="pagination-wrap">
+                    <?php for ($i = 1; $i <= (int) $totalPages; $i++): ?>
+                        <?php
+                            $linkParams = $queryParams;
+                            $linkParams['page'] = $i;
+                            $url = site_url('admin/users?' . http_build_query($linkParams));
+                        ?>
+
+                        <a href="<?= esc($url) ?>" class="page-link <?= (int) $currentPage === $i ? 'active' : '' ?>">
+                            <?= esc((string) $i) ?>
+                        </a>
+                    <?php endfor; ?>
+                </div>
+            <?php endif; ?>
+        <?php else: ?>
+            <div class="premium-empty">
+                Data user tidak ditemukan. Coba ubah kata kunci atau filter yang dipakai.
             </div>
         <?php endif; ?>
-    <?php else: ?>
-        <div class="premium-empty">
-            Data user tidak ditemukan. Coba ubah kata kunci, filter, atau sorting yang dipakai.
-        </div>
-    <?php endif; ?>
+    </div>
 </div>
 
 <?= $this->endSection() ?>

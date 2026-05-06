@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Controllers\BaseController;
 use Config\Database;
+use CodeIgniter\Database\BaseConnection;
 
 class Judul extends BaseController
 {
@@ -102,7 +103,7 @@ $judulAktif = $db->table('pengajuan_judul pj')
         return redirect()->to('/pengajuan-judul')->with('success', 'Judul berhasil diajukan.');
     }
 
-    public function formRevisi($id)
+    public function formRevisi(int $id)
     {
         $userId = (int) session()->get('user_id');
         $role   = session()->get('role');
@@ -147,7 +148,7 @@ $judulAktif = $db->table('pengajuan_judul pj')
         ]);
     }
 
-    public function simpanRevisi($id)
+    public function simpanRevisi(int $id)
     {
         $userId = (int) session()->get('user_id');
         $role   = session()->get('role');
@@ -287,7 +288,7 @@ $judulAktif = $db->table('pengajuan_judul pj')
         ]);
     }
 
-public function detailDosen($id)
+public function detailDosen(int $id)
 {
     $userId = (int) session()->get('user_id');
     $role   = session()->get('role');
@@ -353,7 +354,7 @@ public function detailDosen($id)
     ]);
 }
 
-public function editReview($id)
+public function editReview(int $id)
 {
     $userId = (int) session()->get('user_id');
 
@@ -381,7 +382,7 @@ public function editReview($id)
     ]);
 }
 
-public function updateReview($id)
+public function updateReview(int $id)
 {
     $userId = (int) session()->get('user_id');
     $status = trim((string) $this->request->getPost('status_review'));
@@ -413,7 +414,7 @@ public function updateReview($id)
     return redirect()->to('/dosen/pengajuan-judul/riwayat')->with('success', 'Review judul berhasil diupdate.');
 }
 
-public function deleteReview($id)
+public function deleteReview(int $id)
 {
     $userId = (int) session()->get('user_id');
 
@@ -521,7 +522,7 @@ public function riwayatDosen()
     ]);
 }
 
-   public function detailMahasiswa($id)
+   public function detailMahasiswa(int $id)
 {
     $db = \Config\Database::connect();
 
@@ -586,15 +587,20 @@ $reviews = $db->table('review_judul r')
     // =========================
     // KIRIM KE VIEW
     // =========================
-    return view('dashboard/detail_judul_mahasiswa', [
-        'judul'        => $judul,
-        'reviews'      => $reviews,
-        'pembimbing1'  => $pembimbing1,
-        'pembimbing2'  => $pembimbing2
-    ]);
+return view('dashboard/detail_judul_mahasiswa', [
+    'title'        => 'Detail Pengajuan Judul',
+    'pageTitle'    => 'Detail Pengajuan Judul',
+    'pageSubtitle' => 'Lihat detail judul, status review, dan catatan pembimbing.',
+    'activeMenu'   => 'pengajuan_judul',
+
+    'judul'        => $judul,
+    'reviews'      => $reviews,
+    'pembimbing1'  => $pembimbing1,
+    'pembimbing2'  => $pembimbing2,
+]);
 }
 
-public function review($id)
+public function review(int $id)
 {
     $userId = (int) session()->get('user_id');
     $role   = session()->get('role');
@@ -752,7 +758,7 @@ public function review($id)
         return trim($judul);
     }
 
-    private function hitungSimilarity($db, string $judulNormalized, int $excludeId = 0): array
+    private function hitungSimilarity(BaseConnection $db, string $judulNormalized, int $excludeId = 0): array
     {
         $builder = $db->table('pengajuan_judul')->select('id, judul_normalized');
 

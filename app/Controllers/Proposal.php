@@ -101,7 +101,7 @@ class Proposal extends BaseController
         return redirect()->to('/proposal-ta')->with('success', 'Proposal berhasil diunggah.');
     }
 
-    public function formRevisi($id)
+    public function formRevisi(int $id)
     {
         $userId = (int) session()->get('user_id');
         $role   = session()->get('role');
@@ -148,7 +148,7 @@ class Proposal extends BaseController
         ]);
     }
 
-    public function simpanRevisi($id)
+    public function simpanRevisi(int $id)
     {
         $userId = (int) session()->get('user_id');
         $role   = session()->get('role');
@@ -279,7 +279,7 @@ class Proposal extends BaseController
         ]);
     }
 
-    public function detailDosen($id)
+    public function detailDosen(int $id)
     {
         $userId = (int) session()->get('user_id');
         $role   = session()->get('role');
@@ -432,7 +432,7 @@ public function riwayatDosen()
     ]);
 }
 
-    public function detailMahasiswa($id)
+    public function detailMahasiswa(int $id)
     {
         $userId = (int) session()->get('user_id');
         $role   = session()->get('role');
@@ -493,7 +493,7 @@ public function riwayatDosen()
         ]);
     }
 
-    public function editReview($id)
+    public function editReview(int $id)
 {
     $userId = (int) session()->get('user_id');
 
@@ -522,7 +522,7 @@ public function riwayatDosen()
     ]);
 }
 
-public function updateReview($id)
+public function updateReview(int $id)
 {
     $userId = (int) session()->get('user_id');
     $status = trim((string) $this->request->getPost('status_review'));
@@ -554,7 +554,7 @@ public function updateReview($id)
     return redirect()->to('/dosen/proposal-ta/riwayat')->with('success', 'Review proposal berhasil diupdate.');
 }
 
-public function deleteReview($id)
+public function deleteReview(int $id)
 {
     $userId = (int) session()->get('user_id');
 
@@ -577,7 +577,7 @@ public function deleteReview($id)
     return redirect()->to('/dosen/proposal-ta/riwayat')->with('success', 'Review proposal berhasil dihapus.');
 }
 
-    public function review($id)
+    public function review(int $id)
     {
         $userId = (int) session()->get('user_id');
         $role   = session()->get('role');
