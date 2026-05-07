@@ -82,6 +82,59 @@ class Dashboard extends BaseController
                 ->get()
                 ->getResultArray();
 
+            $bulanLabels = [
+                1 => 'Jan',
+                2 => 'Feb',
+                3 => 'Mar',
+                4 => 'Apr',
+                5 => 'Mei',
+                6 => 'Jun',
+                7 => 'Jul',
+                8 => 'Agu',
+                9 => 'Sep',
+                10 => 'Okt',
+                11 => 'Nov',
+                12 => 'Des',
+            ];
+
+            $chartLabels = array_values($bulanLabels);
+            $chartJudul = array_fill(0, 12, 0);
+            $chartProposal = array_fill(0, 12, 0);
+
+            $judulBulanan = $db->table('pengajuan_judul')
+                ->select('MONTH(created_at) AS bulan, COUNT(*) AS total')
+                ->where('YEAR(created_at)', date('Y'))
+                ->groupBy('MONTH(created_at)')
+                ->get()
+                ->getResultArray();
+
+            foreach ($judulBulanan as $row) {
+                $bulan = (int) ($row['bulan'] ?? 0);
+
+                if ($bulan >= 1 && $bulan <= 12) {
+                    $chartJudul[$bulan - 1] = (int) ($row['total'] ?? 0);
+                }
+            }
+
+            $proposalBulanan = $db->table('proposal_ta')
+                ->select('MONTH(created_at) AS bulan, COUNT(*) AS total')
+                ->where('YEAR(created_at)', date('Y'))
+                ->groupBy('MONTH(created_at)')
+                ->get()
+                ->getResultArray();
+
+            foreach ($proposalBulanan as $row) {
+                $bulan = (int) ($row['bulan'] ?? 0);
+
+                if ($bulan >= 1 && $bulan <= 12) {
+                    $chartProposal[$bulan - 1] = (int) ($row['total'] ?? 0);
+                }
+            }
+
+            $data['chartLabels'] = $chartLabels;
+            $data['chartJudul'] = $chartJudul;
+            $data['chartProposal'] = $chartProposal;
+
             return view('dashboard/admin', [
                 'title'              => 'Dashboard Admin',
                 'pageTitle'          => 'Dashboard Admin',
@@ -101,6 +154,9 @@ class Dashboard extends BaseController
                 'proposalTerbaru'    => $proposalTerbaru,
                 'skTerbaru'          => $skTerbaru,
                 'auditTerbaru'       => $auditTerbaru,
+                'chartLabels'   => $chartLabels,
+                'chartJudul'    => $chartJudul,
+                'chartProposal' => $chartProposal,
             ]);
         }
 
@@ -228,13 +284,12 @@ if ($role === 'dosen') {
         ->countAllResults();
 
     $mahasiswaBimbingan = $db->table('pembimbing_mahasiswa pm')
-        ->select('m.nim, u.name AS nama, pm.jenis_pembimbing, pm.tanggal_penetapan')
-        ->join('mahasiswa m', 'm.id = pm.mahasiswa_id')
-        ->join('users u', 'u.id = m.user_id')
+        ->select('m.id, m.nim, u.name AS nama, u.foto')
+        ->join('mahasiswa m', 'm.id = pm.mahasiswa_id', 'left')
+        ->join('users u', 'u.id = m.user_id', 'left')
         ->where('pm.dosen_id', $dosenId)
         ->where('pm.status_aktif', 1)
-        ->orderBy('pm.tanggal_penetapan', 'DESC')
-        ->limit(5)
+        ->orderBy('u.name', 'ASC')
         ->get()
         ->getResultArray();
 
@@ -360,6 +415,45 @@ public function pembimbing()
         'pembimbingAktif' => $pembimbingAktif,
         'permohonan' => $permohonan,
         'dosenList' => $dosenList,
+    ]);
+}
+
+public function editRiwayatPermohonan(int $id)
+{
+    if (! session()->get('isLoggedIn') || session()->get('role') !== 'dosen') {
+        return redirect()->to('/login');
+    }
+
+    $db = \Config\Database::connect();
+
+    $dosen = $db->table('dosen')
+        ->where('user_id', session()->get('user_id'))
+        ->get()
+        ->getRowArray();
+
+    if (! $dosen) {
+        return redirect()->to('/dosen/permohonan')->with('error', 'Data dosen tidak ditemukan.');
+    }
+
+    $row = $db->table('permohonan_pembimbing pp')
+        ->select('pp.*, m.nim, u.name AS nama_mahasiswa')
+        ->join('mahasiswa m', 'm.id = pp.mahasiswa_id', 'left')
+        ->join('users u', 'u.id = m.user_id', 'left')
+        ->where('pp.id', $id)
+        ->where('pp.dosen_id', $dosen['id'])
+        ->get()
+        ->getRowArray();
+
+    if (! $row) {
+        return redirect()->to('/dosen/permohonan')->with('error', 'Data permohonan tidak ditemukan.');
+    }
+
+    return view('dashboard/permohonan_dosen_edit', [
+        'title'        => 'Edit Keputusan Pembimbing',
+        'pageTitle'    => 'Edit Keputusan Pembimbing',
+        'pageSubtitle' => 'Perbarui status dan catatan keputusan pembimbing.',
+        'activeMenu'   => 'permohonan_dosen',
+        'row'          => $row,
     ]);
 }
 
@@ -526,7 +620,9 @@ public function suratKeputusan()
             'pageTitle'    => 'Surat Keputusan',
             'pageSubtitle' => 'Lihat dan unduh SK tugas akhir',
             'activeMenu'   => 'surat_keputusan',
+
             'rows'         => [],
+            'sk_list'      => [],
         ]);
     }
 
@@ -544,7 +640,9 @@ public function suratKeputusan()
         'pageTitle'    => 'Surat Keputusan',
         'pageSubtitle' => 'Lihat dan unduh SK tugas akhir',
         'activeMenu'   => 'surat_keputusan',
+
         'rows'         => $rows,
+        'sk_list'      => $rows,
     ]);
 }
 

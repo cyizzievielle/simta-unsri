@@ -1,825 +1,410 @@
 <?= $this->extend('layouts/dashboard') ?>
 <?= $this->section('content') ?>
 
-<style>
-.admin-hero {
-    background: linear-gradient(135deg, #0f1f46, #2563eb);
-    color: #fff;
-    border-radius: 30px;
-    padding: 34px;
-    margin-bottom: 24px;
-    box-shadow: 0 20px 48px rgba(37,99,235,.20);
-    position: relative;
-    overflow: hidden;
-}
-
-.admin-hero::after {
-    content: "";
-    position: absolute;
-    right: -70px;
-    top: -70px;
-    width: 230px;
-    height: 230px;
-    border-radius: 999px;
-    background: rgba(255,255,255,.12);
-}
-
-.admin-hero h2,
-.admin-hero p,
-.admin-hero .hero-actions {
-    position: relative;
-    z-index: 1;
-}
-
-.admin-hero h2 {
-    margin: 0 0 10px;
-    font-size: 34px;
-    font-weight: 900;
-}
-
-.admin-hero p {
-    margin: 0;
-    max-width: 900px;
-    line-height: 1.7;
-    color: rgba(255,255,255,.9);
-}
-
-.hero-actions {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-top: 20px;
-}
-
-.hero-btn {
-    display: inline-flex;
-    padding: 12px 16px;
-    border-radius: 15px;
-    background: rgba(255,255,255,.14);
-    border: 1px solid rgba(255,255,255,.18);
-    color: #fff;
-    font-weight: 900;
-    text-decoration: none;
-}
-
-.admin-stat-grid {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 18px;
-    margin-bottom: 24px;
-}
-
-.admin-stat {
-    border-radius: 24px;
-    padding: 24px;
-    color: #fff;
-    aspect-ratio: unset;
-    min-height: 155px;
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 16px 36px rgba(15,23,42,.10);
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-}
-
-.admin-stat::after {
-    content: "";
-    position: absolute;
-    right: -28px;
-    bottom: -28px;
-    width: 115px;
-    height: 115px;
-    border-radius: 999px;
-    background: rgba(255,255,255,.15);
-}
-
-.stat-blue { background: linear-gradient(135deg,#2563eb,#1d4ed8); }
-.stat-green { background: linear-gradient(135deg,#10b981,#059669); }
-.stat-purple { background: linear-gradient(135deg,#8b5cf6,#6d28d9); }
-.stat-orange { background: linear-gradient(135deg,#f59e0b,#ea580c); }
-.stat-red { background: linear-gradient(135deg,#ef4444,#be123c); }
-.stat-dark { background: linear-gradient(135deg,#1f2937,#0f172a); }
-.stat-cyan { background: linear-gradient(135deg,#06b6d4,#0284c7); }
-.stat-pink { background: linear-gradient(135deg,#db2777,#be185d); }
-
-.stat-label,
-.stat-number,
-.stat-desc {
-    position: relative;
-    z-index: 1;
-}
-
-.stat-label {
-    font-size: 14px;
-    font-weight: 800;
-}
-
-.stat-number {
-    font-size: 42px;
-    font-weight: 900;
-    line-height: 1;
-}
-
-.stat-desc {
-    font-size: 13px;
-    line-height: 1.5;
-    opacity: .95;
-}
-
-.dashboard-section {
-    margin-bottom: 24px;
-}
-
-.card-premium {
-    background: #fff;
-    border-radius: 28px;
-    padding: 28px;
-    border: 1px solid #edf2f7;
-    box-shadow: 0 18px 42px rgba(15,23,42,.06);
-}
-
-.section-head {
-    display: flex;
-    justify-content: space-between;
-    gap: 14px;
-    align-items: flex-start;
-    flex-wrap: wrap;
-    margin-bottom: 22px;
-}
-
-.section-title {
-    margin: 0 0 8px;
-    font-size: 26px;
-    font-weight: 900;
-    color: #0f172a;
-}
-
-.section-subtitle {
-    margin: 0;
-    color: #64748b;
-    font-size: 15px;
-    line-height: 1.6;
-}
-
-.see-all {
-    color: #2563eb;
-    font-weight: 900;
-    text-decoration: none;
-}
-
-.menu-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 14px;
-}
-
-.menu-card {
-    min-height: 155px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    gap: 14px;
-    padding: 18px;
-    border-radius: 22px;
-    border: 1px solid #dbeafe;
-    background: linear-gradient(135deg,#f8fbff,#eff6ff);
-    text-decoration: none;
-    transition: .2s ease;
-}
-
-.menu-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 14px 30px rgba(37,99,235,.11);
-}
-
-.menu-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 16px;
-    background: #2563eb;
-    color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 900;
-}
-
-.menu-title {
-    color: #0f172a;
-    font-size: 16px;
-    font-weight: 900;
-    margin-bottom: 4px;
-}
-
-.menu-desc {
-    color: #64748b;
-    font-size: 13px;
-    line-height: 1.4;
-}
-
-.menu-arrow {
-    color: #2563eb;
-    font-weight: 900;
-    align-self: flex-end;
-}
-
-.chart-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 22px;
-    margin-bottom: 24px;
-}
-
-.bar-list {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-
-.bar-item {
-    padding: 16px;
-    border-radius: 18px;
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-}
-
-.bar-top {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 10px;
-    font-weight: 900;
-    color: #0f172a;
-}
-
-.bar-track {
-    width: 100%;
-    height: 13px;
-    background: #e2e8f0;
-    border-radius: 999px;
-    overflow: hidden;
-}
-
-.bar-fill {
-    height: 100%;
-    border-radius: 999px;
-}
-
-.bar-fill.green { background: linear-gradient(135deg, #22c55e, #16a34a); }
-.bar-fill.orange { background: linear-gradient(135deg, #f59e0b, #ea580c); }
-.bar-fill.red { background: linear-gradient(135deg, #ef4444, #dc2626); }
-.bar-fill.blue { background: linear-gradient(135deg, #2563eb, #1d4ed8); }
-
-.latest-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 22px;
-}
-
-.activity-list {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 14px;
-}
-
-.activity-card {
-    display: grid;
-    grid-template-columns: 52px 1fr;
-    gap: 16px;
-    padding: 18px;
-    border-radius: 22px;
-    border: 1px solid #e2e8f0;
-    background: linear-gradient(135deg, #ffffff, #f8fbff);
-}
-
-.activity-avatar {
-    width: 52px;
-    height: 52px;
-    border-radius: 18px;
-    background: #2563eb;
-    color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 900;
-}
-
-.activity-top {
-    display: flex;
-    justify-content: space-between;
-    gap: 16px;
-    align-items: flex-start;
-    margin-bottom: 10px;
-}
-
-.activity-title {
-    font-weight: 900;
-    color: #0f172a;
-    font-size: 16px;
-}
-
-.activity-sub {
-    color: #64748b;
-    font-size: 13px;
-    margin-top: 3px;
-}
-
-.activity-desc {
-    color: #0f172a;
-    font-weight: 800;
-    line-height: 1.55;
-    margin-bottom: 10px;
-}
-
-.activity-date {
-    color: #64748b;
-    font-size: 13px;
-    font-weight: 700;
-}
-
-.badge {
-    display: inline-flex;
-    align-items: center;
-    padding: 8px 12px;
-    border-radius: 999px;
-    font-size: 12px;
-    font-weight: 900;
-    white-space: nowrap;
-}
-
-.badge-green { background: #dcfce7; color: #166534; }
-.badge-orange { background: #fef3c7; color: #92400e; }
-
-.empty-box {
-    padding: 24px;
-    border-radius: 22px;
-    border: 1px dashed #cbd5e1;
-    background: #f8fafc;
-    color: #64748b;
-    text-align: center;
-}
-
-@media(max-width: 1200px) {
-    .admin-stat-grid,
-    .menu-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .admin-stat {
-        aspect-ratio: auto;
-    }
-
-    .chart-grid,
-    .latest-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-@media(max-width: 700px) {
-    .admin-hero {
-        padding: 24px;
-        border-radius: 24px;
-    }
-
-    .admin-hero h2 {
-        font-size: 27px;
-    }
-
-    .hero-actions {
-        flex-direction: column;
-    }
-
-    .hero-btn {
-        width: 100%;
-        justify-content: center;
-    }
-
-    .admin-stat-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 12px;
-    }
-
-    .admin-stat {
-        min-height: 135px;
-        padding: 16px;
-        border-radius: 20px;
-    }
-
-    .stat-label {
-        font-size: 12px;
-    }
-
-    .stat-number {
-        font-size: 30px;
-    }
-
-    .stat-desc {
-        font-size: 11.5px;
-    }
-
-    .card-premium {
-        padding: 20px;
-        border-radius: 24px;
-    }
-
-    .section-title {
-        font-size: 22px;
-    }
-
-    .menu-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .menu-card {
-        min-height: auto;
-        display: grid;
-        grid-template-columns: 44px 1fr auto;
-        align-items: center;
-    }
-
-    .menu-arrow {
-        align-self: center;
-    }
-
-    .activity-card {
-        grid-template-columns: 1fr;
-    }
-
-    .activity-top {
-        flex-direction: column;
-        gap: 10px;
-    }
-}
-</style>
-
 <?php
-$totalUsers       = $totalUsers ?? 0;
-$totalMahasiswa  = $totalMahasiswa ?? 0;
-$totalDosen      = $totalDosen ?? 0;
-$totalJudul      = $totalJudul ?? 0;
-$totalProposal   = $totalProposal ?? 0;
-$totalSk         = $totalSk ?? 0;
-$totalPembimbing = $totalPembimbing ?? 0;
-$totalSkTerbit   = $totalSkTerbit ?? $totalSk;
+$totalUsers       = (int) ($totalUsers ?? 0);
+$totalMahasiswa  = (int) ($totalMahasiswa ?? 0);
+$totalDosen      = (int) ($totalDosen ?? 0);
+$totalJudul      = (int) ($totalJudul ?? 0);
+$totalProposal   = (int) ($totalProposal ?? 0);
+$totalSk         = (int) ($totalSk ?? 0);
+$totalSkTerbit   = (int) ($totalSkTerbit ?? $totalSk);
 
-$permohonanMenunggu = $permohonanMenunggu ?? 0;
-$judulDipantau      = $judulDipantau ?? 0;
-$proposalDiproses   = $proposalDiproses ?? 0;
+$permohonanMenunggu = (int) ($permohonanMenunggu ?? 0);
+$judulDipantau      = (int) ($judulDipantau ?? 0);
+$proposalDiproses   = (int) ($proposalDiproses ?? 0);
 
 $judulTerbaru    = $judulTerbaru ?? [];
 $proposalTerbaru = $proposalTerbaru ?? [];
 
-$judulDisetujui = $judulDisetujui ?? 0;
-$judulRevisi    = $judulRevisi ?? 0;
-$judulDitolak   = $judulDitolak ?? 0;
-$judulDiproses  = $judulDiproses ?? 0;
+$judulDisetujui = (int) ($judulDisetujui ?? 0);
+$judulRevisi    = (int) ($judulRevisi ?? 0);
+$judulDitolak   = (int) ($judulDitolak ?? 0);
+$judulDiproses  = (int) ($judulDiproses ?? 0);
 
-$proposalDisetujui = $proposalDisetujui ?? 0;
-$proposalRevisi    = $proposalRevisi ?? 0;
-$proposalDitolak   = $proposalDitolak ?? 0;
-$proposalDiproses  = $proposalDiproses ?? 0;
+$proposalDisetujui = (int) ($proposalDisetujui ?? 0);
+$proposalRevisi    = (int) ($proposalRevisi ?? 0);
+$proposalDitolak   = (int) ($proposalDitolak ?? 0);
+$proposalDiproses  = (int) ($proposalDiproses ?? 0);
 
-$totalGrafikJudul = max(1, $judulDisetujui + $judulRevisi + $judulDitolak + $judulDiproses);
-$totalGrafikProposal = max(1, $proposalDisetujui + $proposalRevisi + $proposalDitolak + $proposalDiproses);
+$totalJudulChart = max(
+    1,
+    $judulDisetujui + $judulRevisi + $judulDitolak + $judulDiproses
+);
+
+$totalProposalChart = max(
+    1,
+    $proposalDisetujui + $proposalRevisi + $proposalDitolak + $proposalDiproses
+);
+
+$totalUserChart = max(
+    1,
+    $totalMahasiswa + $totalDosen
+);
+
+$percentage = static function (int|float $value, int|float $total): string {
+    $result = ((float) $value / max(1, (float) $total)) * 100;
+
+    return number_format($result, 2, '.', '');
+};
+
+$ring = static function (int|float $value, int|float $total): string {
+    $circumference = 314;
+    $result = (((float) $value / max(1, (float) $total)) * $circumference);
+
+    return number_format($result, 2, '.', '');
+};
+
+$maxBar = max(
+    1,
+    $totalJudul,
+    $totalProposal,
+    $totalSk,
+    $permohonanMenunggu
+);
 ?>
 
-<div class="admin-hero">
-    <h2>Selamat datang, Admin 👑</h2>
-    <p>
-        Kelola pengguna, pembimbing, pengajuan judul, proposal, SK, dan arsip sistem
-        dari satu dashboard operasional yang rapi dan terpusat.
-    </p>
+<div class="admin-dashboard-page admin-dashboard-pro">
 
-    <div class="hero-actions">
-        <a href="<?= base_url('/admin/users/create') ?>" class="hero-btn">+ Tambah User</a>
-        <a href="<?= base_url('/admin/surat-keputusan/create') ?>" class="hero-btn">+ Terbitkan SK</a>
-        <a href="<?= base_url('/admin/laporan') ?>" class="hero-btn">Lihat Laporan</a>
-    </div>
-</div>
+    <section class="page-hero admin-dashboard-hero">
+        <span class="page-kicker">
+            Dashboard Admin
+        </span>
 
-<div class="admin-stat-grid">
-    <div class="admin-stat stat-blue">
-        <div class="stat-label">Total Users</div>
-        <div class="stat-number"><?= esc((string) $totalUsers) ?></div>
-        <div class="stat-desc">Akun admin, mahasiswa, dan dosen</div>
-    </div>
+        <h2>Monitoring Sistem Tugas Akhir</h2>
 
-    <div class="admin-stat stat-green">
-        <div class="stat-label">Mahasiswa</div>
-        <div class="stat-number"><?= esc((string) $totalMahasiswa) ?></div>
-        <div class="stat-desc">Data mahasiswa terdaftar</div>
-    </div>
+        <p>
+            Pantau pengguna, pembimbing, pengajuan judul, proposal, dan penerbitan SK
+            dalam satu dashboard operasional.
+        </p>
 
-    <div class="admin-stat stat-purple">
-        <div class="stat-label">Dosen</div>
-        <div class="stat-number"><?= esc((string) $totalDosen) ?></div>
-        <div class="stat-desc">Dosen pembimbing aktif</div>
-    </div>
+        <div class="admin-hero-actions">
+            <a href="<?= base_url('/admin/users/create') ?>" class="hero-btn">
+                Tambah User
+            </a>
 
-    <div class="admin-stat stat-orange">
-        <div class="stat-label">Pengajuan Judul</div>
-        <div class="stat-number"><?= esc((string) $totalJudul) ?></div>
-        <div class="stat-desc"><?= esc((string) $judulDipantau) ?> perlu dipantau</div>
-    </div>
+            <a href="<?= base_url('/admin/surat-keputusan/create') ?>" class="hero-btn">
+                Terbitkan SK
+            </a>
 
-    <div class="admin-stat stat-cyan">
-        <div class="stat-label">Proposal</div>
-        <div class="stat-number"><?= esc((string) $totalProposal) ?></div>
-        <div class="stat-desc"><?= esc((string) $proposalDiproses) ?> sedang diproses</div>
-    </div>
+            <a href="<?= base_url('/admin/laporan') ?>" class="hero-btn">
+                Lihat Laporan
+            </a>
+        </div>
+    </section>
 
-    <div class="admin-stat stat-pink">
-        <div class="stat-label">Total SK</div>
-        <div class="stat-number"><?= esc((string) $totalSk) ?></div>
-        <div class="stat-desc">SK yang sudah masuk arsip</div>
-    </div>
+    <section class="admin-stat-grid stat-count-4">
+        <div class="stat-card stat-blue">
+            <div class="stat-label">Total Users</div>
+            <div class="stat-value"><?= esc((string) $totalUsers) ?></div>
+            <div class="stat-desc">Akun aktif sistem</div>
+        </div>
 
-    <div class="admin-stat stat-dark">
-        <div class="stat-label">Permohonan Pembimbing</div>
-        <div class="stat-number"><?= esc((string) $permohonanMenunggu) ?></div>
-        <div class="stat-desc">Menunggu keputusan dosen</div>
-    </div>
+        <div class="stat-card stat-green">
+            <div class="stat-label">Mahasiswa</div>
+            <div class="stat-value"><?= esc((string) $totalMahasiswa) ?></div>
+            <div class="stat-desc">Mahasiswa terdaftar</div>
+        </div>
 
-    <div class="admin-stat stat-green">
-        <div class="stat-label">SK Terbit</div>
-        <div class="stat-number"><?= esc((string) $totalSkTerbit) ?></div>
-        <div class="stat-desc">Sudah diterbitkan admin</div>
-    </div>
-</div>
+        <div class="stat-card stat-purple">
+            <div class="stat-label">Dosen</div>
+            <div class="stat-value"><?= esc((string) $totalDosen) ?></div>
+            <div class="stat-desc">Dosen pembimbing</div>
+        </div>
 
-<div class="dashboard-section">
-    <div class="card-premium">
-        <div class="section-head">
-            <div>
-                <h3 class="section-title">Akses Cepat</h3>
-                <p class="section-subtitle">Menu operasional utama admin.</p>
+        <div class="stat-card stat-amber">
+            <div class="stat-label">SK Terbit</div>
+            <div class="stat-value"><?= esc((string) $totalSkTerbit) ?></div>
+            <div class="stat-desc">Dokumen diterbitkan</div>
+        </div>
+    </section>
+
+    <section class="admin-analytics-grid">
+        <div class="card-main admin-chart-card admin-wide-chart">
+            <div class="page-head">
+                <div>
+                    <h3>Ringkasan Proses Akademik</h3>
+                    <p>Perbandingan data utama yang sedang berjalan di sistem.</p>
+                </div>
+            </div>
+
+            <div class="admin-column-chart">
+                <div class="admin-column-item">
+                    <div class="admin-column-track">
+                        <span style="height: <?= esc($percentage($totalJudul, $maxBar)) ?>%;"></span>
+                    </div>
+                    <strong><?= esc((string) $totalJudul) ?></strong>
+                    <small>Judul</small>
+                </div>
+
+                <div class="admin-column-item is-green">
+                    <div class="admin-column-track">
+                        <span style="height: <?= esc($percentage($totalProposal, $maxBar)) ?>%;"></span>
+                    </div>
+                    <strong><?= esc((string) $totalProposal) ?></strong>
+                    <small>Proposal</small>
+                </div>
+
+                <div class="admin-column-item is-amber">
+                    <div class="admin-column-track">
+                        <span style="height: <?= esc($percentage($totalSk, $maxBar)) ?>%;"></span>
+                    </div>
+                    <strong><?= esc((string) $totalSk) ?></strong>
+                    <small>SK</small>
+                </div>
+
+                <div class="admin-column-item is-purple">
+                    <div class="admin-column-track">
+                        <span style="height: <?= esc($percentage($permohonanMenunggu, $maxBar)) ?>%;"></span>
+                    </div>
+                    <strong><?= esc((string) $permohonanMenunggu) ?></strong>
+                    <small>Permohonan</small>
+                </div>
             </div>
         </div>
 
-        <div class="menu-grid">
-            <a href="<?= base_url('/admin/users') ?>" class="menu-card">
-                <div class="menu-icon">U</div>
+        <div class="card-main admin-chart-card">
+            <div class="page-head compact-head">
                 <div>
-                    <div class="menu-title">Kelola Users</div>
-                    <div class="menu-desc">Admin, mahasiswa, dosen</div>
+                    <h3>Komposisi User</h3>
+                    <p>Mahasiswa dan dosen.</p>
                 </div>
-                <div class="menu-arrow">→</div>
-            </a>
+            </div>
 
-            <a href="<?= base_url('/admin/periode-akademik') ?>" class="menu-card">
-                <div class="menu-icon">P</div>
-                <div>
-                    <div class="menu-title">Periode Akademik</div>
-                    <div class="menu-desc">Semester aktif dan riwayat</div>
+            <div class="admin-donut-wrap">
+                <svg class="admin-donut" viewBox="0 0 120 120" aria-hidden="true">
+                    <circle cx="60" cy="60" r="50" class="donut-bg"></circle>
+                    <circle
+                        cx="60"
+                        cy="60"
+                        r="50"
+                        class="donut-ring donut-blue"
+                        stroke-dasharray="<?= esc($ring($totalMahasiswa, $totalUserChart)) ?> 314"
+                    ></circle>
+                    <circle
+                        cx="60"
+                        cy="60"
+                        r="40"
+                        class="donut-ring donut-purple"
+                        stroke-dasharray="<?= esc($ring($totalDosen, $totalUserChart)) ?> 251"
+                    ></circle>
+                </svg>
+
+                <div class="donut-center">
+                    <strong><?= esc((string) $totalUsers) ?></strong>
+                    <span>Total User</span>
                 </div>
-                <div class="menu-arrow">→</div>
-            </a>
+            </div>
 
-            <a href="<?= base_url('/admin/program-studi') ?>" class="menu-card">
-                <div class="menu-icon">S</div>
-                <div>
-                    <div class="menu-title">Program Studi</div>
-                    <div class="menu-desc">Master data prodi</div>
-                </div>
-                <div class="menu-arrow">→</div>
-            </a>
-
-            <a href="<?= base_url('/admin/monitoring-pembimbing') ?>" class="menu-card">
-                <div class="menu-icon">B</div>
-                <div>
-                    <div class="menu-title">Monitoring Pembimbing</div>
-                    <div class="menu-desc">Permohonan dosen pembimbing</div>
-                </div>
-                <div class="menu-arrow">→</div>
-            </a>
-
-            <a href="<?= base_url('/admin/monitoring-judul') ?>" class="menu-card">
-                <div class="menu-icon">J</div>
-                <div>
-                    <div class="menu-title">Monitoring Judul</div>
-                    <div class="menu-desc">Status judul dan revisi</div>
-                </div>
-                <div class="menu-arrow">→</div>
-            </a>
-
-            <a href="<?= base_url('/admin/monitoring-proposal') ?>" class="menu-card">
-                <div class="menu-icon">R</div>
-                <div>
-                    <div class="menu-title">Monitoring Proposal</div>
-                    <div class="menu-desc">Status proposal mahasiswa</div>
-                </div>
-                <div class="menu-arrow">→</div>
-            </a>
-
-            <a href="<?= base_url('/admin/surat-keputusan') ?>" class="menu-card">
-                <div class="menu-icon">SK</div>
-                <div>
-                    <div class="menu-title">Surat Keputusan</div>
-                    <div class="menu-desc">Penerbitan dan arsip SK</div>
-                </div>
-                <div class="menu-arrow">→</div>
-            </a>
-
-            <a href="<?= base_url('/admin/audit-log') ?>" class="menu-card">
-                <div class="menu-icon">L</div>
-                <div>
-                    <div class="menu-title">Audit Log</div>
-                    <div class="menu-desc">Aktivitas dan notifikasi</div>
-                </div>
-                <div class="menu-arrow">→</div>
-            </a>
-        </div>
-    </div>
-</div>
-
-<div class="chart-grid">
-    <div class="card-premium">
-        <div class="section-head">
-            <div>
-                <h3 class="section-title">Grafik Status Judul</h3>
-                <p class="section-subtitle">Ringkasan status pengajuan judul mahasiswa.</p>
+            <div class="chart-legend">
+                <span><b class="dot-blue"></b> Mahasiswa <?= esc((string) $totalMahasiswa) ?></span>
+                <span><b class="dot-purple"></b> Dosen <?= esc((string) $totalDosen) ?></span>
             </div>
         </div>
+    </section>
 
-        <div class="bar-list">
-            <div class="bar-item">
-                <div class="bar-top">
-                    <span>Disetujui</span>
-                    <strong><?= esc((string) $judulDisetujui) ?></strong>
+        <section class="card-main admin-line-chart-card">
+            <div class="page-head">
+                <div>
+                    <h3>Aktivitas Pengajuan Bulanan</h3>
+                    <p>Perbandingan jumlah pengajuan judul dan proposal dalam tahun berjalan.</p>
                 </div>
-                <div class="bar-track">
-                    <div class="bar-fill green" style="width: <?= ($judulDisetujui / $totalGrafikJudul) * 100 ?>%;"></div>
-                </div>
+
+                <span class="badge badge-info">
+                    <?= date('Y') ?>
+                </span>
             </div>
 
-            <div class="bar-item">
-                <div class="bar-top">
-                    <span>Revisi</span>
-                    <strong><?= esc((string) $judulRevisi) ?></strong>
+            <div class="chart-wrapper">
+                <canvas id="adminLineChart"></canvas>
+            </div>
+        </section>
+
+    
+    <section class="admin-latest-grid">
+        <div class ="card-main">
+             <div class="page-head">
+                <div>
+                    <h3>Judul Terbaru</h3>
+                    <p>Pengajuan judul terbaru yang masuk.</p>
                 </div>
-                <div class="bar-track">
-                    <div class="bar-fill orange" style="width: <?= ($judulRevisi / $totalGrafikJudul) * 100 ?>%;"></div>
-                </div>
+
+                <a class="see-all-link" href="<?= base_url('/admin/monitoring-judul') ?>">
+                    Lihat semua
+                </a>
             </div>
 
-            <div class="bar-item">
-                <div class="bar-top">
-                    <span>Ditolak</span>
-                    <strong><?= esc((string) $judulDitolak) ?></strong>
-                </div>
-                <div class="bar-track">
-                    <div class="bar-fill red" style="width: <?= ($judulDitolak / $totalGrafikJudul) * 100 ?>%;"></div>
-                </div>
-            </div>
+            <?php if (! empty($judulTerbaru)): ?>
+                <div class="admin-activity-list">
+                    <?php foreach ($judulTerbaru as $row): ?>
+                        <article class="admin-activity-card">
+                            <div class="admin-activity-avatar">J</div>
 
-            <div class="bar-item">
-                <div class="bar-top">
-                    <span>Diproses</span>
-                    <strong><?= esc((string) $judulDiproses) ?></strong>
-                </div>
-                <div class="bar-track">
-                    <div class="bar-fill blue" style="width: <?= ($judulDiproses / $totalGrafikJudul) * 100 ?>%;"></div>
-                </div>
-            </div>
-        </div>
-    </div>
+                            <div class="admin-activity-body">
+                                <div class="admin-activity-top">
+                                    <div>
+                                        <div class="admin-activity-title">
+                                            <?= esc((string) ($row['nama_mahasiswa'] ?? '-')) ?>
+                                        </div>
 
-    <div class="card-premium">
-        <div class="section-head">
-            <div>
-                <h3 class="section-title">Grafik Status Proposal</h3>
-                <p class="section-subtitle">Ringkasan status proposal tugas akhir.</p>
-            </div>
-        </div>
+                                        <div class="admin-activity-sub">
+                                            <?= esc((string) ($row['nim'] ?? '-')) ?>
+                                        </div>
+                                    </div>
 
-        <div class="bar-list">
-            <div class="bar-item">
-                <div class="bar-top">
-                    <span>Disetujui</span>
-                    <strong><?= esc((string) $proposalDisetujui) ?></strong>
-                </div>
-                <div class="bar-track">
-                    <div class="bar-fill green" style="width: <?= ($proposalDisetujui / $totalGrafikProposal) * 100 ?>%;"></div>
-                </div>
-            </div>
-
-            <div class="bar-item">
-                <div class="bar-top">
-                    <span>Revisi</span>
-                    <strong><?= esc((string) $proposalRevisi) ?></strong>
-                </div>
-                <div class="bar-track">
-                    <div class="bar-fill orange" style="width: <?= ($proposalRevisi / $totalGrafikProposal) * 100 ?>%;"></div>
-                </div>
-            </div>
-
-            <div class="bar-item">
-                <div class="bar-top">
-                    <span>Ditolak</span>
-                    <strong><?= esc((string) $proposalDitolak) ?></strong>
-                </div>
-                <div class="bar-track">
-                    <div class="bar-fill red" style="width: <?= ($proposalDitolak / $totalGrafikProposal) * 100 ?>%;"></div>
-                </div>
-            </div>
-
-            <div class="bar-item">
-                <div class="bar-top">
-                    <span>Diproses</span>
-                    <strong><?= esc((string) $proposalDiproses) ?></strong>
-                </div>
-                <div class="bar-track">
-                    <div class="bar-fill blue" style="width: <?= ($proposalDiproses / $totalGrafikProposal) * 100 ?>%;"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="latest-grid">
-    <div class="card-premium">
-        <div class="section-head">
-            <div>
-                <h3 class="section-title">Pengajuan Judul Terbaru</h3>
-                <p class="section-subtitle">Data pengajuan judul terbaru yang masuk ke sistem.</p>
-            </div>
-            <a class="see-all" href="<?= base_url('/admin/monitoring-judul') ?>">Lihat semua</a>
-        </div>
-
-        <?php if (! empty($judulTerbaru)): ?>
-            <div class="activity-list">
-                <?php foreach ($judulTerbaru as $row): ?>
-                    <div class="activity-card">
-                        <div class="activity-avatar">J</div>
-                        <div class="activity-body">
-                            <div class="activity-top">
-                                <div>
-                                    <div class="activity-title"><?= esc((string) ($row['nama_mahasiswa'] ?? '-')) ?></div>
-                                    <div class="activity-sub"><?= esc((string) ($row['nim'] ?? '-')) ?></div>
+                                    <span class="badge <?= (($row['status'] ?? '') === 'disetujui') ? 'badge-success' : 'badge-warning' ?>">
+                                        <?= esc((string) ($row['status'] ?? '-')) ?>
+                                    </span>
                                 </div>
 
-                                <span class="badge <?= (($row['status'] ?? '') === 'disetujui') ? 'badge-green' : 'badge-orange' ?>">
-                                    <?= esc((string) ($row['status'] ?? '-')) ?>
-                                </span>
+                                <div class="admin-activity-desc">
+                                    <?= esc((string) ($row['judul'] ?? '-')) ?>
+                                </div>
                             </div>
-
-                            <div class="activity-desc">
-                                <?= esc((string) ($row['judul'] ?? '-')) ?>
-                            </div>
-
-                            <div class="activity-date">
-                                <?= esc((string) ($row['tanggal_pengajuan'] ?? $row['created_at'] ?? '-')) ?>
-                            </div>
-                        </div>
-                    </div>
-                <?php endforeach; ?>
-            </div>
-        <?php else: ?>
-            <div class="empty-box">Belum ada pengajuan judul terbaru.</div>
-        <?php endif; ?>
-    </div>
-
-    <div class="card-premium">
-        <div class="section-head">
-            <div>
-                <h3 class="section-title">Proposal Terbaru</h3>
-                <p class="section-subtitle">Data proposal terbaru mahasiswa.</p>
-            </div>
-            <a class="see-all" href="<?= base_url('/admin/monitoring-proposal') ?>">Lihat semua</a>
+                        </article>
+                    <?php endforeach; ?>
+                </div>
+            <?php else: ?>
+                <div class="empty-box">Belum ada pengajuan judul terbaru.</div>
+            <?php endif; ?>
         </div>
 
-        <?php if (! empty($proposalTerbaru)): ?>
-            <div class="activity-list">
-                <?php foreach ($proposalTerbaru as $row): ?>
-                    <div class="activity-card">
-                        <div class="activity-avatar">P</div>
-                        <div class="activity-body">
-                            <div class="activity-top">
-                                <div>
-                                    <div class="activity-title"><?= esc((string) ($row['nama_mahasiswa'] ?? '-')) ?></div>
-                                    <div class="activity-sub"><?= esc((string) ($row['nim'] ?? '-')) ?></div>
+        <div class="card-main">
+            <div class="page-head">
+                <div>
+                    <h3>Proposal Terbaru</h3>
+                    <p>Proposal mahasiswa yang terakhir masuk.</p>
+                </div>
+
+                <a class="see-all-link" href="<?= base_url('/admin/monitoring-proposal') ?>">
+                    Lihat semua
+                </a>
+            </div>
+
+            <?php if (! empty($proposalTerbaru)): ?>
+                <div class="admin-activity-list">
+                    <?php foreach ($proposalTerbaru as $row): ?>
+                        <article class="admin-activity-card">
+                            <div class="admin-activity-avatar">P</div>
+
+                            <div class="admin-activity-body">
+                                <div class="admin-activity-top">
+                                    <div>
+                                        <div class="admin-activity-title">
+                                            <?= esc((string) ($row['nama_mahasiswa'] ?? '-')) ?>
+                                        </div>
+
+                                        <div class="admin-activity-sub">
+                                            <?= esc((string) ($row['nim'] ?? '-')) ?>
+                                        </div>
+                                    </div>
+
+                                    <span class="badge <?= (($row['status'] ?? '') === 'disetujui') ? 'badge-success' : 'badge-warning' ?>">
+                                        <?= esc((string) ($row['status'] ?? '-')) ?>
+                                    </span>
                                 </div>
 
-                                <span class="badge <?= (($row['status'] ?? '') === 'disetujui') ? 'badge-green' : 'badge-orange' ?>">
-                                    <?= esc((string) ($row['status'] ?? '-')) ?>
-                                </span>
+                                <div class="admin-activity-desc">
+                                    <?= esc((string) ($row['nama_file_asli'] ?? '-')) ?>
+                                </div>
                             </div>
+                        </article>
+                    <?php endforeach; ?>
+                </div>
+            <?php else: ?>
+                <div class="empty-box">Belum ada proposal terbaru.</div>
+            <?php endif; ?>
+        </div>
+    </section>
 
-                            <div class="activity-desc">
-                                <?= esc((string) ($row['nama_file_asli'] ?? '-')) ?>
-                            </div>
-
-                            <div class="activity-date">
-                                <?= esc((string) ($row['tanggal_upload'] ?? $row['created_at'] ?? '-')) ?>
-                            </div>
-                        </div>
-                    </div>
-                <?php endforeach; ?>
-            </div>
-        <?php else: ?>
-            <div class="empty-box">Belum ada proposal terbaru.</div>
-        <?php endif; ?>
-    </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+<script>
+const adminLineChart = document.getElementById('adminLineChart');
+
+if (adminLineChart) {
+    new Chart(adminLineChart, {
+        type: 'line',
+
+        data: {
+            labels: <?= json_encode($chartLabels ?? []) ?>,
+
+            datasets: [
+                {
+                    label: 'Pengajuan Judul',
+                    data: <?= json_encode($chartJudul ?? []) ?>,
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, .12)',
+                    fill: true,
+                    tension: .45,
+                    borderWidth: 4,
+                    pointRadius: 4,
+                    pointHoverRadius: 6
+                },
+                {
+                    label: 'Proposal',
+                    data: <?= json_encode($chartProposal ?? []) ?>,
+                    borderColor: '#22c3d6',
+                    backgroundColor: 'rgba(34, 195, 214, .12)',
+                    fill: true,
+                    tension: .45,
+                    borderWidth: 4,
+                    pointRadius: 4,
+                    pointHoverRadius: 6
+                }
+            ]
+        },
+
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        usePointStyle: true,
+                        pointStyle: 'circle',
+                        padding: 18,
+                        color: '#475569',
+                        font: {
+                            size: 13,
+                            weight: '700'
+                        }
+                    }
+                }
+            },
+
+            scales: {
+                x: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        color: '#64748b',
+                        font: {
+                            weight: '700'
+                        }
+                    }
+                },
+
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(148, 163, 184, .16)'
+                    },
+                    ticks: {
+                        precision: 0,
+                        color: '#64748b',
+                        font: {
+                            weight: '700'
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+</script>
 <?= $this->endSection() ?>

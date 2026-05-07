@@ -16,8 +16,6 @@ $safe = static function (mixed $value, string $default = '-'): string {
     return (string) $value;
 };?>
 
-<div class="admin-page">
-
     <!-- ================= STAT ================= -->
     <div class="stat-grid">
 
@@ -36,11 +34,13 @@ $safe = static function (mixed $value, string $default = '-'): string {
         <div class="stat-card stat-green">
             <div class="stat-label">Disetujui</div>
             <div class="stat-value"><?= esc($summary['disetujui'] ?? 0) ?></div>
+            <div class="stat-desc">Permohonan telah disetujui</div>
         </div>
 
         <div class="stat-card stat-rose">
             <div class="stat-label">Ditolak</div>
             <div class="stat-value"><?= esc($summary['ditolak'] ?? 0) ?></div>
+            <div class="stat-desc">Permohonan yang ditolak</div>
         </div>
 
     </div>
@@ -103,8 +103,8 @@ $safe = static function (mixed $value, string $default = '-'): string {
         </div>
 
         <!-- ================= TABLE ================= -->
-        <div class="table-wrap">
-            <table class="admin-table">
+        <div class="table-wrap admin-monitoring-table-wrap">
+    <table class="admin-table admin-monitoring-table">
 
                 <thead>
                     <tr>
@@ -133,7 +133,17 @@ $safe = static function (mixed $value, string $default = '-'): string {
                             </td>
                             <td>
                                 <span class="badge badge-info">
-                                    <?= $r['jenis_pembimbing'] == 2 ? 'P2' : 'P1' ?>
+                                    <?php
+                                        $jenisPembimbing = (string) ($r['jenis_pembimbing'] ?? '');
+
+                                        $jenisLabel = in_array($jenisPembimbing, ['2', 'pembimbing_2'], true)
+                                            ? 'P2'
+                                            : 'P1';
+                                        ?>
+
+                                        <span class="badge badge-info">
+                                            <?= esc($jenisLabel) ?>
+                                        </span>
                                 </span>
                             </td>
 
@@ -191,11 +201,18 @@ $safe = static function (mixed $value, string $default = '-'): string {
 </div>
 
 <!-- ================= POPUP CATATAN ================= -->
-<div id="noteModal" class="note-modal">
-    <div class="note-box">
-        <h4>Catatan</h4>
+<div id="noteModal" class="note-modal-overlay">
+    <div class="note-modal">
+        <h3>Catatan Permohonan</h3>
         <p id="noteText"></p>
-        <button onclick="closeNote()" class="btn btn-primary">Tutup</button>
+
+        <button
+            type="button"
+            onclick="closeNote()"
+            class="note-modal-close"
+        >
+            Tutup
+        </button>
     </div>
 </div>
 
@@ -204,17 +221,19 @@ function showNote(button) {
     const modal = document.getElementById('noteModal');
     const text = document.getElementById('noteText');
 
-    if (!modal || !text) return;
+    if (!modal || !text) {
+        return;
+    }
 
     text.innerText = button.dataset.note || '-';
-    modal.style.display = 'flex';
+    modal.classList.add('show');
 }
 
 function closeNote() {
     const modal = document.getElementById('noteModal');
 
     if (modal) {
-        modal.style.display = 'none';
+        modal.classList.remove('show');
     }
 }
 </script>

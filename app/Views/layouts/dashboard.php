@@ -4,6 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= esc($title ?? 'Sistem TA') ?></title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link
+        href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css"
+        rel="stylesheet"
+    />
+
     <link rel="stylesheet" href="<?= base_url('assets/css/app.css') ?>">
 
     <style>
@@ -248,6 +257,7 @@
     $userName   = session()->get('name') ?? session()->get('email') ?? 'User';
     $userEmail  = session()->get('email') ?? '-';
     $userFoto   = session()->get('foto');
+    $userFoto   = session('foto');
     $userInitial = strtoupper(substr((string) $userName, 0, 1));
 
     $avatarUrl = ! empty($userFoto) ? base_url('uploads/profile/' . $userFoto) : null;
@@ -403,7 +413,6 @@
         <div class="topbar">
             <div class="topbar-left">
                 <h1><?= esc($pageTitle ?? 'Dashboard') ?></h1>
-                <p><?= esc($pageSubtitle ?? 'Kelola aktivitas sistem tugas akhir secara ringkas dan terpusat.') ?></p>
             </div>
 
             <div class="topbar-right">

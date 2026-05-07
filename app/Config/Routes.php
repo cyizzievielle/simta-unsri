@@ -11,6 +11,13 @@ $routes->get('/login', 'Auth::login');
 $routes->post('/login', 'Auth::attemptLogin');
 $routes->post('/logout', 'Auth::logout');
 
+/* PUBLIC RESET PASSWORD */
+$routes->get('/forgot-password', 'Auth::forgotPassword');
+$routes->post('/forgot-password', 'Auth::sendResetLink');
+$routes->get('/reset-password/(:segment)', 'Auth::resetPassword/$1');
+$routes->post('/reset-password', 'Auth::updatePassword');
+
+/* WAJIB LOGIN */
 $routes->group('', ['filter' => 'auth'], static function ($routes) {
     $routes->get('/dashboard', 'Dashboard::index');
     
@@ -58,6 +65,8 @@ $routes->group('', ['filter' => 'auth'], static function ($routes) {
     $routes->get('/dosen/permohonan/detail/(:num)', 'Pembimbing::detailPermohonan/$1');
     $routes->post('/dosen/permohonan/(:num)/respon', 'Pembimbing::responPermohonan/$1');
     $routes->post('/dosen/permohonan/update-riwayat/(:num)', 'Dashboard::updateRiwayatPermohonan/$1');
+    $routes->get('/dosen/permohonan/edit/(:num)', 'Dashboard::editRiwayatPermohonan/$1');
+    $routes->post('/dosen/permohonan/update-riwayat/(:num)', 'Dashboard::updateRiwayatPermohonan/$1');  
 
     // dosen judul
     $routes->get('/dosen/pengajuan-judul', 'Judul::indexDosen');

@@ -62,7 +62,7 @@ class Proposal extends BaseController
         }
 
         $namaAsli = $file->getClientName();
-        $namaBaru = $file->getRandomName();
+        $namaBaru = $namaAsli;
 
         $uploadPath = FCPATH . 'uploads/proposal';
 

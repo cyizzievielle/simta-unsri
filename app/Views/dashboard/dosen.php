@@ -89,7 +89,9 @@ $mahasiswaBimbingan  = $mahasiswaBimbingan ?? [];
                 <?php if (! empty($aktivitas) && is_array($aktivitas)): ?>
                     <?php foreach ($aktivitas as $row): ?>
                         <div class="dosen-timeline-item">
-                            <div class="timeline-dot">📌</div>
+                            <div class="timeline-dot">
+                               <i class="ri-history-line"></i>
+                            </div>
                             <div>
                                 <strong><?= esc(safeText($row['nama_mahasiswa'] ?? '-')) ?></strong>
                                 <p>
@@ -116,18 +118,42 @@ $mahasiswaBimbingan  = $mahasiswaBimbingan ?? [];
             <div class="student-list">
                 <?php if (! empty($mahasiswaBimbingan) && is_array($mahasiswaBimbingan)): ?>
                     <?php foreach ($mahasiswaBimbingan as $mhs): ?>
-                        <?php $studentName = safeText($mhs['nama'] ?? '-', 'Mahasiswa'); ?>
 
-                        <div class="student-card">
-                            <div class="student-avatar">
-                                <?= esc(strtoupper(substr($studentName, 0, 1))) ?>
-                            </div>
+                    <?php
+                    $namaRaw = $mhs['nama'] ?? 'Mahasiswa';
+                    $nama = is_array($namaRaw) ? 'Mahasiswa' : (string) $namaRaw;
 
-                            <div class="student-info">
-                                <strong><?= esc($studentName) ?></strong>
-                                <small>NIM: <?= esc(safeText($mhs['nim'] ?? '-')) ?></small>
-                            </div>
+                    $nimRaw = $mhs['nim'] ?? '-';
+                    $nim = is_array($nimRaw) ? '-' : (string) $nimRaw;
+
+                    $fotoRaw = $mhs['foto'] ?? '';
+                    $fotoMhs = is_array($fotoRaw) ? '' : trim((string) $fotoRaw);
+
+                    $fotoMhsUrl = null;
+
+                    if ($fotoMhs !== '' && file_exists(FCPATH . 'uploads/profile/' . $fotoMhs)) {
+                        $fotoMhsUrl = base_url('uploads/profile/' . $fotoMhs);
+                    }
+
+                    $initial = strtoupper(substr($nama, 0, 1));
+                    ?>
+
+                    <div class="student-card">
+                        <div class="student-avatar">
+                            <?php if ($fotoMhsUrl): ?>
+                                <img src="<?= esc($fotoMhsUrl) ?>" alt="<?= esc($nama) ?>">
+                            <?php else: ?>
+                                <span><?= esc($initial) ?></span>
+                            <?php endif; ?>
                         </div>
+
+                        <div class="student-info">
+                            <strong><?= esc($nama) ?></strong>
+                            <small>NIM: <?= esc($nim) ?></small>
+                        </div>
+
+                    </div>
+
                     <?php endforeach; ?>
                 <?php else: ?>
                     <div class="empty-box">Belum ada mahasiswa bimbingan.</div>

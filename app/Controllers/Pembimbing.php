@@ -240,7 +240,6 @@ public function detailPermohonan(int $id)
     return view('dashboard/permohonan_dosen_detail', [
         'title'        => 'Detail Permohonan Pembimbing',
         'pageTitle'    => 'Detail Permohonan Pembimbing',
-        'pageSubtitle' => 'Lihat detail permohonan dan ambil keputusan',
         'activeMenu'   => 'permohonan_dosen',
         'permohonan'   => $permohonan,
     ]);
@@ -330,7 +329,6 @@ public function permohonanDosen()
     return view('dashboard/permohonan_dosen', [
         'title'                 => 'Permohonan Pembimbing',
         'pageTitle'             => 'Permohonan Pembimbing',
-        'pageSubtitle'          => 'Tinjau dan putuskan permohonan mahasiswa',
         'activeMenu'            => 'permohonan_dosen',
 
         'permohonanMenunggu'    => $permohonanMenunggu,
