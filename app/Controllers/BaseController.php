@@ -42,4 +42,21 @@ abstract class BaseController extends Controller
         // Preload any models, libraries, etc, here.
         // $this->session = service('session');
     }
+    protected function kirimNotif(
+        int $userId,
+        string $judul,
+        string $pesan,
+        string $tipe = 'info',
+        ?string $link = null
+    ): void {
+        $db = \Config\Database::connect();
+
+        $db->table('notifikasi')->insert([
+            'user_id' => $userId,
+            'judul'   => $judul,
+            'pesan'   => $pesan,
+            'tipe'    => $tipe,
+            'link'    => $link,
+        ]);
+    }
 }

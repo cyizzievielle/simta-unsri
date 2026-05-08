@@ -11,6 +11,7 @@ $totalSk         = (int) ($totalSk ?? 0);
 $totalSkTerbit   = (int) ($totalSkTerbit ?? $totalSk);
 
 $permohonanMenunggu = (int) ($permohonanMenunggu ?? 0);
+$permohonanPending  = $permohonanPending ?? 0;
 $judulDipantau      = (int) ($judulDipantau ?? 0);
 $proposalDiproses   = (int) ($proposalDiproses ?? 0);
 
@@ -93,31 +94,71 @@ $maxBar = max(
         </div>
     </section>
 
-    <section class="admin-stat-grid stat-count-4">
-        <div class="stat-card stat-blue">
-            <div class="stat-label">Total Users</div>
-            <div class="stat-value"><?= esc((string) $totalUsers) ?></div>
-            <div class="stat-desc">Akun aktif sistem</div>
-        </div>
+<section class="admin-stat-grid stat-count-8">
 
-        <div class="stat-card stat-green">
-            <div class="stat-label">Mahasiswa</div>
-            <div class="stat-value"><?= esc((string) $totalMahasiswa) ?></div>
-            <div class="stat-desc">Mahasiswa terdaftar</div>
+    <div class="stat-card stat-blue">
+        <div class="stat-label">Total Users</div>
+        <div class="stat-value"><?= esc((string) $totalUsers) ?></div>
+        <div class="stat-desc">
+            Akun admin, mahasiswa, dan dosen
         </div>
+    </div>
 
-        <div class="stat-card stat-purple">
-            <div class="stat-label">Dosen</div>
-            <div class="stat-value"><?= esc((string) $totalDosen) ?></div>
-            <div class="stat-desc">Dosen pembimbing</div>
+    <div class="stat-card stat-green">
+        <div class="stat-label">Mahasiswa</div>
+        <div class="stat-value"><?= esc((string) $totalMahasiswa) ?></div>
+        <div class="stat-desc">
+            Data mahasiswa terdaftar
         </div>
+    </div>
 
-        <div class="stat-card stat-amber">
-            <div class="stat-label">SK Terbit</div>
-            <div class="stat-value"><?= esc((string) $totalSkTerbit) ?></div>
-            <div class="stat-desc">Dokumen diterbitkan</div>
+    <div class="stat-card stat-purple">
+        <div class="stat-label">Dosen</div>
+        <div class="stat-value"><?= esc((string) $totalDosen) ?></div>
+        <div class="stat-desc">
+            Dosen pembimbing aktif
         </div>
-    </section>
+    </div>
+
+    <div class="stat-card stat-indigo">
+        <div class="stat-label">Pengajuan Judul</div>
+        <div class="stat-value"><?= esc((string) $totalJudul) ?></div>
+        <div class="stat-desc">
+            <?= esc((string) ($judulPerluDipantau ?? 0)) ?> perlu dipantau
+        </div>
+    </div>
+
+    <div class="stat-card stat-cyan">
+        <div class="stat-label">Proposal</div>
+        <div class="stat-value"><?= esc((string) $totalProposal) ?></div>
+        <div class="stat-desc">
+            <?= esc((string) ($proposalDiproses ?? 0)) ?> sedang diproses
+        </div>
+    </div>
+
+    <div class="stat-card stat-rose">
+        <div class="stat-label">Total SK</div>
+        <div class="stat-value"><?= esc((string) $totalSk) ?></div>
+        <div class="stat-desc">
+            SK yang sudah masuk arsip
+        </div>
+    </div>
+
+    <div class="stat-card stat-orange">
+        <div class="stat-label">Permohonan Pembimbing</div>
+        <div class="stat-value"><?= esc((string) $permohonanPending) ?></div>
+        <div class="stat-desc">Menunggu keputusan dosen</div>
+    </div>
+
+    <div class="stat-card stat-amber">
+        <div class="stat-label">SK Terbit</div>
+        <div class="stat-value"><?= esc((string) $totalSkTerbit) ?></div>
+        <div class="stat-desc">
+            Sudah diterbitkan admin
+        </div>
+    </div>
+
+</section>
 
     <section class="admin-analytics-grid">
         <div class="card-main admin-chart-card admin-wide-chart">

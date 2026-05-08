@@ -6,42 +6,44 @@ $judulDisetujui  = $judulDisetujui ?? null;
 $riwayatProposal = $riwayatProposal ?? $riwayat ?? $rows ?? [];
 $masihDiproses   = $masihDiproses ?? false;
 
-$safe = static function (mixed $value, string $default = '-'): string {
+$safe = static function ($value, string $default = '-'): string {
     if ($value === null || $value === '') return $default;
     if (is_array($value)) return implode(', ', array_map('strval', $value));
     return (string) $value;
 };
 
-$badgeStatus = static function (mixed $status) use ($safe): string {
+$badgeStatus = static function ($status) use ($safe): string {
     return match (strtolower($safe($status, ''))) {
-        'disetujui' => 'badge-success',
-        'revisi'    => 'badge-warning',
-        'ditolak'   => 'badge-danger',
-        'diajukan',
-        'direview'  => 'badge-info',
-        default     => 'badge-muted',
+        'disetujui', 'diterima' => 'badge-success',
+        'revisi'                => 'badge-warning',
+        'ditolak'               => 'badge-danger',
+        'diajukan', 'menunggu', 'direview' => 'badge-info',
+        default                 => 'badge-muted',
     };
 };
+
+$canDeleteStatus = ['diajukan', 'menunggu'];
 ?>
 
 <div class="proposal-ta-page">
+
     <section class="proposal-step-grid">
         <div class="proposal-step">
             <span>1</span>
             <strong>Judul Disetujui</strong>
-            <p>Proposal hanya bisa diunggah setelah judul TA kamu disetujui.</p>
+            <p>Proposal hanya bisa diunggah setelah judul TA disetujui.</p>
         </div>
 
         <div class="proposal-step">
             <span>2</span>
             <strong>Upload File</strong>
-            <p>Unggah file proposal dan tambahkan catatan jika diperlukan.</p>
+            <p>Unggah file proposal tugas akhir sesuai format akademik.</p>
         </div>
 
         <div class="proposal-step">
             <span>3</span>
             <strong>Review Dosen</strong>
-            <p>Dosen pembimbing meninjau proposal dan memberi catatan.</p>
+            <p>Dosen pembimbing meninjau proposal yang diajukan.</p>
         </div>
 
         <div class="proposal-step">
@@ -51,95 +53,142 @@ $badgeStatus = static function (mixed $status) use ($safe): string {
         </div>
     </section>
 
-<section class="proposal-main-card">
-    <div class="page-head">
-        <div>
-            <h3>Dasar Pengajuan</h3>
-            <p>Judul TA yang sudah disetujui sebagai dasar upload proposal.</p>
-        </div>
-    </div>
-
-    <?php if ($judulDisetujui): ?>
-        <div class="proposal-title-box">
-            <div class="proposal-title-main">
-                <?= esc($safe($judulDisetujui['judul'] ?? '-')) ?>
-            </div>
-
-            <div class="proposal-meta-grid">
-                <div>
-                    <span>Status Judul</span>
-                    <strong><span class="badge badge-success">Disetujui</span></strong>
-                </div>
-
-                <div>
-                    <span>Bidang Topik</span>
-                    <strong><?= esc($safe($judulDisetujui['bidang_topik'] ?? '-')) ?></strong>
-                </div>
-
-                <div>
-                    <span>Kata Kunci</span>
-                    <strong><?= esc($safe($judulDisetujui['kata_kunci'] ?? '-')) ?></strong>
-                </div>
-
-                <div>
-                    <span>Tanggal Persetujuan</span>
-                    <strong><?= esc($safe($judulDisetujui['updated_at'] ?? $judulDisetujui['tanggal_pengajuan'] ?? '-')) ?></strong>
-                </div>
+    <section class="proposal-main-card">
+        <div class="page-head">
+            <div>
+                <h3>Dasar Pengajuan</h3>
+                <p>Judul tugas akhir yang sudah disetujui sebagai dasar upload proposal.</p>
             </div>
         </div>
-    <?php else: ?>
-        <div class="empty-box">Belum ada judul yang disetujui.</div>
-    <?php endif; ?>
 
-<div class="upload-box" style="margin-top:16px;">
+        <?php if ($judulDisetujui): ?>
 
-    <div class="upload-head">
-        <div>
-            <h3>Upload Proposal</h3>
-            <p>Unggah file proposal setelah judul kamu disetujui.</p>
-        </div>
+            <div class="proposal-title-box">
+                <div class="proposal-title-main">
+                    <?= esc($safe($judulDisetujui['judul'] ?? '-')) ?>
+                </div>
 
-        <?php if ($judulDisetujui && ! $masihDiproses): ?>
-            <button type="button" class="btn btn-primary upload-btn" onclick="toggleUploadProposal()">
-                + Upload Proposal Baru
-            </button>
-        <?php endif; ?>
-    </div>
+                <div class="proposal-meta-grid">
+                    <div>
+                        <span>Status Judul</span>
+                        <strong><span class="badge badge-success">Disetujui</span></strong>
+                    </div>
 
-    <?php if (! $judulDisetujui): ?>
-        <div class="empty-box">Upload belum aktif.</div>
+                    <div>
+                        <span>Bidang Topik</span>
+                        <strong><?= esc($safe($judulDisetujui['bidang_topik'] ?? '-')) ?></strong>
+                    </div>
 
-    <?php elseif ($masihDiproses): ?>
-        <div class="empty-box">Masih ada proposal yang sedang diproses.</div>
+                    <div>
+                        <span>Kata Kunci</span>
+                        <strong><?= esc($safe($judulDisetujui['kata_kunci'] ?? '-')) ?></strong>
+                    </div>
 
-    <?php else: ?>
-        <div class="proposal-upload-panel" id="uploadProposalPanel">
-                <form action="<?= base_url('/proposal-ta/upload') ?>" method="post" enctype="multipart/form-data">
-                    <?= csrf_field() ?>
+                    <div>
+                        <span>Tanggal Persetujuan</span>
+                        <strong><?= esc($safe($judulDisetujui['updated_at'] ?? $judulDisetujui['tanggal_pengajuan'] ?? '-')) ?></strong>
+                    </div>
+                </div>
+            </div>
 
-                    <input type="hidden" name="pengajuan_judul_id" value="<?= esc($safe($judulDisetujui['id'] ?? '')) ?>">
+            <div class="upload-box">
+                <div class="upload-head">
+                    <div>
+                        <h3>Upload Proposal</h3>
+                        <p>Unggah file proposal setelah judul kamu disetujui.</p>
+                    </div>
 
-                    <div class="form-grid form-grid-1">
-                        <div class="form-group">
-                            <label>File Proposal</label>
-                            <input type="file" name="file_proposal" class="input" required>
+                    <?php if (! $masihDiproses): ?>
+                        <button type="button" class="btn btn-primary upload-btn" onclick="toggleUploadProposal()">
+                            <i class="ri-upload-cloud-2-line"></i>
+                            Upload Proposal Baru
+                        </button>
+                    <?php endif; ?>
+                </div>
+
+                <?php if ($masihDiproses): ?>
+
+                    <div class="proposal-waiting-card">
+                        <div class="waiting-icon">
+                            <i class="ri-loader-4-line"></i>
                         </div>
 
-                        <div class="form-group">
-                            <label>Catatan Mahasiswa</label>
-                            <textarea name="catatan_mahasiswa" class="input textarea" placeholder="Catatan tambahan..."></textarea>
+                        <div class="waiting-content">
+                            <h4>Proposal Sedang Diproses</h4>
+
+                            <p>
+                                Proposal tugas akhir kamu saat ini sedang ditinjau oleh dosen pembimbing.
+                                Upload proposal baru akan tersedia setelah proses review selesai.
+                            </p>
+
+                            <div class="waiting-badge">
+                                <i class="ri-time-line"></i>
+                                Menunggu Review Dosen
+                            </div>
                         </div>
                     </div>
 
-                    <div class="form-actions">
-                        <button type="submit" class="btn btn-primary">Simpan Proposal</button>
-                        <button type="button" class="btn btn-outline" onclick="toggleUploadProposal()">Batal</button>
+                <?php else: ?>
+
+                    <div class="proposal-upload-panel" id="uploadProposalPanel">
+                        <form action="<?= base_url('/proposal-ta/upload') ?>" method="post" enctype="multipart/form-data">
+                            <?= csrf_field() ?>
+
+                            <input type="hidden" name="pengajuan_judul_id" value="<?= esc($safe($judulDisetujui['id'] ?? '')) ?>">
+
+                            <div class="form-grid form-grid-1">
+                                <div class="form-group">
+                                    <label>File Proposal</label>
+                                    <input type="file" name="file_proposal" class="input" accept=".pdf,.doc,.docx" required>
+                                    <small class="input-hint">Format disarankan: PDF/DOC/DOCX.</small>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Catatan Mahasiswa</label>
+                                    <textarea name="catatan_mahasiswa" class="input textarea" placeholder="Tambahkan catatan jika diperlukan..."></textarea>
+                                </div>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="ri-save-3-line"></i>
+                                    Simpan Proposal
+                                </button>
+
+                                <button type="button" class="btn btn-outline" onclick="toggleUploadProposal()">
+                                    Batal
+                                </button>
+                            </div>
+                        </form>
                     </div>
-                </form>
+
+                <?php endif; ?>
             </div>
+
+        <?php else: ?>
+
+            <div class="proposal-waiting-card proposal-single-state">
+                <div class="waiting-icon">
+                    <i class="ri-file-list-3-line"></i>
+                </div>
+
+                <div class="waiting-content">
+                    <h4>Belum Ada Judul Disetujui</h4>
+
+                    <p>
+                        Upload proposal belum tersedia karena judul tugas akhir kamu
+                        belum disetujui oleh dosen pembimbing.
+                    </p>
+
+                    <div class="waiting-badge">
+                        <i class="ri-time-line"></i>
+                        Menunggu Persetujuan Judul
+                    </div>
+                </div>
+            </div>
+
         <?php endif; ?>
-    </div>
-</section>
+    </section>
 
     <section class="card-main">
         <div class="page-head">
@@ -155,7 +204,7 @@ $badgeStatus = static function (mixed $status) use ($safe): string {
                     <thead>
                         <tr>
                             <th>Judul</th>
-                            <th>File</th>
+                            <th>File Proposal</th>
                             <th>Status</th>
                             <th>Versi</th>
                             <th>Upload</th>
@@ -170,10 +219,13 @@ $badgeStatus = static function (mixed $status) use ($safe): string {
                             <?php
                                 $status     = strtolower($safe($row['status'] ?? '', ''));
                                 $proposalId = $safe($row['id'] ?? '', '');
-                                $fileName   = $safe($row['file_proposal'] ?? '', '');
+                                $fileName   = $safe($row['file_proposal'] ?? $row['file_path'] ?? '', '');
                                 $fileAsli   = $safe($row['nama_file_asli'] ?? '', '');
                                 $fileUrl    = $fileName !== '' ? base_url('uploads/proposal/' . $fileName) : '';
-                                $catatan    = $safe(($row['catatan_reviewer'] ?? '') !== '' ? $row['catatan_reviewer'] : '-', '-');
+
+                                $catatanReviewer = $safe($row['catatan_reviewer'] ?? $row['catatan_dosen'] ?? '', '');
+                                $catatanMhs      = $safe($row['catatan_mahasiswa'] ?? '', '');
+                                $catatanFinal    = $catatanReviewer !== '' ? $catatanReviewer : ($catatanMhs !== '' ? $catatanMhs : '-');
                             ?>
 
                             <tr>
@@ -185,12 +237,26 @@ $badgeStatus = static function (mixed $status) use ($safe): string {
 
                                 <td>
                                     <div class="file-cell">
-                                        <strong><?= esc($fileAsli !== '' ? $fileAsli : ($fileName !== '' ? $fileName : '-')) ?></strong>
+                                        <strong>
+                                            <?= esc($fileAsli !== '' ? $fileAsli : ($fileName !== '' ? $fileName : '-')) ?>
+                                        </strong>
 
                                         <?php if ($fileUrl !== ''): ?>
                                             <div class="file-actions">
-                                                <a href="<?= esc($fileUrl) ?>" target="_blank" rel="noopener" class="icon-btn icon-open" title="Buka File">📄</a>
-                                                <a href="<?= esc($fileUrl) ?>" download class="icon-btn icon-download" title="Download">⬇</a>
+                                                <a href="<?= esc($fileUrl) ?>"
+                                                   target="_blank"
+                                                   rel="noopener"
+                                                   class="mini-file-btn"
+                                                   title="Buka File">
+                                                    <i class="ri-eye-line"></i>
+                                                </a>
+
+                                                <a href="<?= esc($fileUrl) ?>"
+                                                   download
+                                                   class="mini-file-btn"
+                                                   title="Download File">
+                                                    <i class="ri-download-2-line"></i>
+                                                </a>
                                             </div>
                                         <?php endif; ?>
                                     </div>
@@ -207,19 +273,42 @@ $badgeStatus = static function (mixed $status) use ($safe): string {
                                 <td><?= esc($safe($row['tanggal_review'] ?? '-')) ?></td>
 
                                 <td>
-                                    <?php if ($catatan !== '-'): ?>
-                                        <button type="button" class="icon-btn icon-open" onclick="openNoteModal(this)" data-note="<?= esc($catatan) ?>">👁</button>
+                                    <?php if ($catatanFinal !== '-'): ?>
+                                        <button type="button"
+                                                class="icon-btn icon-open"
+                                                onclick="openNoteModal(this)"
+                                                data-note="<?= esc($catatanFinal) ?>"
+                                                title="Lihat Catatan">
+                                            <i class="ri-message-3-line"></i>
+                                        </button>
                                     <?php else: ?>
                                         <span class="muted">-</span>
                                     <?php endif; ?>
                                 </td>
 
-                                <td>
-                                    <?php if (in_array($status, ['revisi', 'ditolak'], true) && $proposalId !== ''): ?>
-                                        <a href="<?= base_url('/proposal-ta/revisi/' . $proposalId) ?>" class="icon-btn icon-edit" title="Revisi">✎</a>
-                                    <?php else: ?>
-                                        <span class="muted">-</span>
-                                    <?php endif; ?>
+                                <td class="proposal-actions">
+                                    <div class="action-group">
+                                        <?php if (in_array($status, ['revisi', 'ditolak'], true) && $proposalId !== ''): ?>
+                                            <a href="<?= base_url('/proposal-ta/revisi/' . $proposalId) ?>"
+                                               class="icon-btn icon-edit"
+                                               title="Revisi Proposal">
+                                                <i class="ri-edit-2-line"></i>
+                                            </a>
+                                        <?php endif; ?>
+
+                                        <?php if (in_array($status, $canDeleteStatus, true) && $proposalId !== ''): ?>
+                                            <a href="<?= base_url('/proposal-ta/hapus/' . $proposalId) ?>"
+                                               class="icon-btn icon-delete"
+                                               title="Hapus Proposal"
+                                               onclick="return confirm('Yakin ingin menghapus proposal ini? Proposal hanya bisa dihapus sebelum direview dosen.')">
+                                                <i class="ri-delete-bin-6-line"></i>
+                                            </a>
+                                        <?php endif; ?>
+
+                                        <?php if (! in_array($status, ['revisi', 'ditolak', 'diajukan', 'menunggu'], true)): ?>
+                                            <span class="muted">-</span>
+                                        <?php endif; ?>
+                                    </div>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -234,8 +323,8 @@ $badgeStatus = static function (mixed $status) use ($safe): string {
 </div>
 
 <div class="note-modal-overlay" id="noteModal" onclick="closeNoteModal(event)">
-    <div class="note-modal">
-        <h3>Catatan Review</h3>
+    <div class="note-modal" onclick="event.stopPropagation()">
+        <h3>Catatan Proposal</h3>
         <p id="noteModalText">-</p>
         <button type="button" class="note-modal-close" onclick="closeNoteModal()">Tutup</button>
     </div>
@@ -261,7 +350,6 @@ function openNoteModal(button) {
 
 function closeNoteModal(event) {
     const modal = document.getElementById('noteModal');
-
     if (!modal) return;
 
     if (!event || event.target === modal) {

@@ -41,7 +41,6 @@ $routes->group('', ['filter' => 'auth'], static function ($routes) {
     $routes->post('/pembimbing/permohonan/(:num)/setujui', 'Pembimbing::setujui/$1');
     $routes->post('/pembimbing/permohonan/(:num)/tolak', 'Pembimbing::tolak/$1');
 
-    $routes->get('/pengajuan-judul', 'Dashboard::pengajuanJudul');
     $routes->post('/pengajuan-judul/simpan', 'Judul::simpan');
     $routes->get('/pengajuan-judul/detail/(:num)', 'Judul::detailMahasiswa/$1');
     $routes->get('/pengajuan-judul/revisi/(:num)', 'Judul::formRevisi/$1');
@@ -77,6 +76,9 @@ $routes->group('', ['filter' => 'auth'], static function ($routes) {
     $routes->post('/dosen/pengajuan-judul/review/update/(:num)', 'Judul::updateReview/$1');
     $routes->post('/dosen/pengajuan-judul/review/delete/(:num)', 'Judul::deleteReview/$1');
 
+    $routes->get('pengajuan-judul', 'Judul::index');
+    $routes->post('pengajuan-judul/simpan', 'Judul::simpan');
+
     // dosen proposal
     $routes->get('/dosen/proposal-ta', 'Proposal::indexDosen');
     $routes->get('/dosen/proposal-ta/detail/(:num)', 'Proposal::detailDosen/$1');
@@ -85,6 +87,20 @@ $routes->group('', ['filter' => 'auth'], static function ($routes) {
     $routes->get('/dosen/proposal-ta/review/edit/(:num)', 'Proposal::editReview/$1');
     $routes->post('/dosen/proposal-ta/review/update/(:num)', 'Proposal::updateReview/$1');
     $routes->post('/dosen/proposal-ta/review/delete/(:num)', 'Proposal::deleteReview/$1');
+
+    $routes->get('notifikasi/latest', 'Notifikasi::latest');
+    $routes->post('notifikasi/read/(:num)', 'Notifikasi::read/$1');
+    $routes->get('/notifikasi/realtime', 'Notifikasi::realtime');
+    $routes->get('/notifikasi/read/(:num)', 'Notifikasi::read/$1');
+    $routes->get('/notifikasi', 'Notifikasi::index');
+    $routes->get('/notifikasi/realtime', 'Notifikasi::realtime');
+    $routes->get('/notifikasi/read/(:num)', 'Notifikasi::read/$1');
+    $routes->post('/notifikasi/read-all', 'Notifikasi::readAll');
+
+    $routes->get('/chat', 'Chat::index');
+    $routes->get('/chat/room/(:num)', 'Chat::room/$1');
+    $routes->post('/chat/send', 'Chat::send');
+    $routes->get('/chat/messages/(:num)', 'Chat::messages/$1');
 
     // admin
     $routes->group('admin', static function ($routes) {
@@ -120,6 +136,7 @@ $routes->group('', ['filter' => 'auth'], static function ($routes) {
 
         $routes->get('laporan', 'Admin::laporan');
         $routes->get('audit-log', 'Admin::auditLog');
+        $routes->get('audit-log/realtime', 'Admin::auditLogRealtime');
 
         $routes->get('laporan/export/rekap', 'Admin::exportRekapPdf');
         $routes->get('laporan/export/judul', 'Admin::exportJudulPdf');

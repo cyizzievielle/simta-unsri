@@ -2,13 +2,15 @@
 <?= $this->section('content') ?>
 
 <?php
-$pengajuanJudul = $pengajuanJudul 
-    ?? $pengajuan 
-    ?? $riwayat 
-    ?? $riwayatJudul 
-    ?? $judulList 
-    ?? $rows 
+$pengajuanJudul = $pengajuanJudul
+    ?? $pengajuan
+    ?? $riwayat
+    ?? $riwayatJudul
+    ?? $judulList
+    ?? $rows
     ?? [];
+
+$bolehAjukanJudul = $bolehAjukanJudul ?? false;
 
 $safe = static function (mixed $value, string $default = '-'): string {
     if ($value === null || $value === '') return $default;
@@ -40,31 +42,32 @@ $statusLabel = static function (mixed $status) use ($safe): string {
 ?>
 
 <div class="judul-page">
-<section class="judul-step-grid">
-    <div class="judul-step">
-        <span>1</span>
-        <strong>Isi Data Judul</strong>
-        <p>Masukkan judul, latar belakang, bidang topik, dan kata kunci.</p>
-    </div>
 
-    <div class="judul-step">
-        <span>2</span>
-        <strong>Cek Similarity</strong>
-        <p>Sistem membantu mendeteksi judul yang terlalu mirip dengan data lama.</p>
-    </div>
+    <section class="judul-step-grid">
+        <div class="judul-step">
+            <span>1</span>
+            <strong>Pembimbing Disetujui</strong>
+            <p>Minimal satu dosen pembimbing harus menyetujui permohonan bimbingan.</p>
+        </div>
 
-    <div class="judul-step">
-        <span>3</span>
-        <strong>Review Dosen</strong>
-        <p>Dosen pembimbing memberi keputusan dan catatan review.</p>
-    </div>
+        <div class="judul-step">
+            <span>2</span>
+            <strong>Isi Data Judul</strong>
+            <p>Masukkan judul, latar belakang, bidang topik, dan kata kunci.</p>
+        </div>
 
-    <div class="judul-step">
-        <span>4</span>
-        <strong>Keputusan</strong>
-        <p>Judul bisa disetujui, ditolak, atau diminta revisi.</p>
-    </div>
-</section>
+        <div class="judul-step">
+            <span>3</span>
+            <strong>Review Dosen</strong>
+            <p>Dosen pembimbing memberi keputusan dan catatan review.</p>
+        </div>
+
+        <div class="judul-step">
+            <span>4</span>
+            <strong>Keputusan</strong>
+            <p>Judul dapat disetujui, ditolak, atau diminta revisi.</p>
+        </div>
+    </section>
 
     <section class="card-main">
         <div class="page-head">
@@ -73,73 +76,108 @@ $statusLabel = static function (mixed $status) use ($safe): string {
                 <p>Ajukan judul, pantau status review, dan lihat riwayat pengajuan kamu.</p>
             </div>
 
-            <button type="button" class="btn btn-primary" onclick="toggleFormJudul()">
-                + Ajukan Judul
-            </button>
+            <?php if ($bolehAjukanJudul): ?>
+                <button type="button" class="btn btn-primary" onclick="toggleFormJudul()">
+                    <i class="ri-add-line"></i>
+                    Ajukan Judul
+                </button>
+            <?php endif; ?>
         </div>
 
-        <div id="formJudul" class="form-panel">
-            <form action="<?= base_url('/pengajuan-judul/simpan') ?>" method="post">
-                <?= csrf_field() ?>
+        <?php if ($bolehAjukanJudul): ?>
 
-                <div class="form-grid form-grid-2">
-                    <div class="form-group form-full">
-                        <label for="judul">Judul Tugas Akhir</label>
-                        <input
-                            type="text"
-                            id="judul"
-                            name="judul"
-                            class="input"
-                            value="<?= esc($safe(old('judul'), '')) ?>"
-                            placeholder="Masukkan judul tugas akhir"
-                            required
-                        >
+            <div id="formJudul" class="form-panel">
+                <form action="<?= base_url('/pengajuan-judul/simpan') ?>" method="post">
+                    <?= csrf_field() ?>
+
+                    <div class="form-grid form-grid-2">
+                        <div class="form-group form-full">
+                            <label for="judul">Judul Tugas Akhir</label>
+                            <input
+                                type="text"
+                                id="judul"
+                                name="judul"
+                                class="input"
+                                value="<?= esc($safe(old('judul'), '')) ?>"
+                                placeholder="Masukkan judul tugas akhir"
+                                required
+                            >
+                        </div>
+
+                        <div class="form-group form-full">
+                            <label for="latar_belakang">Latar Belakang</label>
+                            <textarea
+                                id="latar_belakang"
+                                name="latar_belakang"
+                                class="input textarea"
+                                placeholder="Tuliskan latar belakang singkat"
+                                required
+                            ><?= esc($safe(old('latar_belakang'), '')) ?></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="bidang_topik">Bidang Topik</label>
+                            <input
+                                type="text"
+                                id="bidang_topik"
+                                name="bidang_topik"
+                                class="input"
+                                value="<?= esc($safe(old('bidang_topik'), '')) ?>"
+                                placeholder="Contoh: Web, Database, UI/UX"
+                                required
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="kata_kunci">Kata Kunci</label>
+                            <input
+                                type="text"
+                                id="kata_kunci"
+                                name="kata_kunci"
+                                class="input"
+                                value="<?= esc($safe(old('kata_kunci'), '')) ?>"
+                                placeholder="Contoh: sistem informasi, website"
+                                required
+                            >
+                        </div>
                     </div>
 
-                    <div class="form-group form-full">
-                        <label for="latar_belakang">Latar Belakang</label>
-                        <textarea
-                            id="latar_belakang"
-                            name="latar_belakang"
-                            class="input textarea"
-                            placeholder="Tuliskan latar belakang singkat"
-                            required
-                        ><?= esc($safe(old('latar_belakang'), '')) ?></textarea>
-                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ri-send-plane-line"></i>
+                            Kirim Pengajuan
+                        </button>
 
-                    <div class="form-group">
-                        <label for="bidang_topik">Bidang Topik</label>
-                        <input
-                            type="text"
-                            id="bidang_topik"
-                            name="bidang_topik"
-                            class="input"
-                            value="<?= esc($safe(old('bidang_topik'), '')) ?>"
-                            placeholder="Contoh: Web, Database, UI/UX"
-                            required
-                        >
+                        <button type="button" class="btn btn-outline" onclick="toggleFormJudul()">
+                            Batal
+                        </button>
                     </div>
+                </form>
+            </div>
 
-                    <div class="form-group">
-                        <label for="kata_kunci">Kata Kunci</label>
-                        <input
-                            type="text"
-                            id="kata_kunci"
-                            name="kata_kunci"
-                            class="input"
-                            value="<?= esc($safe(old('kata_kunci'), '')) ?>"
-                            placeholder="Contoh: sistem informasi, website"
-                            required
-                        >
-                    </div>
+        <?php else: ?>
+
+            <div class="proposal-waiting-card">
+                <div class="waiting-icon">
+                    <i class="ri-user-follow-line"></i>
                 </div>
 
-                <div class="form-actions">
-                    <button type="submit" class="btn btn-primary">Kirim Pengajuan</button>
-                    <button type="button" class="btn btn-outline" onclick="toggleFormJudul()">Batal</button>
+                <div class="waiting-content">
+                    <h4>Menunggu Persetujuan Pembimbing</h4>
+
+                    <p>
+                        Pengajuan judul hanya dapat dilakukan setelah minimal satu dosen
+                        pembimbing menyetujui permohonan bimbingan kamu.
+                    </p>
+
+                    <div class="waiting-badge">
+                        <i class="ri-time-line"></i>
+                        Belum Ada Pembimbing Disetujui
+                    </div>
                 </div>
-            </form>
-        </div>
+            </div>
+
+        <?php endif; ?>
     </section>
 
     <section class="card-main">
@@ -200,7 +238,7 @@ $statusLabel = static function (mixed $status) use ($safe): string {
                                             class="icon-btn icon-open"
                                             title="Detail"
                                         >
-                                            👁
+                                            <i class="ri-eye-line"></i>
                                         </a>
 
                                         <?php if (($row['status'] ?? '') === 'revisi'): ?>
@@ -209,7 +247,7 @@ $statusLabel = static function (mixed $status) use ($safe): string {
                                                 class="icon-btn icon-edit"
                                                 title="Revisi"
                                             >
-                                                ✎
+                                                <i class="ri-edit-2-line"></i>
                                             </a>
                                         <?php endif; ?>
                                     </div>

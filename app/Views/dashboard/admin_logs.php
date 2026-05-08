@@ -1,248 +1,277 @@
 <?= $this->extend('layouts/dashboard') ?>
 <?= $this->section('content') ?>
 
-<style>
-    .logs-hero {
-        background: linear-gradient(135deg, #0f172a 0%, #334155 45%, #1d4ed8 100%);
-        color: #fff;
-        border-radius: 28px;
-        padding: 28px 30px;
-        margin-bottom: 22px;
-        box-shadow: 0 18px 40px rgba(15, 23, 42, 0.18);
-        position: relative;
-        overflow: hidden;
+<?php
+$auditLogs  = $auditLogs ?? [];
+$notifikasi = $notifikasi ?? [];
+
+$safe = static function (mixed $value, string $default = '-'): string {
+    if ($value === null || $value === '') {
+        return $default;
     }
 
-    .logs-hero::after {
-        content: "";
-        position: absolute;
-        right: -45px;
-        top: -45px;
-        width: 180px;
-        height: 180px;
-        background: rgba(255,255,255,0.08);
-        border-radius: 50%;
+    if (is_array($value)) {
+        return implode(', ', array_map('strval', $value));
     }
 
-    .logs-hero h2 {
-        margin: 0 0 8px;
-        font-size: 28px;
-        font-weight: 800;
-        position: relative;
-        z-index: 1;
-    }
+    return (string) $value;
+};
 
-    .logs-hero p {
-        margin: 0;
-        color: rgba(255,255,255,0.92);
-        line-height: 1.7;
-        position: relative;
-        z-index: 1;
-    }
+$activityClass = static function (mixed $value) use ($safe): string {
+    return match (strtolower($safe($value, ''))) {
+        'create', 'created', 'tambah', 'insert' => 'log-create',
+        'update', 'edit', 'ubah'               => 'log-update',
+        'delete', 'hapus'                      => 'log-delete',
+        'login'                                => 'log-login',
+        default                                => 'log-default',
+    };
+};
+?>
 
-    .logs-grid {
-        display: grid;
-        grid-template-columns: 1.2fr 0.8fr;
-        gap: 22px;
-    }
+<div class="admin-logs-page">
 
-    .logs-card {
-        background: #fff;
-        border-radius: 24px;
-        padding: 24px;
-        box-shadow: 0 14px 35px rgba(15, 23, 42, 0.06);
-        border: 1px solid #eef2f7;
-    }
+    <section class="page-hero logs-page-hero">
+        <span class="page-kicker">System Activity</span>
 
-    .logs-card h3 {
-        margin: 0 0 8px;
-        font-size: 22px;
-        color: #0f172a;
-    }
+        <h2>Notifikasi & Audit Log</h2>
 
-    .logs-card p {
-        margin: 0 0 16px;
-        color: #64748b;
-        line-height: 1.7;
-    }
+        <p>
+            Pantau aktivitas sistem, perubahan data, dan notifikasi pengguna secara real-time.
+        </p>
+    </section>
 
-    .premium-table-wrap {
-        width: 100%;
-        overflow-x: auto;
-        border-radius: 18px;
-        border: 1px solid #eef2f7;
-    }
+    <section class="logs-summary-grid">
+        <div class="logs-summary-card">
+            <span>Total Audit</span>
+            <strong id="auditCount"><?= esc((string) count($auditLogs)) ?></strong>
+            <small>Aktivitas sistem tercatat</small>
+        </div>
 
-    .premium-table {
-        width: 100%;
-        min-width: 1100px;
-        border-collapse: collapse;
-        background: #fff;
-    }
+        <div class="logs-summary-card">
+            <span>Total Notifikasi</span>
+            <strong id="notifCount"><?= esc((string) count($notifikasi)) ?></strong>
+            <small>Notifikasi pengguna</small>
+        </div>
 
-    .premium-table thead tr {
-        background: linear-gradient(135deg, #f8fbff, #eff6ff);
-    }
+        <div class="logs-summary-card">
+            <span>Status Realtime</span>
+            <strong class="realtime-status">
+                <i></i> Aktif
+            </strong>
+            <small>Refresh otomatis 10 detik</small>
+        </div>
+    </section>
 
-    .premium-table th,
-    .premium-table td {
-        padding: 16px 14px;
-        text-align: left;
-        border-bottom: 1px solid #eef2f7;
-        vertical-align: top;
-    }
+    <section class="logs-layout">
 
-    .premium-table th {
-        font-size: 13px;
-        font-weight: 800;
-        color: #334155;
-        white-space: nowrap;
-    }
+        <div class="card-main logs-main-card">
+            <div class="page-head">
+                <div>
+                    <h3>Audit Log</h3>
+                    <p>Riwayat aktivitas user dan perubahan data di dalam sistem.</p>
+                </div>
+            </div>
 
-    .premium-table td {
-        color: #0f172a;
-        font-size: 14px;
-    }
-
-    .premium-table tbody tr:hover {
-        background: #fafcff;
-    }
-
-    .notif-list {
-        display: grid;
-        gap: 14px;
-    }
-
-    .notif-card {
-        border: 1px solid #e2e8f0;
-        background: linear-gradient(135deg, #ffffff, #f8fbff);
-        border-radius: 20px;
-        padding: 16px;
-    }
-
-    .notif-card strong {
-        display: block;
-        margin-bottom: 8px;
-        color: #0f172a;
-    }
-
-    .notif-meta {
-        color: #64748b;
-        font-size: 13px;
-        line-height: 1.65;
-        margin-top: 6px;
-    }
-
-    .status-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 8px 12px;
-        border-radius: 999px;
-        font-size: 12px;
-        font-weight: 800;
-        line-height: 1;
-        white-space: nowrap;
-    }
-
-    .badge-read {
-        background: #dcfce7;
-        color: #166534;
-    }
-
-    .badge-unread {
-        background: #fee2e2;
-        color: #b91c1c;
-    }
-
-    .premium-empty {
-        border: 1px dashed #cbd5e1;
-        background: linear-gradient(135deg, #f8fafc, #f1f5f9);
-        border-radius: 22px;
-        padding: 28px;
-        text-align: center;
-        color: #64748b;
-    }
-
-    @media (max-width: 1100px) {
-        .logs-grid {
-            grid-template-columns: 1fr;
-        }
-    }
-</style>
-
-<div class="logs-hero">
-    <h2>Notifikasi / Audit Log</h2>
-    <p>Pantau aktivitas sistem, log perubahan data, dan notifikasi user dari satu halaman admin yang rapi dan mudah dibaca.</p>
-</div>
-
-<div class="logs-grid">
-    <div class="logs-card">
-        <h3>Audit Log</h3>
-        <p>Riwayat aktivitas user dan perubahan entitas di dalam sistem.</p>
-
-        <?php if (! empty($auditLogs)): ?>
-            <div class="premium-table-wrap">
-                <table class="premium-table">
+            <div class="table-wrap logs-table-wrap">
+                <table class="admin-table logs-table">
                     <thead>
                         <tr>
                             <th>User</th>
                             <th>Aktivitas</th>
                             <th>Entitas</th>
-                            <th>Entitas ID</th>
+                            <th>ID</th>
                             <th>Deskripsi</th>
                             <th>Waktu</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <?php foreach ($auditLogs as $row): ?>
+
+                    <tbody id="auditLogBody">
+                        <?php if (! empty($auditLogs)): ?>
+                            <?php foreach ($auditLogs as $row): ?>
+                                <tr>
+                                    <td>
+                                        <strong><?= esc($safe($row['name'] ?? '-')) ?></strong>
+                                    </td>
+
+                                    <td>
+                                        <span class="log-pill <?= esc($activityClass($row['aktivitas'] ?? '')) ?>">
+                                            <?= esc($safe($row['aktivitas'] ?? '-')) ?>
+                                        </span>
+                                    </td>
+
+                                    <td><?= esc($safe($row['entitas'] ?? '-')) ?></td>
+                                    <td><?= esc($safe($row['entitas_id'] ?? '-')) ?></td>
+
+                                    <td>
+                                        <div class="log-desc">
+                                            <?= esc($safe($row['deskripsi'] ?? '-')) ?>
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <span class="log-time">
+                                            <?= esc($safe($row['created_at'] ?? '-')) ?>
+                                        </span>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php else: ?>
                             <tr>
-                                <td><?= esc((string) ($row['name'] ?? '-')) ?></td>
-                                <td><?= esc((string) ($row['aktivitas'] ?? '-')) ?></td>
-                                <td><?= esc((string) ($row['entitas'] ?? '-')) ?></td>
-                                <td><?= esc((string) ($row['entitas_id'] ?? '-')) ?></td>
-                                <td><?= esc((string) ($row['deskripsi'] ?? '-')) ?></td>
-                                <td><?= esc((string) ($row['created_at'] ?? '-')) ?></td>
+                                <td colspan="6">
+                                    <div class="empty-box">Belum ada audit log.</div>
+                                </td>
                             </tr>
-                        <?php endforeach; ?>
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>
-        <?php else: ?>
-            <div class="premium-empty">Belum ada audit log.</div>
-        <?php endif; ?>
-    </div>
+        </div>
 
-    <div class="logs-card">
-        <h3>Notifikasi</h3>
-        <p>Daftar notifikasi yang masuk ke user.</p>
-
-        <?php if (! empty($notifikasi)): ?>
-            <div class="notif-list">
-                <?php foreach ($notifikasi as $row): ?>
-                    <div class="notif-card">
-                        <strong><?= esc((string) ($row['judul'] ?? '-')) ?></strong>
-                        <div><?= esc((string) ($row['pesan'] ?? '-')) ?></div>
-
-                        <div class="notif-meta">
-                            User: <?= esc((string) ($row['name'] ?? '-')) ?><br>
-                            Waktu: <?= esc((string) ($row['created_at'] ?? '-')) ?>
-                        </div>
-
-                        <div style="margin-top:10px;">
-                            <?php if ((int) ($row['is_read'] ?? 0) === 1): ?>
-                                <span class="status-badge badge-read">Sudah Dibaca</span>
-                            <?php else: ?>
-                                <span class="status-badge badge-unread">Belum Dibaca</span>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                <?php endforeach; ?>
+        <aside class="card-main logs-side-card">
+            <div class="page-head">
+                <div>
+                    <h3>Notifikasi Terbaru</h3>
+                    <p>Daftar notifikasi yang masuk ke user.</p>
+                </div>
             </div>
-        <?php else: ?>
-            <div class="premium-empty">Belum ada notifikasi.</div>
-        <?php endif; ?>
-    </div>
+
+            <div class="notif-list" id="notifList">
+                <?php if (! empty($notifikasi)): ?>
+                    <?php foreach ($notifikasi as $row): ?>
+                        <article class="notif-card <?= (int) ($row['is_read'] ?? 0) === 1 ? 'is-read' : 'is-unread' ?>">
+                            <div class="notif-icon">
+                                <i class="ri-notification-3-line"></i>
+                            </div>
+
+                            <div class="notif-content">
+                                <div class="notif-title">
+                                    <?= esc($safe($row['judul'] ?? '-')) ?>
+                                </div>
+
+                                <p>
+                                    <?= esc($safe($row['pesan'] ?? '-')) ?>
+                                </p>
+
+                                <div class="notif-meta">
+                                    <?= esc($safe($row['name'] ?? '-')) ?> ·
+                                    <?= esc($safe($row['created_at'] ?? '-')) ?>
+                                </div>
+
+                                <span class="notif-status <?= (int) ($row['is_read'] ?? 0) === 1 ? 'read' : 'unread' ?>">
+                                    <?= (int) ($row['is_read'] ?? 0) === 1 ? 'Sudah dibaca' : 'Belum dibaca' ?>
+                                </span>
+                            </div>
+                        </article>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <div class="empty-box">Belum ada notifikasi.</div>
+                <?php endif; ?>
+            </div>
+        </aside>
+
+    </section>
+
 </div>
+
+<script>
+(function () {
+    const auditBody = document.getElementById('auditLogBody');
+    const notifList = document.getElementById('notifList');
+    const auditCount = document.getElementById('auditCount');
+    const notifCount = document.getElementById('notifCount');
+
+    function escapeHtml(value) {
+        return String(value ?? '-').replace(/[&<>"']/g, function (char) {
+            return {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            }[char];
+        });
+    }
+
+    function activityClass(value) {
+        value = String(value || '').toLowerCase();
+
+        if (['create', 'created', 'tambah', 'insert'].includes(value)) return 'log-create';
+        if (['update', 'edit', 'ubah'].includes(value)) return 'log-update';
+        if (['delete', 'hapus'].includes(value)) return 'log-delete';
+        if (value === 'login') return 'log-login';
+
+        return 'log-default';
+    }
+
+    async function loadRealtimeLogs() {
+        try {
+            const response = await fetch('<?= base_url('/admin/audit-log/realtime') ?>', {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+
+            if (!response.ok) return;
+
+            const data = await response.json();
+
+            const audits = data.auditLogs || [];
+            const notifs = data.notifikasi || [];
+
+            auditCount.textContent = audits.length;
+            notifCount.textContent = notifs.length;
+
+            auditBody.innerHTML = audits.length
+                ? audits.map(row => `
+                    <tr>
+                        <td><strong>${escapeHtml(row.name)}</strong></td>
+                        <td>
+                            <span class="log-pill ${activityClass(row.aktivitas)}">
+                                ${escapeHtml(row.aktivitas)}
+                            </span>
+                        </td>
+                        <td>${escapeHtml(row.entitas)}</td>
+                        <td>${escapeHtml(row.entitas_id)}</td>
+                        <td><div class="log-desc">${escapeHtml(row.deskripsi)}</div></td>
+                        <td><span class="log-time">${escapeHtml(row.created_at)}</span></td>
+                    </tr>
+                `).join('')
+                : `<tr><td colspan="6"><div class="empty-box">Belum ada audit log.</div></td></tr>`;
+
+            notifList.innerHTML = notifs.length
+                ? notifs.map(row => {
+                    const isRead = Number(row.is_read || 0) === 1;
+
+                    return `
+                        <article class="notif-card ${isRead ? 'is-read' : 'is-unread'}">
+                            <div class="notif-icon">
+                                <i class="ri-notification-3-line"></i>
+                            </div>
+
+                            <div class="notif-content">
+                                <div class="notif-title">${escapeHtml(row.judul)}</div>
+                                <p>${escapeHtml(row.pesan)}</p>
+
+                                <div class="notif-meta">
+                                    ${escapeHtml(row.name)} · ${escapeHtml(row.created_at)}
+                                </div>
+
+                                <span class="notif-status ${isRead ? 'read' : 'unread'}">
+                                    ${isRead ? 'Sudah dibaca' : 'Belum dibaca'}
+                                </span>
+                            </div>
+                        </article>
+                    `;
+                }).join('')
+                : `<div class="empty-box">Belum ada notifikasi.</div>`;
+        } catch (error) {
+            console.warn('Realtime log gagal dimuat:', error);
+        }
+    }
+
+    loadRealtimeLogs();
+    setInterval(loadRealtimeLogs, 10000);
+})();
+</script>
 
 <?= $this->endSection() ?>

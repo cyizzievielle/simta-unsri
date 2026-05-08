@@ -22,7 +22,7 @@ class Pembimbing extends BaseController
         ];
 
         if (! $this->validate($rules)) {
-            return redirect()->back()->with('error', 'Data permohonan tidak valid.');
+            return redirect()->back()->withInput()->with('error', 'Data permohonan tidak valid.');
         }
 
         $db = Database::connect();
@@ -37,9 +37,15 @@ class Pembimbing extends BaseController
         }
 
         $dosenId         = (int) $this->request->getPost('dosen_id');
-        $jenisPembimbing = $this->request->getPost('jenis_pembimbing');
+        $jenisPembimbing = trim((string) $this->request->getPost('jenis_pembimbing'));
         $catatan         = trim((string) $this->request->getPost('catatan'));
-        $periodeId       = 1;
+
+        $periodeAktif = $db->table('periode_akademik')
+            ->where('is_active', 1)
+            ->get()
+            ->getRowArray();
+
+        $periodeId = (int) ($periodeAktif['id'] ?? 1);
 
         $cekAktif = $db->table('pembimbing_mahasiswa')
             ->where('mahasiswa_id', $mahasiswa['id'])
@@ -75,9 +81,8 @@ class Pembimbing extends BaseController
             ->where('status_aktif', 1)
             ->countAllResults();
 
-        $status = 'menunggu';
-        if ($kuotaAktif >= (int) $dosen['kuota_maksimal']) {
-            $status = 'kuota_penuh';
+        if ($kuotaAktif >= (int) ($dosen['kuota_maksimal'] ?? 25)) {
+            return redirect()->back()->with('error', 'Kuota dosen penuh. Silakan pilih dosen lain.');
         }
 
         $db->table('permohonan_pembimbing')->insert([
@@ -85,278 +90,33 @@ class Pembimbing extends BaseController
             'dosen_id'            => $dosenId,
             'periode_akademik_id' => $periodeId,
             'jenis_pembimbing'    => $jenisPembimbing,
-            'status'              => $status,
-            'catatan'             => $catatan ?: null,
+            'status'              => 'menunggu',
+            'catatan'             => $catatan !== '' ? $catatan : null,
             'tanggal_pengajuan'   => date('Y-m-d H:i:s'),
             'created_at'          => date('Y-m-d H:i:s'),
             'updated_at'          => date('Y-m-d H:i:s'),
         ]);
 
-        if ($status === 'kuota_penuh') {
-            return redirect()->back()->with('error', 'Kuota dosen penuh. Silakan pilih dosen lain.');
+        if (! empty($dosen['user_id'])) {
+            $this->kirimNotif(
+                (int) $dosen['user_id'],
+                'Permohonan Pembimbing Baru',
+                'Ada mahasiswa yang mengajukan permohonan bimbingan.',
+                'pembimbing',
+                base_url('/dosen/permohonan')
+            );
         }
 
         return redirect()->to('/pembimbing')->with('success', 'Permohonan pembimbing berhasil diajukan.');
     }
 
-public function responPermohonan(int $id)
-{
-    $userId = (int) session()->get('user_id');
-    $role   = session()->get('role');
-
-    if ($role !== 'dosen') {
-        return redirect()->to('/dashboard')->with('error', 'Akses ditolak.');
-    }
-
-    $status  = trim((string) $this->request->getPost('status'));
-    $catatan = trim((string) $this->request->getPost('catatan'));
-
-    if (! in_array($status, ['disetujui', 'ditolak'], true)) {
-        return redirect()->back()->with('error', 'Status keputusan tidak valid.');
-    }
-
-    $db = \Config\Database::connect();
-
-    $dosen = $db->table('dosen')
-        ->where('user_id', $userId)
-        ->get()
-        ->getRowArray();
-
-    if (! $dosen) {
-        return redirect()->to('/dashboard')->with('error', 'Data dosen tidak ditemukan.');
-    }
-
-    $permohonan = $db->table('permohonan_pembimbing')
-        ->where('id', $id)
-        ->where('dosen_id', $dosen['id'])
-        ->get()
-        ->getRowArray();
-
-    if (! $permohonan) {
-        return redirect()->to('/dosen/permohonan')->with('error', 'Permohonan tidak ditemukan.');
-    }
-
-    if (($permohonan['status'] ?? '') !== 'menunggu') {
-        return redirect()->to('/dosen/permohonan')->with('error', 'Permohonan ini sudah diproses sebelumnya.');
-    }
-
-    // ambil periode akademik aktif
-    $periodeAktif = $db->table('periode_akademik')
-        ->where('is_active', 1)
-        ->get()
-        ->getRowArray();
-
-    if (! $periodeAktif) {
-        return redirect()->to('/dosen/permohonan')->with('error', 'Periode akademik aktif tidak ditemukan.');
-    }
-
-    $db->transStart();
-
-    $db->table('permohonan_pembimbing')
-        ->where('id', $id)
-        ->update([
-            'status'         => $status,
-            'catatan'        => $catatan !== '' ? $catatan : null,
-            'tanggal_respon' => date('Y-m-d H:i:s'),
-            'updated_at'     => date('Y-m-d H:i:s'),
-        ]);
-
-    if ($status === 'disetujui') {
-        $sudahAda = $db->table('pembimbing_mahasiswa')
-            ->where('mahasiswa_id', $permohonan['mahasiswa_id'])
-            ->where('jenis_pembimbing', $permohonan['jenis_pembimbing'])
-            ->where('status_aktif', 1)
-            ->countAllResults();
-
-        if ($sudahAda === 0) {
-            $db->table('pembimbing_mahasiswa')->insert([
-                'mahasiswa_id'        => $permohonan['mahasiswa_id'],
-                'dosen_id'            => $permohonan['dosen_id'],
-                'periode_akademik_id' => $periodeAktif['id'],
-                'jenis_pembimbing'    => $permohonan['jenis_pembimbing'],
-                'status_aktif'        => 1,
-                'tanggal_penetapan'   => date('Y-m-d H:i:s'),
-                'created_at'          => date('Y-m-d H:i:s'),
-                'updated_at'          => date('Y-m-d H:i:s'),
-            ]);
-        }
-
-        $db->table('permohonan_pembimbing')
-            ->where('mahasiswa_id', $permohonan['mahasiswa_id'])
-            ->where('jenis_pembimbing', $permohonan['jenis_pembimbing'])
-            ->where('id !=', $permohonan['id'])
-            ->where('status', 'menunggu')
-            ->update([
-                'status'         => 'ditolak',
-                'catatan'        => 'Permohonan otomatis ditutup karena mahasiswa sudah memiliki pembimbing untuk jenis ini.',
-                'tanggal_respon' => date('Y-m-d H:i:s'),
-                'updated_at'     => date('Y-m-d H:i:s'),
-            ]);
-    }
-
-    $db->transComplete();
-
-    if (! $db->transStatus()) {
-        $error = $db->error();
-        return redirect()->to('/dosen/permohonan')->with('error', 'Gagal memproses permohonan. ' . ($error['message'] ?? ''));
-    }
-
-    return redirect()->to('/dosen/permohonan')->with('success', 'Permohonan berhasil diproses.');
-}
-
-public function detailPermohonan(int $id)
-{
-    $userId = (int) session()->get('user_id');
-    $role   = session()->get('role');
-
-    if ($role !== 'dosen') {
-        return redirect()->to('/dashboard')->with('error', 'Akses ditolak.');
-    }
-
-    $db = \Config\Database::connect();
-
-    $dosen = $db->table('dosen')
-        ->where('user_id', $userId)
-        ->get()
-        ->getRowArray();
-
-    if (! $dosen) {
-        return redirect()->to('/dashboard')->with('error', 'Data dosen tidak ditemukan.');
-    }
-
-    $permohonan = $db->table('permohonan_pembimbing pp')
-        ->select('pp.*, um.name AS nama_mahasiswa, m.nim')
-        ->join('mahasiswa m', 'm.id = pp.mahasiswa_id')
-        ->join('users um', 'um.id = m.user_id')
-        ->where('pp.id', $id)
-        ->where('pp.dosen_id', $dosen['id'])
-        ->get()
-        ->getRowArray();
-
-    if (! $permohonan) {
-        return redirect()->to('/dosen/permohonan')->with('error', 'Permohonan tidak ditemukan.');
-    }
-
-    return view('dashboard/permohonan_dosen_detail', [
-        'title'        => 'Detail Permohonan Pembimbing',
-        'pageTitle'    => 'Detail Permohonan Pembimbing',
-        'activeMenu'   => 'permohonan_dosen',
-        'permohonan'   => $permohonan,
-    ]);
-}
-
-public function permohonanDosen()
-{
-    $userId = (int) session()->get('user_id');
-    $role   = session()->get('role');
-
-    if ($role !== 'dosen') {
-        return redirect()->to('/dashboard')->with('error', 'Akses ditolak.');
-    }
-
-    $db = \Config\Database::connect();
-
-    $dosen = $db->table('dosen')
-        ->where('user_id', $userId)
-        ->get()
-        ->getRowArray();
-
-    if (! $dosen) {
-        return redirect()->to('/dashboard')->with('error', 'Data dosen tidak ditemukan.');
-    }
-
-    $keyword = trim((string) $this->request->getGet('q'));
-    $jenis   = trim((string) $this->request->getGet('jenis'));
-    $status  = trim((string) $this->request->getGet('status'));
-    $perPage = (int) ($this->request->getGet('per_page') ?: 10);
-    $page    = max(1, (int) ($this->request->getGet('page') ?: 1));
-
-    if (! in_array($perPage, [10, 50, 100], true)) {
-        $perPage = 10;
-    }
-
-    $builder = $db->table('permohonan_pembimbing pp')
-        ->select('pp.*, um.name AS nama_mahasiswa, m.nim')
-        ->join('mahasiswa m', 'm.id = pp.mahasiswa_id')
-        ->join('users um', 'um.id = m.user_id')
-        ->where('pp.dosen_id', $dosen['id']);
-
-    if ($keyword !== '') {
-        $builder->groupStart()
-            ->like('um.name', $keyword)
-            ->orLike('m.nim', $keyword)
-            ->groupEnd();
-    }
-
-    if ($jenis !== '' && in_array($jenis, ['pembimbing_1', 'pembimbing_2'], true)) {
-        $builder->where('pp.jenis_pembimbing', $jenis);
-    }
-
-    if ($status !== '' && in_array($status, ['menunggu', 'disetujui', 'ditolak', 'kuota_penuh'], true)) {
-        $builder->where('pp.status', $status);
-    }
-
-    $totalRows = (clone $builder)->countAllResults();
-
-    $offset = ($page - 1) * $perPage;
-
-    $rows = (clone $builder)
-        ->orderBy('pp.tanggal_pengajuan', 'DESC')
-        ->limit($perPage, $offset)
-        ->get()
-        ->getResultArray();
-
-    $permohonanMenunggu = [];
-    $riwayatKeputusan = [];
-
-    foreach ($rows as $row) {
-        if (($row['status'] ?? '') === 'menunggu') {
-            $permohonanMenunggu[] = $row;
-        } else {
-            $riwayatKeputusan[] = $row;
-        }
-    }
-
-    $jumlahMenungguSidebar = $db->table('permohonan_pembimbing')
-        ->where('dosen_id', $dosen['id'])
-        ->where('status', 'menunggu')
-        ->countAllResults();
-
-    $totalPages = max(1, (int) ceil($totalRows / $perPage));
-    $startRow   = $totalRows > 0 ? $offset + 1 : 0;
-    $endRow     = min($offset + $perPage, $totalRows);
-
-    return view('dashboard/permohonan_dosen', [
-        'title'                 => 'Permohonan Pembimbing',
-        'pageTitle'             => 'Permohonan Pembimbing',
-        'activeMenu'            => 'permohonan_dosen',
-
-        'permohonanMenunggu'    => $permohonanMenunggu,
-        'riwayatKeputusan'      => $riwayatKeputusan,
-
-        'jumlahMenunggu'        => $jumlahMenungguSidebar,
-        'jumlahMenungguSidebar' => $jumlahMenungguSidebar,
-
-        'keyword'               => $keyword,
-        'jenis'                 => $jenis,
-        'status'                => $status,
-
-        'perPage'               => $perPage,
-        'page'                  => $page,
-        'totalRows'             => $totalRows,
-        'totalPages'            => $totalPages,
-        'startRow'              => $startRow,
-        'endRow'                => $endRow,
-    ]);
-}
-
-    public function setujui(int $id)
+    public function permohonanDosen()
     {
         $userId = (int) session()->get('user_id');
         $role   = session()->get('role');
 
         if ($role !== 'dosen') {
-            return redirect()->back()->with('error', 'Akses ditolak.');
+            return redirect()->to('/dashboard')->with('error', 'Akses ditolak.');
         }
 
         $db = Database::connect();
@@ -367,7 +127,172 @@ public function permohonanDosen()
             ->getRowArray();
 
         if (! $dosen) {
-            return redirect()->back()->with('error', 'Data dosen tidak ditemukan.');
+            return redirect()->to('/dashboard')->with('error', 'Data dosen tidak ditemukan.');
+        }
+
+        $keyword = trim((string) $this->request->getGet('q'));
+        $jenis   = trim((string) $this->request->getGet('jenis'));
+        $status  = trim((string) $this->request->getGet('status'));
+        $perPage = (int) ($this->request->getGet('per_page') ?: 10);
+        $page    = max(1, (int) ($this->request->getGet('page') ?: 1));
+
+        if (! in_array($perPage, [10, 50, 100], true)) {
+            $perPage = 10;
+        }
+
+        $builder = $db->table('permohonan_pembimbing pp')
+            ->select('pp.*, um.name AS nama_mahasiswa, m.nim')
+            ->join('mahasiswa m', 'm.id = pp.mahasiswa_id', 'left')
+            ->join('users um', 'um.id = m.user_id', 'left')
+            ->where('pp.dosen_id', $dosen['id']);
+
+        if ($keyword !== '') {
+            $builder->groupStart()
+                ->like('um.name', $keyword)
+                ->orLike('m.nim', $keyword)
+                ->groupEnd();
+        }
+
+        if ($jenis !== '' && in_array($jenis, ['pembimbing_1', 'pembimbing_2'], true)) {
+            $builder->where('pp.jenis_pembimbing', $jenis);
+        }
+
+        if ($status !== '' && in_array($status, ['menunggu', 'disetujui', 'ditolak', 'kuota_penuh'], true)) {
+            $builder->where('pp.status', $status);
+        }
+
+        $totalRows = (clone $builder)->countAllResults();
+        $offset    = ($page - 1) * $perPage;
+
+        $rows = (clone $builder)
+            ->orderBy('pp.tanggal_pengajuan', 'DESC')
+            ->limit($perPage, $offset)
+            ->get()
+            ->getResultArray();
+
+        $permohonanMenunggu = [];
+        $riwayatKeputusan   = [];
+
+        foreach ($rows as $row) {
+            if (($row['status'] ?? '') === 'menunggu') {
+                $permohonanMenunggu[] = $row;
+            } else {
+                $riwayatKeputusan[] = $row;
+            }
+        }
+
+        $jumlahMenungguSidebar = $db->table('permohonan_pembimbing')
+            ->where('dosen_id', $dosen['id'])
+            ->where('status', 'menunggu')
+            ->countAllResults();
+
+        return view('dashboard/permohonan_dosen', [
+            'title'                 => 'Permohonan Pembimbing',
+            'pageTitle'             => 'Permohonan Pembimbing',
+            'pageSubtitle'          => 'Kelola permohonan bimbingan mahasiswa',
+            'activeMenu'            => 'permohonan_dosen',
+
+            'permohonanMenunggu'    => $permohonanMenunggu,
+            'riwayatKeputusan'      => $riwayatKeputusan,
+            'jumlahMenunggu'        => $jumlahMenungguSidebar,
+            'jumlahMenungguSidebar' => $jumlahMenungguSidebar,
+
+            'keyword'               => $keyword,
+            'jenis'                 => $jenis,
+            'status'                => $status,
+            'perPage'               => $perPage,
+            'page'                  => $page,
+            'totalRows'             => $totalRows,
+            'totalPages'            => max(1, (int) ceil($totalRows / $perPage)),
+            'startRow'              => $totalRows > 0 ? $offset + 1 : 0,
+            'endRow'                => min($offset + $perPage, $totalRows),
+        ]);
+    }
+
+    public function detailPermohonan(int $id)
+    {
+        $userId = (int) session()->get('user_id');
+        $role   = session()->get('role');
+
+        if ($role !== 'dosen') {
+            return redirect()->to('/dashboard')->with('error', 'Akses ditolak.');
+        }
+
+        $db = Database::connect();
+
+        $dosen = $db->table('dosen')
+            ->where('user_id', $userId)
+            ->get()
+            ->getRowArray();
+
+        if (! $dosen) {
+            return redirect()->to('/dashboard')->with('error', 'Data dosen tidak ditemukan.');
+        }
+
+        $permohonan = $db->table('permohonan_pembimbing pp')
+            ->select('pp.*, um.name AS nama_mahasiswa, m.nim')
+            ->join('mahasiswa m', 'm.id = pp.mahasiswa_id', 'left')
+            ->join('users um', 'um.id = m.user_id', 'left')
+            ->where('pp.id', $id)
+            ->where('pp.dosen_id', $dosen['id'])
+            ->get()
+            ->getRowArray();
+
+        if (! $permohonan) {
+            return redirect()->to('/dosen/permohonan')->with('error', 'Permohonan tidak ditemukan.');
+        }
+
+        return view('dashboard/permohonan_dosen_detail', [
+            'title'      => 'Detail Permohonan Pembimbing',
+            'pageTitle'  => 'Detail Permohonan Pembimbing',
+            'activeMenu' => 'permohonan_dosen',
+            'permohonan' => $permohonan,
+        ]);
+    }
+
+    public function setujui(int $id)
+    {
+        return $this->prosesKeputusan($id, 'disetujui');
+    }
+
+    public function tolak(int $id)
+    {
+        return $this->prosesKeputusan($id, 'ditolak');
+    }
+
+    public function responPermohonan(int $id)
+    {
+        $status = trim((string) $this->request->getPost('status'));
+
+        if (! in_array($status, ['disetujui', 'ditolak'], true)) {
+            return redirect()->back()->with('error', 'Status keputusan tidak valid.');
+        }
+
+        return $this->prosesKeputusan($id, $status);
+    }
+
+    private function prosesKeputusan(int $id, string $status)
+    {
+        $userId = (int) session()->get('user_id');
+        $role   = session()->get('role');
+
+        if ($role !== 'dosen') {
+            return redirect()->to('/dashboard')->with('error', 'Akses ditolak.');
+        }
+
+        if (! in_array($status, ['disetujui', 'ditolak'], true)) {
+            return redirect()->back()->with('error', 'Status keputusan tidak valid.');
+        }
+
+        $db = Database::connect();
+
+        $dosen = $db->table('dosen')
+            ->where('user_id', $userId)
+            ->get()
+            ->getRowArray();
+
+        if (! $dosen) {
+            return redirect()->to('/dashboard')->with('error', 'Data dosen tidak ditemukan.');
         }
 
         $permohonan = $db->table('permohonan_pembimbing')
@@ -377,123 +302,120 @@ public function permohonanDosen()
             ->getRowArray();
 
         if (! $permohonan) {
-            return redirect()->back()->with('error', 'Permohonan tidak ditemukan.');
+            return redirect()->to('/dosen/permohonan')->with('error', 'Permohonan tidak ditemukan.');
         }
 
-        if ($permohonan['status'] !== 'menunggu') {
-            return redirect()->back()->with('error', 'Permohonan ini sudah diproses.');
+        if (($permohonan['status'] ?? '') !== 'menunggu') {
+            return redirect()->to('/dosen/permohonan')->with('error', 'Permohonan ini sudah diproses sebelumnya.');
         }
 
-        $kuotaAktif = $db->table('pembimbing_mahasiswa')
-            ->where('dosen_id', $dosen['id'])
-            ->where('status_aktif', 1)
-            ->countAllResults();
+        $catatan = trim((string) $this->request->getPost('catatan'));
 
-        if ($kuotaAktif >= (int) $dosen['kuota_maksimal']) {
-            $db->table('permohonan_pembimbing')
-                ->where('id', $id)
-                ->update([
-                    'status'         => 'kuota_penuh',
-                    'tanggal_respon' => date('Y-m-d H:i:s'),
-                    'updated_at'     => date('Y-m-d H:i:s'),
-                ]);
+        $periodeAktif = $db->table('periode_akademik')
+            ->where('is_active', 1)
+            ->get()
+            ->getRowArray();
 
-            return redirect()->back()->with('error', 'Kuota bimbingan sudah penuh.');
-        }
+        $periodeId = (int) ($periodeAktif['id'] ?? ($permohonan['periode_akademik_id'] ?? 1));
 
-        $cekSudahAda = $db->table('pembimbing_mahasiswa')
-            ->where('mahasiswa_id', $permohonan['mahasiswa_id'])
-            ->where('jenis_pembimbing', $permohonan['jenis_pembimbing'])
-            ->where('status_aktif', 1)
-            ->countAllResults();
-
-        if ($cekSudahAda > 0) {
-            return redirect()->back()->with('error', 'Mahasiswa sudah memiliki pembimbing aktif untuk jenis ini.');
-        }
+        $mahasiswa = $db->table('mahasiswa')
+            ->where('id', $permohonan['mahasiswa_id'])
+            ->get()
+            ->getRowArray();
 
         $db->transStart();
 
         $db->table('permohonan_pembimbing')
             ->where('id', $id)
             ->update([
-                'status'         => 'disetujui',
+                'status'         => $status,
+                'catatan'        => $catatan !== '' ? $catatan : null,
                 'tanggal_respon' => date('Y-m-d H:i:s'),
                 'updated_at'     => date('Y-m-d H:i:s'),
             ]);
 
-        $db->table('pembimbing_mahasiswa')->insert([
-            'mahasiswa_id'        => $permohonan['mahasiswa_id'],
-            'dosen_id'            => $permohonan['dosen_id'],
-            'periode_akademik_id' => $permohonan['periode_akademik_id'],
-            'jenis_pembimbing'    => $permohonan['jenis_pembimbing'],
-            'status_aktif'        => 1,
-            'tanggal_penetapan'   => date('Y-m-d H:i:s'),
-            'created_at'          => date('Y-m-d H:i:s'),
-            'updated_at'          => date('Y-m-d H:i:s'),
-        ]);
+        if ($status === 'disetujui') {
+            $sudahAda = $db->table('pembimbing_mahasiswa')
+                ->where('mahasiswa_id', $permohonan['mahasiswa_id'])
+                ->where('jenis_pembimbing', $permohonan['jenis_pembimbing'])
+                ->where('status_aktif', 1)
+                ->countAllResults();
 
-        $db->table('permohonan_pembimbing')
-            ->where('mahasiswa_id', $permohonan['mahasiswa_id'])
-            ->where('jenis_pembimbing', $permohonan['jenis_pembimbing'])
-            ->where('status', 'menunggu')
-            ->where('id !=', $permohonan['id'])
-            ->update([
-                'status'         => 'ditolak',
-                'catatan'        => 'Ditutup otomatis karena mahasiswa sudah mendapatkan pembimbing.',
-                'tanggal_respon' => date('Y-m-d H:i:s'),
-                'updated_at'     => date('Y-m-d H:i:s'),
-            ]);
+            if ($sudahAda === 0) {
+                $db->table('pembimbing_mahasiswa')->insert([
+                    'mahasiswa_id'        => $permohonan['mahasiswa_id'],
+                    'dosen_id'            => $permohonan['dosen_id'],
+                    'periode_akademik_id' => $periodeId,
+                    'jenis_pembimbing'    => $permohonan['jenis_pembimbing'],
+                    'status_aktif'        => 1,
+                    'tanggal_penetapan'   => date('Y-m-d H:i:s'),
+                    'created_at'          => date('Y-m-d H:i:s'),
+                    'updated_at'          => date('Y-m-d H:i:s'),
+                ]);
+            }
+
+            $db->table('permohonan_pembimbing')
+                ->where('mahasiswa_id', $permohonan['mahasiswa_id'])
+                ->where('jenis_pembimbing', $permohonan['jenis_pembimbing'])
+                ->where('id !=', $permohonan['id'])
+                ->where('status', 'menunggu')
+                ->update([
+                    'status'         => 'ditolak',
+                    'catatan'        => 'Permohonan otomatis ditutup karena mahasiswa sudah memiliki pembimbing untuk jenis ini.',
+                    'tanggal_respon' => date('Y-m-d H:i:s'),
+                    'updated_at'     => date('Y-m-d H:i:s'),
+                ]);
+        }
 
         $db->transComplete();
 
-        return redirect()->back()->with('success', 'Permohonan berhasil disetujui.');
-    }
-
-    public function tolak(int $id)
-    {
-        $userId = (int) session()->get('user_id');
-        $role   = session()->get('role');
-
-        if ($role !== 'dosen') {
-            return redirect()->back()->with('error', 'Akses ditolak.');
+        if (! $db->transStatus()) {
+            $error = $db->error();
+            return redirect()->to('/dosen/permohonan')
+                ->with('error', 'Gagal memproses permohonan. ' . ($error['message'] ?? ''));
         }
 
-        $db = Database::connect();
+        if ($mahasiswa && ! empty($mahasiswa['user_id'])) {
+            if ($status === 'disetujui') {
+                buat_notifikasi(
+                    (int) $mahasiswa['user_id'],
+                    'Pembimbing Disetujui',
+                    'Permohonan pembimbing kamu telah disetujui dosen.',
+                    'success',
+                    base_url('/pembimbing')
+                );
 
-        $dosen = $db->table('dosen')
-            ->where('user_id', $userId)
-            ->get()
-            ->getRowArray();
+                catat_audit(
+                    'pembimbing',
+                    'approve',
+                    'Dosen menyetujui permohonan pembimbing mahasiswa.',
+                    $permohonan,
+                    [
+                        'status' => 'disetujui',
+                        'catatan' => $catatan !== '' ? $catatan : null,
+                    ]
+                );
+            } else {
+                buat_notifikasi(
+                    (int) $mahasiswa['user_id'],
+                    'Pembimbing Ditolak',
+                    'Permohonan pembimbing kamu ditolak. Silakan pilih dosen lain.',
+                    'danger',
+                    base_url('/pembimbing')
+                );
 
-        if (! $dosen) {
-            return redirect()->back()->with('error', 'Data dosen tidak ditemukan.');
+                catat_audit(
+                    'pembimbing',
+                    'reject',
+                    'Dosen menolak permohonan pembimbing mahasiswa.',
+                    $permohonan,
+                    [
+                        'status' => 'ditolak',
+                        'catatan' => $catatan !== '' ? $catatan : null,
+                    ]
+                );
+            }
         }
-
-        $permohonan = $db->table('permohonan_pembimbing')
-            ->where('id', $id)
-            ->where('dosen_id', $dosen['id'])
-            ->get()
-            ->getRowArray();
-
-        if (! $permohonan) {
-            return redirect()->back()->with('error', 'Permohonan tidak ditemukan.');
-        }
-
-        if ($permohonan['status'] !== 'menunggu') {
-            return redirect()->back()->with('error', 'Permohonan ini sudah diproses.');
-        }
-
-        $catatan = trim((string) $this->request->getPost('catatan'));
-
-        $db->table('permohonan_pembimbing')
-            ->where('id', $id)
-            ->update([
-                'status'         => 'ditolak',
-                'catatan'        => $catatan ?: 'Permohonan ditolak oleh dosen.',
-                'tanggal_respon' => date('Y-m-d H:i:s'),
-                'updated_at'     => date('Y-m-d H:i:s'),
-            ]);
-
-        return redirect()->back()->with('success', 'Permohonan berhasil ditolak.');
+        return redirect()->to('/dosen/permohonan')->with('success', 'Permohonan berhasil diproses.');
     }
 }

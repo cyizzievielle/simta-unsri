@@ -1227,7 +1227,7 @@ public function laporan()
     }
 
     $periodeId = (int) ($this->request->getGet('periode_id') ?: 0);
-
+    
     if ($periodeId <= 0) {
         $periodeAktifDefault = null;
 
@@ -1342,6 +1342,38 @@ public function laporan()
         'arsipJudul'      => $arsipJudul,
         'arsipProposal'   => $arsipProposal,
         'arsipSk'         => $arsipSk,
+    ]);
+}
+public function auditLogRealtime()
+{
+    if ($redirect = $this->guardAdmin()) {
+        return $this->response->setJSON([
+            'auditLogs'  => [],
+            'notifikasi' => [],
+        ]);
+    }
+
+    $db = \Config\Database::connect();
+
+    $auditLogs = $db->table('audit_logs al')
+        ->select('al.*, u.name')
+        ->join('users u', 'u.id = al.user_id', 'left')
+        ->orderBy('al.created_at', 'DESC')
+        ->limit(20)
+        ->get()
+        ->getResultArray();
+
+    $notifikasi = $db->table('notifikasi n')
+        ->select('n.*, u.name')
+        ->join('users u', 'u.id = n.user_id', 'left')
+        ->orderBy('n.created_at', 'DESC')
+        ->limit(12)
+        ->get()
+        ->getResultArray();
+
+    return $this->response->setJSON([
+        'auditLogs'  => $auditLogs,
+        'notifikasi' => $notifikasi,
     ]);
 }
 

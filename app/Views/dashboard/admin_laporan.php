@@ -3,7 +3,7 @@
 
 <?php
 $periodeList     = $periodeList ?? [];
-$periodeAktif    = $periodeAktif ?? null;
+$periodeAktif    = $periodeAktif ?? [];
 $summary         = $summary ?? [];
 $arsipPembimbing = $arsipPembimbing ?? [];
 $arsipJudul      = $arsipJudul ?? [];
@@ -57,43 +57,43 @@ $reportCards = [
         'label' => 'Permohonan',
         'value' => $summary['permohonan_total'] ?? 0,
         'desc'  => 'Total permohonan pembimbing',
-        'class' => 'stat-blue',
+        'class' => 'report-card-blue',
     ],
     [
         'label' => 'Pembimbing Disetujui',
         'value' => $summary['permohonan_disetujui'] ?? 0,
         'desc'  => 'Permohonan telah diterima',
-        'class' => 'stat-green',
+        'class' => 'report-card-green',
     ],
     [
         'label' => 'Judul Diajukan',
         'value' => $summary['judul_total'] ?? 0,
         'desc'  => 'Total judul semester ini',
-        'class' => 'stat-purple',
+        'class' => 'report-card-purple',
     ],
     [
         'label' => 'Judul Disetujui',
         'value' => $summary['judul_disetujui'] ?? 0,
         'desc'  => 'Judul telah disetujui',
-        'class' => 'stat-amber',
+        'class' => 'report-card-orange',
     ],
     [
         'label' => 'Proposal',
         'value' => $summary['proposal_total'] ?? 0,
         'desc'  => 'Proposal yang masuk',
-        'class' => 'stat-blue',
+        'class' => 'report-card-cyan',
     ],
     [
         'label' => 'Proposal Disetujui',
         'value' => $summary['proposal_disetujui'] ?? 0,
         'desc'  => 'Proposal sudah diterima',
-        'class' => 'stat-green',
+        'class' => 'report-card-pink',
     ],
     [
         'label' => 'SK Terbit',
         'value' => $summary['sk_total'] ?? 0,
         'desc'  => 'SK diterbitkan admin',
-        'class' => 'stat-slate',
+        'class' => 'report-card-lime',
     ],
 ];
 ?>
@@ -123,13 +123,19 @@ $reportCards = [
             <div class="filter-field">
                 <label>Periode Akademik</label>
 
-                <select name="periode_id">
+                <select name="periode_id" id="periode_id">
                     <?php foreach ($periodeList as $periode): ?>
+                        <?php
+                            $selected = (string) ($periodeAktif['id'] ?? '') === (string) ($periode['id'] ?? '');
+                            $label = ($periode['tahun_ajaran'] ?? '-') . ' - ' . ucfirst((string) ($periode['semester'] ?? '-'));
+                        ?>
+
                         <option
                             value="<?= esc((string) ($periode['id'] ?? '')) ?>"
-                            <?= (string) ($periode['id'] ?? '') === (string) $periodeId ? 'selected' : '' ?>
+                            <?= $selected ? 'selected' : '' ?>
                         >
-                            <?= esc($safe($periode['nama_periode'] ?? '-')) ?>
+                            <?= esc($label) ?>
+                            <?= (int) ($periode['is_active'] ?? 0) === 1 ? ' (Aktif)' : '' ?>
                         </option>
                     <?php endforeach; ?>
                 </select>

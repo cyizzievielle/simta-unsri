@@ -8,100 +8,154 @@ use CodeIgniter\Database\BaseConnection;
 
 class Judul extends BaseController
 {
-    public function simpan()
-    {
-        $userId = (int) session()->get('user_id');
-        $role   = session()->get('role');
+    public function index()
+{
+    $userId = (int) session()->get('user_id');
+    $role   = session()->get('role');
 
-        if ($role !== 'mahasiswa') {
-            return redirect()->back()->with('error', 'Akses ditolak.');
-        }
-
-        $rules = [
-            'judul'          => 'required|min_length[10]|max_length[255]',
-            'latar_belakang' => 'required|min_length[20]',
-            'bidang_topik'   => 'required|max_length[100]',
-            'kata_kunci'     => 'required|max_length[255]',
-        ];
-
-        if (! $this->validate($rules)) {
-            return redirect()->back()->withInput()->with('error', 'Data pengajuan judul belum lengkap atau tidak valid.');
-        }
-
-        $db = Database::connect();
-
-        $mahasiswa = $db->table('mahasiswa')
-            ->where('user_id', $userId)
-            ->get()
-            ->getRowArray();
-
-        if (! $mahasiswa) {
-            return redirect()->back()->with('error', 'Data mahasiswa tidak ditemukan.');
-        }
-$db = \Config\Database::connect();
-
-$judulAktif = $db->table('pengajuan_judul pj')
-    ->select('pj.*')
-    ->join('mahasiswa m', 'm.id = pj.mahasiswa_id')
-    ->where('m.user_id', session()->get('user_id'))
-    ->where('pj.status', 'disetujui')
-    ->orderBy('pj.id', 'DESC')
-    ->get()
-    ->getRowArray();
-
-        if ($judulAktif > 0) {
-            return redirect()->to('/pengajuan-judul')->with('error', 'Judul sudah disetujui. Anda tidak dapat mengajukan judul baru.');
-        }
-
-        $masihProses = $db->table('pengajuan_judul')
-            ->where('mahasiswa_id', $mahasiswa['id'])
-            ->whereIn('status', ['diajukan', 'direview'])
-            ->countAllResults();
-
-        if ($masihProses > 0) {
-            return redirect()->to('/pengajuan-judul')->with('error', 'Masih ada pengajuan judul yang sedang diproses.');
-        }
-
-        $judul         = trim((string) $this->request->getPost('judul'));
-        $latarBelakang = trim((string) $this->request->getPost('latar_belakang'));
-        $bidangTopik   = trim((string) $this->request->getPost('bidang_topik'));
-        $kataKunci     = trim((string) $this->request->getPost('kata_kunci'));
-
-        $judulNormalized = $this->normalizeJudul($judul);
-
-        [$similarityScore, $similarityFlag] = $this->hitungSimilarity($db, $judulNormalized);
-
-        $db->table('pengajuan_judul')->insert([
-            'mahasiswa_id'        => $mahasiswa['id'],
-            'periode_akademik_id' => 1,
-            'judul'               => $judul,
-            'judul_normalized'    => $judulNormalized,
-            'latar_belakang'      => $latarBelakang,
-            'bidang_topik'        => $bidangTopik,
-            'kata_kunci'          => $kataKunci,
-            'similarity_score'    => $similarityScore,
-            'similarity_flag'     => $similarityFlag,
-            'status'              => 'diajukan',
-            'versi_ke'            => 1,
-            'parent_id'           => null,
-            'tanggal_pengajuan'   => date('Y-m-d H:i:s'),
-            'created_at'          => date('Y-m-d H:i:s'),
-            'updated_at'          => date('Y-m-d H:i:s'),
-        ]);
-
-        $pengajuanId = $db->insertID();
-
-        $db->table('judul_similarity_logs')->insert([
-            'pengajuan_judul_id'     => $pengajuanId,
-            'compared_with_judul_id' => null,
-            'judul_pembanding'       => 'Pemeriksaan otomatis sistem',
-            'score'                  => $similarityScore,
-            'hasil'                  => $similarityFlag ? 'terindikasi_mirip' : 'aman',
-            'created_at'             => date('Y-m-d H:i:s'),
-        ]);
-
-        return redirect()->to('/pengajuan-judul')->with('success', 'Judul berhasil diajukan.');
+    if ($role !== 'mahasiswa') {
+        return redirect()->to('/dashboard')->with('error', 'Akses ditolak.');
     }
+
+    $db = \Config\Database::connect();
+
+    $mahasiswa = $db->table('mahasiswa')
+        ->where('user_id', $userId)
+        ->get()
+        ->getRowArray();
+
+    if (! $mahasiswa) {
+        return redirect()->to('/dashboard')->with('error', 'Data mahasiswa tidak ditemukan.');
+    }
+
+    $bolehAjukanJudul = $db->table('pembimbing_mahasiswa')
+        ->where('mahasiswa_id', $mahasiswa['id'])
+        ->where('status_aktif', 1)
+        ->countAllResults() > 0;
+
+    $pengajuanJudul = $db->table('pengajuan_judul')
+        ->where('mahasiswa_id', $mahasiswa['id'])
+        ->orderBy('id', 'DESC')
+        ->get()
+        ->getResultArray();
+
+    return view('dashboard/pengajuan_judul', [
+        'title'             => 'Pengajuan Judul',
+        'pageTitle'         => 'Pengajuan Judul',
+        'pageSubtitle'      => 'Kelola pengajuan dan revisi judul tugas akhir',
+        'activeMenu'        => 'pengajuan_judul',
+        'pengajuanJudul'    => $pengajuanJudul,
+        'bolehAjukanJudul'  => $bolehAjukanJudul,
+    ]);
+}
+
+public function simpan()
+{
+    $userId = (int) session()->get('user_id');
+    $role   = session()->get('role');
+
+    if ($role !== 'mahasiswa') {
+        return redirect()->back()->with('error', 'Akses ditolak.');
+    }
+
+    $rules = [
+        'judul'          => 'required|min_length[10]|max_length[255]',
+        'latar_belakang' => 'required|min_length[20]',
+        'bidang_topik'   => 'required|max_length[100]',
+        'kata_kunci'     => 'required|max_length[255]',
+    ];
+
+    if (! $this->validate($rules)) {
+        return redirect()->back()
+            ->withInput()
+            ->with('error', 'Data pengajuan belum lengkap atau tidak valid.');
+    }
+
+    $db = \Config\Database::connect();
+
+    $mahasiswa = $db->table('mahasiswa')
+        ->where('user_id', $userId)
+        ->get()
+        ->getRowArray();
+
+    if (! $mahasiswa) {
+        return redirect()->to('/pengajuan-judul')
+            ->with('error', 'Data mahasiswa tidak ditemukan.');
+    }
+
+    // WAJIB sudah punya minimal 1 pembimbing aktif
+    $bolehAjukanJudul = $db->table('pembimbing_mahasiswa')
+        ->where('mahasiswa_id', $mahasiswa['id'])
+        ->where('status_aktif', 1)
+        ->countAllResults() > 0;
+
+    if (! $bolehAjukanJudul) {
+        return redirect()->to('/pengajuan-judul')
+            ->with('error', 'Pengajuan judul hanya dapat dilakukan setelah minimal satu pembimbing disetujui.');
+    }
+
+    $judulAktif = $db->table('pengajuan_judul')
+        ->where('mahasiswa_id', $mahasiswa['id'])
+        ->where('status', 'disetujui')
+        ->countAllResults();
+
+    if ($judulAktif > 0) {
+        return redirect()->to('/pengajuan-judul')
+            ->with('error', 'Judul sudah disetujui. Anda tidak dapat mengajukan judul baru.');
+    }
+
+    $masihProses = $db->table('pengajuan_judul')
+        ->where('mahasiswa_id', $mahasiswa['id'])
+        ->whereIn('status', ['diajukan', 'direview'])
+        ->countAllResults();
+
+    if ($masihProses > 0) {
+        return redirect()->to('/pengajuan-judul')
+            ->with('error', 'Masih ada pengajuan judul yang sedang diproses.');
+    }
+
+    $judul         = trim((string) $this->request->getPost('judul'));
+    $latarBelakang = trim((string) $this->request->getPost('latar_belakang'));
+    $bidangTopik   = trim((string) $this->request->getPost('bidang_topik'));
+    $kataKunci     = trim((string) $this->request->getPost('kata_kunci'));
+
+    $judulNormalized = $this->normalizeJudul($judul);
+
+    [$similarityScore, $similarityFlag] = $this->hitungSimilarity($db, $judulNormalized);
+
+    $db->table('pengajuan_judul')->insert([
+        'mahasiswa_id'        => $mahasiswa['id'],
+        'periode_akademik_id' => 1,
+        'judul'               => $judul,
+        'judul_normalized'    => $judulNormalized,
+        'latar_belakang'      => $latarBelakang,
+        'bidang_topik'        => $bidangTopik,
+        'kata_kunci'          => $kataKunci,
+        'similarity_score'    => $similarityScore,
+        'similarity_flag'     => $similarityFlag,
+        'bolehAjukanJudul' => $bolehAjukanJudul,
+        'status'              => 'diajukan',
+        'versi_ke'            => 1,
+        'parent_id'           => null,
+        'tanggal_pengajuan'   => date('Y-m-d H:i:s'),
+        'created_at'          => date('Y-m-d H:i:s'),
+        'updated_at'          => date('Y-m-d H:i:s'),
+    ]);
+
+    $pengajuanId = $db->insertID();
+
+    $db->table('judul_similarity_logs')->insert([
+        'pengajuan_judul_id'     => $pengajuanId,
+        'compared_with_judul_id' => null,
+        'judul_pembanding'       => 'Pemeriksaan otomatis sistem',
+        'score'                  => $similarityScore,
+        'hasil'                  => $similarityFlag ? 'terindikasi_mirip' : 'aman',
+        'created_at'             => date('Y-m-d H:i:s'),
+    ]);
+
+    return redirect()->to('/pengajuan-judul')
+        ->with('success', 'Judul berhasil diajukan.');
+}
 
     public function formRevisi(int $id)
     {

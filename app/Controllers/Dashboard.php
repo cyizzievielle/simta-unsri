@@ -75,7 +75,7 @@ class Dashboard extends BaseController
                 ->getResultArray();
 
             $auditTerbaru = $db->table('audit_logs al')
-                ->select('al.aktivitas, al.entitas, al.deskripsi, al.created_at, u.name')
+                ->select('al.action, al.module, al.description, al.created_at, u.name')
                 ->join('users u', 'u.id = al.user_id', 'left')
                 ->orderBy('al.id', 'DESC')
                 ->limit(5)
@@ -260,6 +260,7 @@ if ($role === 'dosen') {
     }
 
     $dosenId = (int) $dosen['id'];
+    
 
     $totalBimbingan = $db->table('pembimbing_mahasiswa')
         ->where('dosen_id', $dosenId)
@@ -404,8 +405,15 @@ public function pembimbing()
 
     // ✅ LIST DOSEN UNTUK DIPILIH
     $dosenList = $db->table('dosen d')
-        ->select('d.*, u.name')
-        ->join('users u', 'u.id = d.user_id')
+        ->select('
+            d.*,
+            u.name AS nama_dosen,
+            COUNT(pm.id) AS jumlah_bimbingan
+        ')
+        ->join('users u', 'u.id = d.user_id', 'left')
+        ->join('pembimbing_mahasiswa pm', 'pm.dosen_id = d.id AND pm.status_aktif = 1', 'left')
+        ->groupBy('d.id')
+        ->orderBy('u.name', 'ASC')
         ->get()
         ->getResultArray();
 

@@ -38,49 +38,168 @@ $labelJenis = static function (mixed $jenis) use ($safe): string {
 
 <div class="pembimbing-page">
 
-    <section class="card-main">
-        <div class="page-head">
-            <div>
-                <h3>Pembimbing Aktif</h3>
-                <p>Dosen pembimbing yang sudah disetujui dan aktif membimbing kamu.</p>
+<section class="card-main pembimbing-active-section">
+    <div class="page-head pembimbing-head">
+        <div>
+            <h3>Pembimbing Tugas Akhir</h3>
+            <p>Dosen pembimbing yang sudah menyetujui dan aktif membimbing proses tugas akhir kamu.</p>
+        </div>
+    </div>
+
+    <?php if (! empty($pembimbingAktif) && is_array($pembimbingAktif)): ?>
+        <div class="pembimbing-grid-modern">
+            <?php foreach ($pembimbingAktif as $row): ?>
+                <?php $jenisPembimbing = $row['jenis_pembimbing'] ?? ''; ?>
+
+                <article class="dosen-card-modern">
+                    <div class="dosen-card-accent"></div>
+
+                    <div class="dosen-card-header">
+                        <div class="dosen-profile">
+                            <div class="dosen-avatar">
+                                <i class="ri-user-3-line"></i>
+                            </div>
+
+                            <div class="dosen-profile-text">
+                                <h4>
+                                    <?= esc($safe($row['nama_dosen'] ?? $row['nama'] ?? '-')) ?>
+                                </h4>
+                                <p>NIDN: <?= esc($safe($row['nidn'] ?? '-')) ?></p>
+                            </div>
+                        </div>
+
+                        <span class="badge <?= esc($badgeJenis($jenisPembimbing)) ?>">
+                            <?= esc($labelJenis($jenisPembimbing)) ?>
+                        </span>
+                    </div>
+
+                    <div class="dosen-detail-grid">
+                        <div class="dosen-detail-item">
+                            <span>No. HP</span>
+                            <strong><?= esc($safe($row['no_hp'] ?? '-')) ?></strong>
+                        </div>
+
+                        <div class="dosen-detail-item">
+                            <span>Status</span>
+                            <strong>
+                                <span class="badge badge-success">Aktif</span>
+                            </strong>
+                        </div>
+
+                        <div class="dosen-detail-item detail-wide">
+                            <span>Bidang Keahlian</span>
+                            <strong><?= esc($safe($row['bidang_keahlian'] ?? '-')) ?></strong>
+                        </div>
+
+                        <div class="dosen-detail-item detail-wide">
+                            <span>Tanggal Penetapan</span>
+                            <strong><?= esc($safe($row['tanggal_penetapan'] ?? '-')) ?></strong>
+                        </div>
+                    </div>
+                </article>
+            <?php endforeach; ?>
+        </div>
+    <?php else: ?>
+
+    <div class="proposal-waiting-card">
+
+        <div class="waiting-icon">
+            <i class="ri-user-follow-line"></i>
+        </div>
+
+        <div class="waiting-content">
+            <h4>Belum Ada Pembimbing Aktif</h4>
+
+            <p>
+                Kamu belum memiliki pembimbing yang disetujui.
+                Ajukan pembimbing terlebih dahulu dan tunggu persetujuan dosen
+                sebelum melanjutkan proses tugas akhir.
+            </p>
+
+            <div class="waiting-badge">
+                <i class="ri-time-line"></i>
+                Menunggu Persetujuan Pembimbing
             </div>
         </div>
 
-        <?php if (! empty($pembimbingAktif) && is_array($pembimbingAktif)): ?>
-            <div class="pembimbing-grid">
-                <?php foreach ($pembimbingAktif as $row): ?>
-                    <?php $jenisPembimbing = $row['jenis_pembimbing'] ?? ''; ?>
+    </div>
 
-                    <div class="dosen-card">
-                        <div class="dosen-card-top">
-                            <div>
-                                <div class="dosen-name">
-                                    <?= esc($safe($row['nama_dosen'] ?? $row['nama'] ?? '-')) ?>
-                                </div>
-                                <div class="dosen-small">
-                                    NIDN: <?= esc($safe($row['nidn'] ?? '-')) ?>
-                                </div>
-                            </div>
+<?php endif; ?>
+    </section>
 
-                            <span class="badge <?= esc($badgeJenis($jenisPembimbing)) ?>">
-                                <?= esc($labelJenis($jenisPembimbing)) ?>
-                            </span>
-                        </div>
+    <section class="card-main">
+        <div class="page-head">
+            <div>
+                <h3>Ajukan Pembimbing</h3>
+                <p>Klik tombol untuk memilih dosen pembimbing 1 atau pembimbing 2.</p>
+            </div>
 
-                        <div class="dosen-info">
-                            <div><strong>No. HP:</strong> <?= esc($safe($row['no_hp'] ?? '-')) ?></div>
-                            <div><strong>Bidang:</strong> <?= esc($safe($row['bidang_keahlian'] ?? '-')) ?></div>
-                            <div><strong>Status:</strong> <span class="badge badge-success">Aktif</span></div>
-                            <div><strong>Tanggal Penetapan:</strong> <?= esc($safe($row['tanggal_penetapan'] ?? '-')) ?></div>
-                        </div>
+            <button type="button" class="btn btn-primary" onclick="toggleFormPembimbing()">
+                + Ajukan Pembimbing
+            </button>
+        </div>
+
+        <div id="formPembimbing" class="form-panel">
+            <form action="<?= base_url('/pembimbing/ajukan') ?>" method="post">
+                <?= csrf_field() ?>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Jenis Pembimbing</label>
+                        <select name="jenis_pembimbing" class="input" required>
+                            <option value="">-- Pilih Jenis --</option>
+                            <option value="pembimbing_1">Pembimbing 1</option>
+                            <option value="pembimbing_2">Pembimbing 2</option>
+                        </select>
                     </div>
-                <?php endforeach; ?>
-            </div>
-        <?php else: ?>
-            <div class="empty-box">
-                Belum ada pembimbing aktif. Ajukan pembimbing terlebih dahulu, lalu tunggu persetujuan dosen.
-            </div>
-        <?php endif; ?>
+
+                <div class="form-group">
+                    <label>Pilih Dosen Pembimbing</label>
+
+                    <select name="dosen_id" class="input modern-select" required>
+                        <option value="">-- Pilih Dosen Pembimbing --</option>
+
+                        <?php foreach ($dosenList as $dosen): ?>
+
+                            <?php
+                                $kuotaMaks = (int) ($dosen['kuota_maksimal'] ?? 25);
+                                $kuotaTerpakai = (int) ($dosen['jumlah_bimbingan'] ?? 0);
+                                $sisaKuota = $kuotaMaks - $kuotaTerpakai;
+
+                                $isFull = $sisaKuota <= 0;
+                            ?>
+
+                            <option
+                                value="<?= esc($safe($dosen['id'] ?? '')) ?>"
+                                <?= $isFull ? 'disabled' : '' ?>
+                            >
+                                <?= esc($safe($dosen['nama_dosen'] ?? $dosen['nama'] ?? '-')) ?>
+
+                                <?php if (($dosen['nidn'] ?? '') !== ''): ?>
+                                    — <?= esc($safe($dosen['nidn'])) ?>
+                                <?php endif; ?>
+
+                                | Kuota:
+                                <?= $sisaKuota ?>/<?= $kuotaMaks ?>
+
+                                <?= $isFull ? '(PENUH)' : '' ?>
+                            </option>
+
+                        <?php endforeach; ?>
+                    </select>
+
+                    <small class="input-hint">
+                        Pilih dosen yang masih memiliki kuota bimbingan tersedia.
+                    </small>
+                </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Kirim Pengajuan</button>
+                    <button type="button" class="btn btn-outline" onclick="toggleFormPembimbing()">Batal</button>
+                </div>
+            </form>
+        </div>
     </section>
 
     <section class="card-main">
@@ -150,56 +269,6 @@ $labelJenis = static function (mixed $jenis) use ($safe): string {
         <?php endif; ?>
     </section>
 
-    <section class="card-main">
-        <div class="page-head">
-            <div>
-                <h3>Ajukan Pembimbing</h3>
-                <p>Klik tombol untuk memilih dosen pembimbing 1 atau pembimbing 2.</p>
-            </div>
-
-            <button type="button" class="btn btn-primary" onclick="toggleFormPembimbing()">
-                + Ajukan Pembimbing
-            </button>
-        </div>
-
-        <div id="formPembimbing" class="form-panel">
-            <form action="<?= base_url('/pembimbing/ajukan') ?>" method="post">
-                <?= csrf_field() ?>
-
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label>Jenis Pembimbing</label>
-                        <select name="jenis_pembimbing" class="input" required>
-                            <option value="">-- Pilih Jenis --</option>
-                            <option value="pembimbing_1">Pembimbing 1</option>
-                            <option value="pembimbing_2">Pembimbing 2</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Pilih Dosen</label>
-                        <select name="dosen_id" class="input" required>
-                            <option value="">-- Pilih Dosen --</option>
-
-                            <?php foreach ($dosenList as $dosen): ?>
-                                <option value="<?= esc($safe($dosen['id'] ?? '')) ?>">
-                                    <?= esc($safe($dosen['nama_dosen'] ?? $dosen['nama'] ?? '-')) ?>
-                                    <?php if (($dosen['nidn'] ?? '') !== ''): ?>
-                                        - <?= esc($safe($dosen['nidn'])) ?>
-                                    <?php endif; ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-actions">
-                    <button type="submit" class="btn btn-primary">Kirim Pengajuan</button>
-                    <button type="button" class="btn btn-outline" onclick="toggleFormPembimbing()">Batal</button>
-                </div>
-            </form>
-        </div>
-    </section>
 
 </div>
 
