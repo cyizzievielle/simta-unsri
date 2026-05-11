@@ -14,6 +14,14 @@ $totalPages         = $totalPages ?? 1;
 $startRow           = $startRow ?? 0;
 $endRow             = $endRow ?? 0;
 
+$totalPermohonanMenunggu = is_countable($permohonanMenunggu)
+    ? count($permohonanMenunggu)
+    : (int) $permohonanMenunggu;
+
+$totalRiwayatKeputusan = is_countable($riwayatKeputusan)
+    ? count($riwayatKeputusan)
+    : (int) $riwayatKeputusan;
+
 $safe = static function (mixed $value, string $default = '-'): string {
     if ($value === null || $value === '') return $default;
     if (is_array($value)) return implode(', ', array_map('strval', $value));
@@ -112,13 +120,13 @@ $buildPageUrl = static function (int $targetPage) use ($queryParams): string {
 
         <div class="stat-card stat-amber">
             <div class="stat-label">Menunggu Keputusan</div>
-            <div class="stat-value"><?= esc($safe(count($permohonanMenunggu), '0')) ?></div>
+            <div class="stat-value"><?= esc($safe($totalPermohonanMenunggu, '0')) ?></div>
             <div class="stat-desc">Perlu ditinjau dosen</div>
         </div>
 
         <div class="stat-card stat-green">
             <div class="stat-label">Riwayat Keputusan</div>
-            <div class="stat-value"><?= esc($safe(count($riwayatKeputusan), '0')) ?></div>
+            <div class="stat-value"><?= esc($safe($totalRiwayatKeputusan, '0')) ?></div>
             <div class="stat-desc">Data pada halaman ini</div>
         </div>
     </section>
@@ -133,7 +141,7 @@ $buildPageUrl = static function (int $targetPage) use ($queryParams): string {
 
         <?php if (! empty($permohonanMenunggu) && is_array($permohonanMenunggu)): ?>
             <div class="table-wrap request-table-wrap">
-                <table class="admin-table request-table">
+                <table class="admin-table request-table request-active-table">
                     <thead>
                         <tr>
                             <th>Mahasiswa</th>
@@ -162,43 +170,14 @@ $buildPageUrl = static function (int $targetPage) use ($queryParams): string {
                                 </td>
                                 <td><?= esc($safe($row['tanggal_pengajuan'] ?? '-')) ?></td>
                                 <td>
-                                    <a href="<?= base_url('/dosen/permohonan/detail/' . $safe($row['id'] ?? '')) ?>" class="icon-btn icon-open" title="Lihat Detail">👁</a>
+                                    <a href="<?= base_url('/dosen/permohonan/detail/' . $safe($row['id'] ?? '')) ?>" class="icon-btn icon-open" title="Lihat Detail">
+                                        <i class="ri-eye-line"></i>
+                                    </a>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
-            </div>
-
-            <div class="request-mobile-list">
-                <?php foreach ($permohonanMenunggu as $row): ?>
-                    <article class="request-mobile-card">
-                        <div class="request-mobile-top">
-                            <div>
-                                <strong><?= esc($safe($row['nama_mahasiswa'] ?? '-')) ?></strong>
-                                <span>NIM: <?= esc($safe($row['nim'] ?? '-')) ?></span>
-                            </div>
-                            <span class="badge <?= esc($badgeStatus($row['status'] ?? '')) ?>">
-                                <?= esc($statusLabel($row['status'] ?? '-')) ?>
-                            </span>
-                        </div>
-
-                        <div class="request-mobile-info">
-                            <div>
-                                <small>Jenis Pembimbing</small>
-                                <b><?= esc($labelJenis($row['jenis_pembimbing'] ?? '')) ?></b>
-                            </div>
-                            <div>
-                                <small>Tanggal Pengajuan</small>
-                                <b><?= esc($safe($row['tanggal_pengajuan'] ?? '-')) ?></b>
-                            </div>
-                        </div>
-
-                        <a href="<?= base_url('/dosen/permohonan/detail/' . $safe($row['id'] ?? '')) ?>" class="btn btn-primary request-mobile-btn">
-                            Lihat Detail
-                        </a>
-                    </article>
-                <?php endforeach; ?>
             </div>
         <?php else: ?>
             <div class="empty-box">
@@ -251,7 +230,7 @@ $buildPageUrl = static function (int $targetPage) use ($queryParams): string {
 
         <?php if (! empty($riwayatKeputusan) && is_array($riwayatKeputusan)): ?>
             <div class="table-wrap request-table-wrap">
-                <table class="admin-table request-table">
+                <table class="admin-table request-table request-history-table">
                     <thead>
                         <tr>
                             <th>Mahasiswa</th>
@@ -298,8 +277,8 @@ $buildPageUrl = static function (int $targetPage) use ($queryParams): string {
                                             "nim" => $safe($row["nim"] ?? "-"),
                                             "jenis" => $jenisLabel($row["jenis_pembimbing"] ?? ""),
                                             "status" => $statusLabel($row["status"] ?? ""),
-                                            "tanggal" => $safe($row["created_at"] ?? "-"),
-                                            "respon" => $safe($row["updated_at"] ?? "-"),
+                                            "pengajuan" => $safe($row["tanggal_pengajuan"] ?? "-"),
+                                            "respon" => $safe($row["tanggal_respon"] ?? "-"),
                                             "catatan" => $safe($row["catatan"] ?? "Tidak ada catatan"),
                                         ]), "attr") ?>'
                                     >
@@ -319,45 +298,6 @@ $buildPageUrl = static function (int $targetPage) use ($queryParams): string {
                         <?php endforeach; ?>
                     </tbody>
                 </table>
-            </div>
-
-            <div class="request-mobile-list">
-                <?php foreach ($riwayatKeputusan as $row): ?>
-                    <article class="request-mobile-card">
-                        <div class="request-mobile-top">
-                            <div>
-                                <strong><?= esc($safe($row['nama_mahasiswa'] ?? '-')) ?></strong>
-                                <span>NIM: <?= esc($safe($row['nim'] ?? '-')) ?></span>
-                            </div>
-                            <span class="badge <?= esc($badgeStatus($row['status'] ?? '')) ?>">
-                                <?= esc($statusLabel($row['status'] ?? '-')) ?>
-                            </span>
-                        </div>
-
-                        <div class="request-mobile-info">
-                            <div>
-                                <small>Jenis Pembimbing</small>
-                                <b><?= esc($labelJenis($row['jenis_pembimbing'] ?? '')) ?></b>
-                            </div>
-                            <div>
-                                <small>Pengajuan</small>
-                                <b><?= esc($safe($row['tanggal_pengajuan'] ?? '-')) ?></b>
-                            </div>
-                            <div>
-                                <small>Respon</small>
-                                <b><?= esc($safe($row['tanggal_respon'] ?? '-')) ?></b>
-                            </div>
-                            <div>
-                                <small>Catatan</small>
-                                <b><?= esc($safe($row['catatan'] ?? '-')) ?></b>
-                            </div>
-                        </div>
-
-                        <button type="button" class="btn btn-primary request-mobile-btn table-detail-btn" data-detail="<?= esc($detailJson($row), 'attr') ?>">
-                            Lihat Detail Keputusan
-                        </button>
-                    </article>
-                <?php endforeach; ?>
             </div>
         <?php else: ?>
             <div class="empty-box">

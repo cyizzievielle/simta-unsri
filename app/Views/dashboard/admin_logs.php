@@ -26,6 +26,16 @@ $activityClass = static function (mixed $value) use ($safe): string {
         default                                => 'log-default',
     };
 };
+
+$auditValue = static function (array $row, array $keys, string $default = '-') use ($safe): string {
+    foreach ($keys as $key) {
+        if (array_key_exists($key, $row) && $row[$key] !== null && $row[$key] !== '') {
+            return $safe($row[$key], $default);
+        }
+    }
+
+    return $default;
+};
 ?>
 
 <div class="admin-logs-page">
@@ -94,17 +104,18 @@ $activityClass = static function (mixed $value) use ($safe): string {
                                     </td>
 
                                     <td>
-                                        <span class="log-pill <?= esc($activityClass($row['aktivitas'] ?? '')) ?>">
-                                            <?= esc($safe($row['aktivitas'] ?? '-')) ?>
+                                        <?php $activity = $auditValue($row, ['aktivitas', 'action']); ?>
+                                        <span class="log-pill <?= esc($activityClass($activity)) ?>">
+                                            <?= esc($activity) ?>
                                         </span>
                                     </td>
 
-                                    <td><?= esc($safe($row['entitas'] ?? '-')) ?></td>
-                                    <td><?= esc($safe($row['entitas_id'] ?? '-')) ?></td>
+                                    <td><?= esc($auditValue($row, ['entitas', 'target_type', 'module'])) ?></td>
+                                    <td><?= esc($auditValue($row, ['entitas_id', 'target_id'])) ?></td>
 
                                     <td>
                                         <div class="log-desc">
-                                            <?= esc($safe($row['deskripsi'] ?? '-')) ?>
+                                            <?= esc($auditValue($row, ['deskripsi', 'description'])) ?>
                                         </div>
                                     </td>
 
@@ -153,7 +164,7 @@ $activityClass = static function (mixed $value) use ($safe): string {
                                 </p>
 
                                 <div class="notif-meta">
-                                    <?= esc($safe($row['name'] ?? '-')) ?> ·
+                                    <?= esc($safe($row['name'] ?? '-')) ?> &middot;
                                     <?= esc($safe($row['created_at'] ?? '-')) ?>
                                 </div>
 
@@ -203,6 +214,16 @@ $activityClass = static function (mixed $value) use ($safe): string {
         return 'log-default';
     }
 
+    function firstValue(row, keys, fallback = '-') {
+        for (const key of keys) {
+            if (row && row[key] !== undefined && row[key] !== null && row[key] !== '') {
+                return row[key];
+            }
+        }
+
+        return fallback;
+    }
+
     async function loadRealtimeLogs() {
         try {
             const response = await fetch('<?= base_url('/admin/audit-log/realtime') ?>', {
@@ -226,13 +247,13 @@ $activityClass = static function (mixed $value) use ($safe): string {
                     <tr>
                         <td><strong>${escapeHtml(row.name)}</strong></td>
                         <td>
-                            <span class="log-pill ${activityClass(row.aktivitas)}">
-                                ${escapeHtml(row.aktivitas)}
+                            <span class="log-pill ${activityClass(firstValue(row, ['aktivitas', 'action']))}">
+                                ${escapeHtml(firstValue(row, ['aktivitas', 'action']))}
                             </span>
                         </td>
-                        <td>${escapeHtml(row.entitas)}</td>
-                        <td>${escapeHtml(row.entitas_id)}</td>
-                        <td><div class="log-desc">${escapeHtml(row.deskripsi)}</div></td>
+                        <td>${escapeHtml(firstValue(row, ['entitas', 'target_type', 'module']))}</td>
+                        <td>${escapeHtml(firstValue(row, ['entitas_id', 'target_id']))}</td>
+                        <td><div class="log-desc">${escapeHtml(firstValue(row, ['deskripsi', 'description']))}</div></td>
                         <td><span class="log-time">${escapeHtml(row.created_at)}</span></td>
                     </tr>
                 `).join('')
@@ -253,7 +274,7 @@ $activityClass = static function (mixed $value) use ($safe): string {
                                 <p>${escapeHtml(row.pesan)}</p>
 
                                 <div class="notif-meta">
-                                    ${escapeHtml(row.name)} · ${escapeHtml(row.created_at)}
+                                    ${escapeHtml(row.name)} &middot; ${escapeHtml(row.created_at)}
                                 </div>
 
                                 <span class="notif-status ${isRead ? 'read' : 'unread'}">

@@ -78,6 +78,7 @@ $routes->group('', ['filter' => 'auth'], static function ($routes) {
 
     $routes->get('pengajuan-judul', 'Judul::index');
     $routes->post('pengajuan-judul/simpan', 'Judul::simpan');
+    $routes->post('pengajuan-judul/cek-similarity', 'Judul::cekSimilarity');
 
     // dosen proposal
     $routes->get('/dosen/proposal-ta', 'Proposal::indexDosen');
@@ -97,10 +98,14 @@ $routes->group('', ['filter' => 'auth'], static function ($routes) {
     $routes->get('/notifikasi/read/(:num)', 'Notifikasi::read/$1');
     $routes->post('/notifikasi/read-all', 'Notifikasi::readAll');
 
+    //chat 
     $routes->get('/chat', 'Chat::index');
     $routes->get('/chat/room/(:num)', 'Chat::room/$1');
     $routes->post('/chat/send', 'Chat::send');
     $routes->get('/chat/messages/(:num)', 'Chat::messages/$1');
+    $routes->get('/chat/status/(:num)', 'Chat::status/$1');
+    $routes->post('/chat/edit', 'Chat::edit');
+    $routes->post('/chat/delete', 'Chat::delete');  
 
     // admin
     $routes->group('admin', static function ($routes) {
@@ -142,5 +147,11 @@ $routes->group('', ['filter' => 'auth'], static function ($routes) {
         $routes->get('laporan/export/judul', 'Admin::exportJudulPdf');
         $routes->get('laporan/export/proposal', 'Admin::exportProposalPdf');
         $routes->get('laporan/export/sk', 'Admin::exportSkPdf');
+
+        // Activity Log / Audit Trail
+        $routes->get('activity-log', 'ActivityLog::index');
+        $routes->get('activity-log/export', 'ActivityLog::export');
+        $routes->get('activity-log/user/(:num)', 'ActivityLog::userDetail/$1');
+        $routes->post('activity-log/clear-old', 'ActivityLog::clearOldLogs');
     });
 });

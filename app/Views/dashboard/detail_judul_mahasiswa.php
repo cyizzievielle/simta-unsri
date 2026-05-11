@@ -2,11 +2,11 @@
 <?= $this->section('content') ?>
 
 <?php
-$judul   = $judul ?? $pengajuan ?? [];
-$reviews = $reviews ?? $reviewJudul ?? $riwayatReview ?? [];
-
-$pembimbing1 = $pembimbing1 ?? ($judul['pembimbing_1'] ?? null);
-$pembimbing2 = $pembimbing2 ?? ($judul['pembimbing_2'] ?? null);
+$judul          = $judul ?? [];
+$reviews        = $reviews ?? [];
+$similarityLogs = $similarityLogs ?? [];
+$pembimbing1    = $pembimbing1 ?? '-';
+$pembimbing2    = $pembimbing2 ?? '-';
 
 $safe = static function (mixed $value, string $default = '-'): string {
     if ($value === null || $value === '') return $default;
@@ -14,7 +14,10 @@ $safe = static function (mixed $value, string $default = '-'): string {
     return (string) $value;
 };
 
-$status = strtolower($safe($judul['status'] ?? '-', '-'));
+$cleanNote = static function (mixed $value): string {
+    $text = is_scalar($value) ? trim((string) $value) : '';
+    return $text !== '' ? $text : 'Belum ada catatan.';
+};
 
 $badgeStatus = static function (mixed $status) use ($safe): string {
     return match (strtolower($safe($status, ''))) {
@@ -22,89 +25,162 @@ $badgeStatus = static function (mixed $status) use ($safe): string {
         'revisi'    => 'badge-warning',
         'ditolak'   => 'badge-danger',
         'diajukan',
-        'direview',
-        'menunggu'  => 'badge-info',
+        'direview'  => 'badge-info',
         default     => 'badge-muted',
     };
 };
 
-$cleanNote = static function (mixed $text): string {
-    $raw = (string) ($text ?? '');
-    $clean = trim(strip_tags(html_entity_decode($raw)));
+$status = $safe($judul['status'] ?? '-');
 
-    return $clean !== '' ? $clean : 'Tidak ada catatan.';
-};
+$similarityScore = (float) ($judul['similarity_score'] ?? 0);
+
+$similarityClass = $similarityScore >= 80
+    ? 'danger'
+    : ($similarityScore >= 60 ? 'warning' : 'success');
+
+$similarityLabel = $similarityScore >= 80
+    ? 'Terlalu Mirip'
+    : ($similarityScore >= 60 ? 'Perlu Ditinjau' : 'Aman');
+
+$similarityDesc = $similarityScore >= 80
+    ? 'Judul memiliki kemiripan tinggi dan perlu diperiksa ulang.'
+    : ($similarityScore >= 60
+        ? 'Judul cukup mirip dengan judul lain, namun masih dapat ditinjau pembimbing.'
+        : 'Judul belum terdeteksi mirip signifikan dengan data yang ada.');
+
+$similarityLog = $similarityLogs[0] ?? null;
 ?>
 
 <div class="judul-detail-page">
+    <section class="judul-detail-hero">
+        <div>
+            <span class="judul-detail-kicker">
+                <i class="ri-file-search-fill"></i>
+                Detail Pengajuan
+            </span>
 
-    <div class="detail-actions">
-        <a href="<?= base_url('/pengajuan-judul') ?>" class="btn btn-outline">← Kembali</a>
+            <h2>Detail Pengajuan Judul</h2>
+            <p>Lihat status, pembimbing, hasil similarity, dan catatan review judul tugas akhir kamu.</p>
+        </div>
 
-        <?php if ($status === 'revisi'): ?>
-            <a href="<?= base_url('/pengajuan-judul/revisi/' . $safe($judul['id'] ?? '0')) ?>" class="btn btn-primary">
-                Ajukan Revisi
+        <div class="judul-detail-actions">
+            <a href="<?= base_url('/pengajuan-judul') ?>" class="btn btn-light">
+                <i class="ri-arrow-left-line"></i>
+                Kembali
             </a>
-        <?php endif; ?>
-    </div>
+
+            <?php if (in_array(($judul['status'] ?? ''), ['revisi', 'ditolak'], true)): ?>
+                <a href="<?= base_url('/pengajuan-judul/revisi/' . (int) ($judul['id'] ?? 0)) ?>" class="btn btn-primary">
+                    <i class="ri-edit-2-line"></i>
+                    Ajukan Revisi
+                </a>
+            <?php endif; ?>
+        </div>
+    </section>
 
     <div class="judul-detail-layout">
-
-        <section class="card-main">
-            <div class="page-head">
-                <div>
-                    <h3>Informasi Judul</h3>
-                    <p>Data utama judul tugas akhir yang kamu ajukan.</p>
+        <main class="judul-main">
+            <section class="card-main detail-main-card">
+                <div class="page-head">
+                    <div>
+                        <h3>Informasi Judul</h3>
+                        <p>Data utama judul tugas akhir yang kamu ajukan.</p>
+                    </div>
                 </div>
-            </div>
 
-            <div class="title-box">
-                <?= esc($safe($judul['judul'] ?? '-')) ?>
-            </div>
+                <div class="title-box">
+                    <?= esc($safe($judul['judul'] ?? '-')) ?>
+                </div>
 
-            <div class="info-grid">
-                <div class="info-chip">
-                    <span>Status</span>
-                    <strong>
-                        <span class="badge <?= esc($badgeStatus($status)) ?>">
-                            <?= esc($safe($judul['status'] ?? '-')) ?>
+                <div class="info-grid">
+                    <div class="info-chip">
+                        <span>Status</span>
+                        <strong>
+                            <span class="badge <?= esc($badgeStatus($status)) ?>">
+                                <?= esc($status) ?>
+                            </span>
+                        </strong>
+                    </div>
+
+                    <div class="info-chip">
+                        <span>Versi</span>
+                        <strong>v<?= esc($safe($judul['versi_ke'] ?? '1')) ?></strong>
+                    </div>
+
+                    <div class="info-chip">
+                        <span>Bidang Topik</span>
+                        <strong><?= esc($safe($judul['bidang_topik'] ?? '-')) ?></strong>
+                    </div>
+
+                    <div class="info-chip">
+                        <span>Kata Kunci</span>
+                        <strong><?= esc($safe($judul['kata_kunci'] ?? '-')) ?></strong>
+                    </div>
+
+                    <div class="info-chip">
+                        <span>Tanggal Pengajuan</span>
+                        <strong><?= esc($safe($judul['tanggal_pengajuan'] ?? $judul['created_at'] ?? '-')) ?></strong>
+                    </div>
+
+                    <div class="info-chip">
+                        <span>Similarity</span>
+                        <strong><?= esc((string) $similarityScore) ?>%</strong>
+                    </div>
+                </div>
+
+                <div class="latar-box">
+                    <h4>Latar Belakang</h4>
+                    <p><?= nl2br(esc($safe($judul['latar_belakang'] ?? '-'))) ?></p>
+                </div>
+            </section>
+
+            <section class="similarity-detail-card <?= esc($similarityClass) ?>">
+                <div class="similarity-detail-icon">
+                    <i class="ri-radar-line"></i>
+                </div>
+
+                <div class="similarity-detail-content">
+                    <div class="similarity-detail-head">
+                        <div>
+                            <h4>Analisis Kemiripan Judul</h4>
+                            <p><?= esc($similarityDesc) ?></p>
+                        </div>
+
+                        <span class="similarity-score-badge">
+                            <?= esc((string) $similarityScore) ?>%
                         </span>
-                    </strong>
-                </div>
+                    </div>
 
-                <div class="info-chip">
-                    <span>Versi</span>
-                    <strong>v<?= esc($safe($judul['versi_ke'] ?? '1')) ?></strong>
-                </div>
+                    <div class="similarity-detail-body">
+                        <div>
+                            <span>Status Similarity</span>
+                            <strong><?= esc($similarityLabel) ?></strong>
+                        </div>
 
-                <div class="info-chip">
-                    <span>Bidang Topik</span>
-                    <strong><?= esc($safe($judul['bidang_topik'] ?? '-')) ?></strong>
-                </div>
+                        <div>
+                            <span>Pembanding Terdekat</span>
+                            <strong>
+                                <?= esc($safe($similarityLog['judul_pembanding'] ?? null, 'Tidak ada pembanding signifikan')) ?>
+                            </strong>
+                        </div>
 
-                <div class="info-chip">
-                    <span>Kata Kunci</span>
-                    <strong><?= esc($safe($judul['kata_kunci'] ?? '-')) ?></strong>
-                </div>
+                        <div>
+                            <span>Hasil Sistem</span>
+                            <strong>
+                                <?= esc($safe($similarityLog['hasil'] ?? null, $similarityScore >= 60 ? 'warning' : 'aman')) ?>
+                            </strong>
+                        </div>
 
-                <div class="info-chip">
-                    <span>Similarity</span>
-                    <strong>
-                        <?= esc(($safe($judul['similarity_score'] ?? '', '') !== '') ? $safe($judul['similarity_score']) . '%' : '-') ?>
-                    </strong>
+                        <div>
+                            <span>Skor Pembanding</span>
+                            <strong>
+                                <?= esc(isset($similarityLog['score']) ? (string) $similarityLog['score'] . '%' : (string) $similarityScore . '%') ?>
+                            </strong>
+                        </div>
+                    </div>
                 </div>
-
-                <div class="info-chip">
-                    <span>Tanggal Pengajuan</span>
-                    <strong><?= esc($safe($judul['tanggal_pengajuan'] ?? $judul['created_at'] ?? '-')) ?></strong>
-                </div>
-            </div>
-
-            <div class="latar-box">
-                <h4>Latar Belakang</h4>
-                <p><?= nl2br(esc($safe($judul['latar_belakang'] ?? '-'))) ?></p>
-            </div>
-        </section>
+            </section>
+        </main>
 
         <aside class="judul-side">
             <section class="card-main">
@@ -146,8 +222,8 @@ $cleanNote = static function (mixed $text): string {
                     <div class="review-list">
                         <?php foreach ($reviews as $review): ?>
                             <?php
-                                $statusReview = $safe($review['status_review'] ?? $review['status'] ?? '-');
-                                $catatan = $cleanNote($review['catatan'] ?? '');
+                            $statusReview = $safe($review['status_review'] ?? $review['status'] ?? '-');
+                            $catatan = $cleanNote($review['catatan'] ?? '');
                             ?>
 
                             <div class="review-card">
@@ -177,7 +253,6 @@ $cleanNote = static function (mixed $text): string {
                 <?php endif; ?>
             </section>
         </aside>
-
     </div>
 </div>
 

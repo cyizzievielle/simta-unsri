@@ -1,69 +1,129 @@
-# CodeIgniter 4 Application Starter
+# SIMTA MI UNSRI
 
-## What is CodeIgniter?
+SIMTA MI UNSRI adalah sistem informasi tugas akhir untuk membantu alur administrasi, pengajuan, review, dan arsip tugas akhir mahasiswa Manajemen Informatika Universitas Sriwijaya.
 
-CodeIgniter is a PHP full-stack web framework that is light, fast, flexible and secure.
-More information can be found at the [official site](https://codeigniter.com).
+Live production: https://project-simta.my.id
 
-This repository holds a composer-installable app starter.
-It has been built from the
-[development repository](https://github.com/codeigniter4/CodeIgniter4).
+> Situs di atas adalah server live/production, bukan halaman demo.
 
-More information about the plans for version 4 can be found in [CodeIgniter 4](https://forum.codeigniter.com/forumdisplay.php?fid=28) on the forums.
+## Ringkasan
 
-You can read the [user guide](https://codeigniter.com/user_guide/)
-corresponding to the latest version of the framework.
+Aplikasi ini dibangun dengan CodeIgniter 4 dan mendukung tiga peran utama: admin, mahasiswa, dan dosen. Fokus sistem adalah memindahkan proses tugas akhir ke satu tempat yang rapi, mulai dari pengajuan pembimbing, pengajuan judul, upload proposal, review dosen, penerbitan surat keputusan, sampai laporan dan audit aktivitas.
 
-## Installation & updates
+## Fitur Utama
 
-`composer create-project codeigniter4/appstarter` then `composer update` whenever
-there is a new release of the framework.
+- Autentikasi login, logout, forgot password, dan reset password.
+- Dashboard berbasis peran untuk admin, mahasiswa, dan dosen.
+- Manajemen user admin, mahasiswa, dan dosen.
+- Pengelolaan program studi dan periode akademik.
+- Pengajuan dan persetujuan pembimbing tugas akhir.
+- Pengajuan judul dengan review, revisi, riwayat, dan pengecekan similarity.
+- Upload proposal tugas akhir, review dosen, revisi, dan riwayat review.
+- Chat internal antar pengguna dengan dukungan lampiran.
+- Notifikasi dan audit log aktivitas sistem.
+- Penerbitan serta arsip Surat Keputusan.
+- Laporan dan ekspor PDF untuk rekap semester, judul, proposal, dan SK.
 
-When updating, check the release notes to see if there are any changes you might need to apply
-to your `app` folder. The affected files can be copied or merged from
-`vendor/codeigniter4/framework/app`.
+## Teknologi
 
-## Setup
+- PHP 8.2+
+- CodeIgniter 4.7+
+- MySQL/MariaDB
+- Composer
+- Dompdf untuk ekspor PDF
 
-Copy `env` to `.env` and tailor for your app, specifically the baseURL
-and any database settings.
+## Struktur Singkat
 
-## Important Change with index.php
+```text
+app/
+  Config/          Konfigurasi aplikasi, route, filter, dan service
+  Controllers/     Logika fitur dan endpoint
+  Database/        Migration dan seed database
+  Filters/         Middleware/filter request
+  Helpers/         Helper aplikasi
+  Models/          Model database
+  Views/           Template halaman dashboard, auth, PDF, dan chat
+public/
+  assets/          CSS, gambar, dan aset publik
+  uploads/         File upload dari fitur proposal, chat, profil, dan SK
+writable/          Cache, log, session, dan file runtime CodeIgniter
+```
 
-`index.php` is no longer in the root of the project! It has been moved inside the *public* folder,
-for better security and separation of components.
+## Instalasi Lokal
 
-This means that you should configure your web server to "point" to your project's *public* folder, and
-not to the project root. A better practice would be to configure a virtual host to point there. A poor practice would be to point your web server to the project root and expect to enter *public/...*, as the rest of your logic and the
-framework are exposed.
+1. Clone repository.
 
-**Please** read the user guide for a better explanation of how CI4 works!
+```bash
+git clone https://github.com/cyizzievielle/simta-unsri.git
+cd simta-unsri
+```
 
-## Repository Management
+2. Install dependency PHP.
 
-We use GitHub issues, in our main repository, to track **BUGS** and to track approved **DEVELOPMENT** work packages.
-We use our [forum](http://forum.codeigniter.com) to provide SUPPORT and to discuss
-FEATURE REQUESTS.
+```bash
+composer install
+```
 
-This repository is a "distribution" one, built by our release preparation script.
-Problems with it can be raised on our forum, or as issues in the main repository.
+3. Buat file `.env` dari template environment CodeIgniter, lalu sesuaikan konfigurasi aplikasi dan database.
 
-## Server Requirements
+```bash
+cp env .env
+```
 
-PHP version 8.2 or higher is required, with the following extensions installed:
+Konfigurasi penting:
 
-- [intl](http://php.net/manual/en/intl.requirements.php)
-- [mbstring](http://php.net/manual/en/mbstring.installation.php)
+```ini
+CI_ENVIRONMENT = development
+app.baseURL = 'http://localhost/sistem_ta_mi_unsri/public/'
 
-> [!WARNING]
-> - The end of life date for PHP 7.4 was November 28, 2022.
-> - The end of life date for PHP 8.0 was November 26, 2023.
-> - The end of life date for PHP 8.1 was December 31, 2025.
-> - If you are still using below PHP 8.2, you should upgrade immediately.
-> - The end of life date for PHP 8.2 will be December 31, 2026.
+database.default.hostname = localhost
+database.default.database = nama_database
+database.default.username = root
+database.default.password =
+database.default.DBDriver = MySQLi
+```
 
-Additionally, make sure that the following extensions are enabled in your PHP:
+4. Jalankan migration.
 
-- json (enabled by default - don't turn it off)
-- [mysqlnd](http://php.net/manual/en/mysqlnd.install.php) if you plan to use MySQL
-- [libcurl](http://php.net/manual/en/curl.requirements.php) if you plan to use the HTTP\CURLRequest library
+```bash
+php spark migrate
+```
+
+5. Jalankan server lokal.
+
+```bash
+php spark serve
+```
+
+Default server lokal CodeIgniter akan berjalan di `http://localhost:8080`.
+
+## Deployment
+
+Untuk server production, arahkan document root web server ke folder `public/`. Pastikan `.env` production sudah memakai konfigurasi aman:
+
+```ini
+CI_ENVIRONMENT = production
+app.baseURL = 'https://project-simta.my.id/'
+```
+
+Pastikan juga permission folder `writable/` dan folder upload di `public/uploads/` dapat ditulis oleh web server.
+
+## Perintah Berguna
+
+```bash
+composer install
+php spark migrate
+php spark serve
+vendor/bin/phpunit
+```
+
+## Catatan Keamanan
+
+- Jangan commit file `.env`, kredensial database, atau file konfigurasi rahasia.
+- Validasi file upload tetap harus dijaga di sisi server.
+- Backup database production sebelum menjalankan migration atau perubahan besar.
+- Server live berada di `https://project-simta.my.id` dan digunakan sebagai production.
+
+## Lisensi
+
+Proyek ini mengikuti lisensi yang tersedia di file `LICENSE`.

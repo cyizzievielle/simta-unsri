@@ -1344,6 +1344,60 @@ public function laporan()
         'arsipSk'         => $arsipSk,
     ]);
 }
+private function getAuditLogRows(?int $limit = null): array
+{
+    $db = Database::connect();
+    $rows = [];
+
+    if ($db->tableExists('audit_logs')) {
+        $builder = $db->table('audit_logs al')
+            ->select("al.id, al.user_id, COALESCE(u.name, al.role, 'User') AS name, al.module, al.action, al.description, NULL AS target_type, NULL AS target_id, al.created_at, 'audit_logs' AS source", false)
+            ->join('users u', 'u.id = al.user_id', 'left')
+            ->orderBy('al.created_at', 'DESC')
+            ->orderBy('al.id', 'DESC');
+
+        if ($limit !== null) {
+            $builder->limit($limit);
+        }
+
+        $rows = array_merge($rows, $builder->get()->getResultArray());
+    }
+
+    if ($db->tableExists('activity_logs')) {
+        $builder = $db->table('activity_logs al')
+            ->select("al.id, al.user_id, COALESCE(u.name, al.username, 'User') AS name, al.module, al.action, al.description, al.target_type, al.target_id, al.created_at, 'activity_logs' AS source", false)
+            ->join('users u', 'u.id = al.user_id', 'left')
+            ->orderBy('al.created_at', 'DESC')
+            ->orderBy('al.id', 'DESC');
+
+        if ($limit !== null) {
+            $builder->limit($limit);
+        }
+
+        $rows = array_merge($rows, $builder->get()->getResultArray());
+    }
+
+    usort($rows, static function (array $a, array $b): int {
+        return strcmp((string) ($b['created_at'] ?? ''), (string) ($a['created_at'] ?? ''));
+    });
+
+    if ($limit !== null) {
+        $rows = array_slice($rows, 0, $limit);
+    }
+
+    return array_map(static function (array $row): array {
+        $module = (string) ($row['module'] ?? '-');
+        $targetType = (string) ($row['target_type'] ?? '');
+
+        return array_merge($row, [
+            'aktivitas'  => $row['action'] ?? '-',
+            'entitas'    => $targetType !== '' ? $targetType : ($module !== '' ? $module : '-'),
+            'entitas_id' => $row['target_id'] ?? '-',
+            'deskripsi'  => $row['description'] ?? '-',
+        ]);
+    }, $rows);
+}
+
 public function auditLogRealtime()
 {
     if ($redirect = $this->guardAdmin()) {
@@ -1355,13 +1409,7 @@ public function auditLogRealtime()
 
     $db = \Config\Database::connect();
 
-    $auditLogs = $db->table('audit_logs al')
-        ->select('al.*, u.name')
-        ->join('users u', 'u.id = al.user_id', 'left')
-        ->orderBy('al.created_at', 'DESC')
-        ->limit(20)
-        ->get()
-        ->getResultArray();
+    $auditLogs = $this->getAuditLogRows(20);
 
     $notifikasi = $db->table('notifikasi n')
         ->select('n.*, u.name')
@@ -1528,12 +1576,7 @@ public function auditLog()
 
     $db = Database::connect();
 
-    $auditLogs = $db->table('audit_logs al')
-        ->select('al.*, u.name')
-        ->join('users u', 'u.id = al.user_id', 'left')
-        ->orderBy('al.id', 'DESC')
-        ->get()
-        ->getResultArray();
+    $auditLogs = $this->getAuditLogRows();
 
     $notifikasi = $db->table('notifikasi n')
         ->select('n.*, u.name')

@@ -43,17 +43,32 @@ $statusLabel = static function (mixed $status) use ($safe): string {
 
 <div class="judul-page">
 
+    <section class="judul-hero">
+        <div>
+            <span class="judul-kicker">
+                <i class="ri-draft-fill"></i>
+                Pengajuan Judul TA
+            </span>
+
+            <h2>Kelola Pengajuan Judul Tugas Akhir</h2>
+            <p>
+                Ajukan judul, cek kemiripan otomatis, pantau status review dosen,
+                dan lanjutkan proses tugas akhir dengan alur yang lebih rapi.
+            </p>
+        </div>
+    </section>
+
     <section class="judul-step-grid">
         <div class="judul-step">
             <span>1</span>
             <strong>Pembimbing Disetujui</strong>
-            <p>Minimal satu dosen pembimbing harus menyetujui permohonan bimbingan.</p>
+            <p>Minimal satu dosen pembimbing menyetujui permohonan bimbingan.</p>
         </div>
 
         <div class="judul-step">
             <span>2</span>
-            <strong>Isi Data Judul</strong>
-            <p>Masukkan judul, latar belakang, bidang topik, dan kata kunci.</p>
+            <strong>Cek Kemiripan</strong>
+            <p>Sistem membantu mendeteksi judul yang mirip sebelum dikirim.</p>
         </div>
 
         <div class="judul-step">
@@ -69,11 +84,11 @@ $statusLabel = static function (mixed $status) use ($safe): string {
         </div>
     </section>
 
-    <section class="card-main">
+    <section class="card-main judul-card">
         <div class="page-head">
             <div>
-                <h3>Pengajuan Judul Tugas Akhir</h3>
-                <p>Ajukan judul, pantau status review, dan lihat riwayat pengajuan kamu.</p>
+                <h3>Form Pengajuan Judul</h3>
+                <p>Isi data judul dengan jelas. Gunakan fitur cek kemiripan sebelum mengirim.</p>
             </div>
 
             <?php if ($bolehAjukanJudul): ?>
@@ -85,38 +100,53 @@ $statusLabel = static function (mixed $status) use ($safe): string {
         </div>
 
         <?php if ($bolehAjukanJudul): ?>
-
-            <div id="formJudul" class="form-panel">
+            <div id="formJudul" class="form-panel judul-form-panel">
                 <form action="<?= base_url('/pengajuan-judul/simpan') ?>" method="post">
                     <?= csrf_field() ?>
 
                     <div class="form-grid form-grid-2">
                         <div class="form-group form-full">
                             <label for="judul">Judul Tugas Akhir</label>
+
                             <input
                                 type="text"
                                 id="judul"
                                 name="judul"
                                 class="input"
                                 value="<?= esc($safe(old('judul'), '')) ?>"
-                                placeholder="Masukkan judul tugas akhir"
+                                placeholder="Contoh: Sistem Informasi Pengajuan Tugas Akhir Berbasis Web"
                                 required
                             >
+
+                            <div class="judul-tools">
+                                <button type="button" class="btn btn-light btn-similarity" id="btnCekSimilarity">
+                                    <i class="ri-search-eye-line"></i>
+                                    Cek Kemiripan Judul
+                                </button>
+
+                                <span class="judul-tools-note">
+                                    Minimal 10 karakter
+                                </span>
+                            </div>
+
+                            <div id="similarityPreview" class="similarity-preview"></div>
                         </div>
 
                         <div class="form-group form-full">
                             <label for="latar_belakang">Latar Belakang</label>
+
                             <textarea
                                 id="latar_belakang"
                                 name="latar_belakang"
                                 class="input textarea"
-                                placeholder="Tuliskan latar belakang singkat"
+                                placeholder="Tuliskan latar belakang singkat dari judul yang diajukan"
                                 required
                             ><?= esc($safe(old('latar_belakang'), '')) ?></textarea>
                         </div>
 
                         <div class="form-group">
                             <label for="bidang_topik">Bidang Topik</label>
+
                             <input
                                 type="text"
                                 id="bidang_topik"
@@ -130,13 +160,14 @@ $statusLabel = static function (mixed $status) use ($safe): string {
 
                         <div class="form-group">
                             <label for="kata_kunci">Kata Kunci</label>
+
                             <input
                                 type="text"
                                 id="kata_kunci"
                                 name="kata_kunci"
                                 class="input"
                                 value="<?= esc($safe(old('kata_kunci'), '')) ?>"
-                                placeholder="Contoh: sistem informasi, website"
+                                placeholder="Contoh: sistem informasi, website, tugas akhir"
                                 required
                             >
                         </div>
@@ -154,9 +185,7 @@ $statusLabel = static function (mixed $status) use ($safe): string {
                     </div>
                 </form>
             </div>
-
         <?php else: ?>
-
             <div class="proposal-waiting-card">
                 <div class="waiting-icon">
                     <i class="ri-user-follow-line"></i>
@@ -176,11 +205,10 @@ $statusLabel = static function (mixed $status) use ($safe): string {
                     </div>
                 </div>
             </div>
-
         <?php endif; ?>
     </section>
 
-    <section class="card-main">
+    <section class="card-main judul-card">
         <div class="page-head">
             <div>
                 <h3>Riwayat Pengajuan Judul</h3>
@@ -234,7 +262,7 @@ $statusLabel = static function (mixed $status) use ($safe): string {
                                 <td>
                                     <div class="action-group">
                                         <a
-                                            href="<?= base_url('/pengajuan-judul/detail/' . $safe($row['id'] ?? '0')) ?>"
+                                            href="<?= base_url('/pengajuan-judul/detail/' . (int) ($row['id'] ?? 0)) ?>"
                                             class="icon-btn icon-open"
                                             title="Detail"
                                         >
@@ -243,7 +271,7 @@ $statusLabel = static function (mixed $status) use ($safe): string {
 
                                         <?php if (($row['status'] ?? '') === 'revisi'): ?>
                                             <a
-                                                href="<?= base_url('/pengajuan-judul/revisi/' . $safe($row['id'] ?? '0')) ?>"
+                                                href="<?= base_url('/pengajuan-judul/revisi/' . (int) ($row['id'] ?? 0)) ?>"
                                                 class="icon-btn icon-edit"
                                                 title="Revisi"
                                             >
@@ -272,6 +300,113 @@ function toggleFormJudul() {
     if (!form) return;
 
     form.classList.toggle('show');
+}
+
+const btnCekSimilarity = document.getElementById('btnCekSimilarity');
+const similarityPreview = document.getElementById('similarityPreview');
+const judulInput = document.getElementById('judul');
+
+function escapeSimilarity(value) {
+    return String(value ?? '').replace(/[&<>"']/g, function (m) {
+        return ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        })[m];
+    });
+}
+
+if (btnCekSimilarity && similarityPreview && judulInput) {
+    btnCekSimilarity.addEventListener('click', async function () {
+        const judul = judulInput.value.trim();
+
+        if (judul.length < 10) {
+            similarityPreview.className = 'similarity-preview show danger';
+            similarityPreview.innerHTML = `
+                <div class="similarity-top">
+                    <strong>Judul terlalu pendek</strong>
+                    <span>0%</span>
+                </div>
+                <p>Masukkan judul minimal 10 karakter untuk mengecek kemiripan.</p>
+            `;
+            return;
+        }
+
+        btnCekSimilarity.disabled = true;
+        btnCekSimilarity.innerHTML = '<i class="ri-loader-4-line"></i> Mengecek...';
+
+        try {
+            const formData = new FormData();
+            formData.append('judul', judul);
+            formData.append('<?= csrf_token() ?>', '<?= csrf_hash() ?>');
+
+            const response = await fetch("<?= base_url('/pengajuan-judul/cek-similarity') ?>", {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (!data.success) {
+                similarityPreview.className = 'similarity-preview show danger';
+                similarityPreview.innerHTML = `
+                    <div class="similarity-top">
+                        <strong>Gagal mengecek</strong>
+                        <span>!</span>
+                    </div>
+                    <p>${escapeSimilarity(data.message || 'Terjadi kesalahan saat mengecek kemiripan judul.')}</p>
+                `;
+                return;
+            }
+
+            const statusClass = data.status === 'blocked'
+                ? 'danger'
+                : (data.status === 'warning' ? 'warning' : 'success');
+
+            const similarTitle = data.similar_title
+                ? `
+                    <div class="similar-title">
+                        <i class="ri-file-search-line"></i>
+                        Pembanding terdekat:
+                        <span>${escapeSimilarity(data.similar_title)}</span>
+                    </div>
+                `
+                : '';
+
+            const advice = data.status === 'blocked'
+                ? 'Sebaiknya ubah judul karena tingkat kemiripan terlalu tinggi dan kemungkinan akan ditolak sistem.'
+                : data.status === 'warning'
+                    ? 'Judul masih bisa diajukan, tetapi disarankan memperjelas objek, metode, lokasi, atau studi kasus.'
+                    : 'Judul aman untuk diajukan.';
+
+            similarityPreview.className = `similarity-preview show ${statusClass}`;
+            similarityPreview.innerHTML = `
+                <div class="similarity-top">
+                    <strong>${escapeSimilarity(data.message)}</strong>
+                    <span>${escapeSimilarity(data.score)}%</span>
+                </div>
+                ${similarTitle}
+                <p>${advice}</p>
+            `;
+        } catch (error) {
+            similarityPreview.className = 'similarity-preview show danger';
+            similarityPreview.innerHTML = `
+                <div class="similarity-top">
+                    <strong>Error koneksi</strong>
+                    <span>!</span>
+                </div>
+                <p>Tidak dapat terhubung ke server similarity.</p>
+            `;
+        } finally {
+            btnCekSimilarity.disabled = false;
+            btnCekSimilarity.innerHTML = '<i class="ri-search-eye-line"></i> Cek Kemiripan Judul';
+        }
+    });
 }
 </script>
 

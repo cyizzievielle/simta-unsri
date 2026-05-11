@@ -57,6 +57,33 @@ $initial = static function (mixed $name) use ($safe): string {
     return strtoupper(substr($value, 0, 1));
 };
 
+$avatarUrl = static function (array $row) use ($safe): string {
+    $foto = trim($safe($row['foto'] ?? '', ''));
+
+    if ($foto === '') {
+        return '';
+    }
+
+    $path = FCPATH . 'uploads/profile/' . $foto;
+
+    return is_file($path) ? base_url('uploads/profile/' . $foto) : '';
+};
+
+$userDetailJson = static function (array $row) use ($safe, $userCode, $statusLabel, $avatarUrl): string {
+    $payload = [
+        'name'   => $safe($row['name'] ?? '-'),
+        'email'  => $safe($row['email'] ?? '-'),
+        'role'   => ucfirst($safe($row['role'] ?? '-')),
+        'code'   => $userCode($row),
+        'status' => $statusLabel($row['is_active'] ?? 0),
+        'avatar' => $avatarUrl($row),
+    ];
+
+    $json = json_encode($payload, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
+
+    return is_string($json) ? $json : '{}';
+};
+
 $queryParams = [
     'keyword' => $keyword,
     'role'    => $roleFilter,
@@ -163,17 +190,30 @@ $queryParams = [
 
                     <tbody>
                         <?php foreach ($users as $row): ?>
+                            <?php
+                                $userAvatar = $avatarUrl($row);
+                                $userDetail = $userDetailJson($row);
+                            ?>
                             <tr>
                                 <td>
-                                    <div class="user-cell">
-                                        <div class="user-cell-avatar">
-                                            <?= esc($initial($row['name'] ?? 'U')) ?>
-                                        </div>
+                                    <button
+                                        type="button"
+                                        class="user-cell user-cell-profile-trigger user-detail-trigger"
+                                        title="Lihat detail akun"
+                                        data-detail="<?= esc($userDetail, 'attr') ?>"
+                                    >
+                                        <span class="user-cell-avatar" aria-hidden="true">
+                                            <?php if ($userAvatar !== ''): ?>
+                                                <img src="<?= esc($userAvatar, 'attr') ?>" alt="<?= esc($safe($row['name'] ?? 'User'), 'attr') ?>">
+                                            <?php else: ?>
+                                                <?= esc($initial($row['name'] ?? 'U')) ?>
+                                            <?php endif; ?>
+                                        </span>
 
                                         <div class="user-cell-info">
                                             <strong><?= esc($safe($row['name'] ?? '-')) ?></strong>
                                         </div>
-                                    </div>
+                                    </button>
                                 </td>
 
                                 <td>
@@ -238,18 +278,31 @@ $queryParams = [
 
             <div class="admin-users-mobile-list">
                 <?php foreach ($users as $row): ?>
+                    <?php
+                        $userAvatar = $avatarUrl($row);
+                        $userDetail = $userDetailJson($row);
+                    ?>
                     <article class="admin-user-mobile-card">
                         <div class="admin-user-mobile-top">
-                            <div class="user-cell">
-                                <div class="user-cell-avatar">
-                                    <?= esc($initial($row['name'] ?? 'U')) ?>
-                                </div>
+                            <button
+                                type="button"
+                                class="user-cell user-cell-profile-trigger user-detail-trigger"
+                                title="Lihat detail akun"
+                                data-detail="<?= esc($userDetail, 'attr') ?>"
+                            >
+                                <span class="user-cell-avatar" aria-hidden="true">
+                                    <?php if ($userAvatar !== ''): ?>
+                                        <img src="<?= esc($userAvatar, 'attr') ?>" alt="<?= esc($safe($row['name'] ?? 'User'), 'attr') ?>">
+                                    <?php else: ?>
+                                        <?= esc($initial($row['name'] ?? 'U')) ?>
+                                    <?php endif; ?>
+                                </span>
 
                                 <div class="user-cell-info">
                                     <strong><?= esc($safe($row['name'] ?? '-')) ?></strong>
                                     <span><?= esc($safe($row['email'] ?? '-')) ?></span>
                                 </div>
-                            </div>
+                            </button>
 
                             <span class="badge <?= esc($statusBadge($row['is_active'] ?? 0)) ?>">
                                 <?= esc($statusLabel($row['is_active'] ?? 0)) ?>
@@ -320,5 +373,109 @@ $queryParams = [
         <?php endif; ?>
     </section>
 </div>
+
+<div class="user-profile-modal" id="userProfileModal" aria-hidden="true">
+    <div class="user-profile-card" role="dialog" aria-modal="true" aria-labelledby="userProfileName">
+        <button type="button" class="user-profile-close" id="closeUserProfile" aria-label="Tutup detail akun">
+            <i class="ri-close-line"></i>
+        </button>
+
+        <div class="user-profile-cover"></div>
+
+        <div class="user-profile-avatar" id="userProfileAvatar"></div>
+
+        <div class="user-profile-main">
+            <h4 id="userProfileName">-</h4>
+            <p id="userProfileEmail">-</p>
+
+            <div class="user-profile-badges">
+                <span id="userProfileRole">-</span>
+                <span id="userProfileStatus">-</span>
+            </div>
+        </div>
+
+        <div class="user-profile-detail">
+            <div>
+                <span>NIM / NIDN</span>
+                <strong id="userProfileCode">-</strong>
+            </div>
+            <div>
+                <span>Email</span>
+                <strong id="userProfileEmailDetail">-</strong>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+(function () {
+    const modal = document.getElementById('userProfileModal');
+    const closeBtn = document.getElementById('closeUserProfile');
+    const avatarBox = document.getElementById('userProfileAvatar');
+    const nameEl = document.getElementById('userProfileName');
+    const emailEl = document.getElementById('userProfileEmail');
+    const roleEl = document.getElementById('userProfileRole');
+    const statusEl = document.getElementById('userProfileStatus');
+    const codeEl = document.getElementById('userProfileCode');
+    const emailDetailEl = document.getElementById('userProfileEmailDetail');
+
+    if (!modal || !avatarBox || !nameEl || !emailEl || !roleEl || !statusEl || !codeEl || !emailDetailEl) return;
+
+    const escapeHtml = (value) => String(value ?? '-').replace(/[&<>"']/g, (char) => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    }[char]));
+
+    const getInitial = (name) => String(name || 'U').trim().charAt(0).toUpperCase() || 'U';
+
+    const openModal = (data) => {
+        const name = data.name || '-';
+        const email = data.email || '-';
+
+        avatarBox.innerHTML = data.avatar
+            ? `<img src="${escapeHtml(data.avatar)}" alt="${escapeHtml(name)}">`
+            : `<span>${escapeHtml(getInitial(name))}</span>`;
+
+        nameEl.textContent = name;
+        emailEl.textContent = email;
+        roleEl.textContent = data.role || '-';
+        statusEl.textContent = data.status || '-';
+        statusEl.classList.toggle('is-inactive', String(data.status || '').toLowerCase() !== 'aktif');
+        codeEl.textContent = data.code || '-';
+        emailDetailEl.textContent = email;
+
+        modal.classList.add('show');
+        modal.setAttribute('aria-hidden', 'false');
+    };
+
+    const closeModal = () => {
+        modal.classList.remove('show');
+        modal.setAttribute('aria-hidden', 'true');
+    };
+
+    document.querySelectorAll('.user-detail-trigger').forEach((button) => {
+        button.addEventListener('click', () => {
+            try {
+                openModal(JSON.parse(button.dataset.detail || '{}'));
+            } catch (error) {
+                openModal({});
+            }
+        });
+    });
+
+    closeBtn?.addEventListener('click', closeModal);
+
+    modal.addEventListener('click', (event) => {
+        if (event.target === modal) closeModal();
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') closeModal();
+    });
+})();
+</script>
 
 <?= $this->endSection() ?>
